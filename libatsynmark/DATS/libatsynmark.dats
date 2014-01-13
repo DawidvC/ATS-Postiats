@@ -11,21 +11,28 @@
 
 (* ****** ****** *)
 
-staload UN = "prelude/SATS/unsafe.sats"
+staload
+UN = "prelude/SATS/unsafe.sats"
+
+(* ****** ****** *)
+
 staload _(*anon*) = "prelude/DATS/list.dats"
 staload _(*anon*) = "prelude/DATS/list_vt.dats"
 staload _(*anon*) = "prelude/DATS/pointer.dats"
 
 (* ****** ****** *)
 
-staload STDIO = "libc/SATS/stdio.sats"
+staload
+STDIO = "libc/SATS/stdio.sats"
 
 (* ****** ****** *)
 
-staload "libatsynmark/SATS/libatsynmark.sats"
+staload "./../SATS/libatsynmark.sats"
 
 (* ****** ****** *)
-
+//
+// HX: a placeholder-implementation
+//
 implement
 $FIL.pkgsrcname_relocatize (given, ngurl) = given
 
@@ -55,7 +62,8 @@ end // end of [libatsynmark_filename_set_current]
 (* ****** ****** *)
 
 implement
-fhtml_putc (c, putc) = let
+fhtml_putc
+  (c, putc) = let
   macdef fpr (s) = fstring_putc (,(s), putc)
 in
   case+ c of
@@ -68,7 +76,8 @@ end // end of [fhtml_putc]
 (* ****** ****** *)
 
 implement
-fstring_putc (x, putc) = let
+fstring_putc
+  (x, putc) = let
 //
 fun loop{n:int}
   {i:nat | i <= n} .<n-i>.
@@ -396,6 +405,21 @@ end // end of [lexbufobj_make_string]
 (* ****** ****** *)
 
 implement
+lexbufobj_make_charlst_vt
+  (inp) = let
+  val [l:addr]
+    (pfgc, pfat | p) = ptr_alloc<lexbuf> ()
+  val () = $LBF.lexbuf_initialize_charlst_vt (!p, inp)
+  extern castfn __cast
+    (pf1: free_gc_v (lexbuf?, l), pf2: lexbuf @ l | p: ptr l): lexbufobj
+  // end of [extern]
+in
+  __cast (pfgc, pfat | p)
+end // end of [lexbufobj_make_charlst_vt]
+
+(* ****** ****** *)
+
+implement
 lexbufobj_make_fileref
   (inp) = let
   val [l:addr]
@@ -412,21 +436,6 @@ end // end of [lexbufobj_make_fileref]
 (* ****** ****** *)
 
 implement
-lexbufobj_make_charlst_vt
-  (inp) = let
-  val [l:addr]
-    (pfgc, pfat | p) = ptr_alloc<lexbuf> ()
-  val () = $LBF.lexbuf_initialize_charlst_vt (!p, inp)
-  extern castfn __cast
-    (pf1: free_gc_v (lexbuf?, l), pf2: lexbuf @ l | p: ptr l): lexbufobj
-  // end of [extern]
-in
-  __cast (pfgc, pfat | p)
-end // end of [lexbufobj_make_charlst_vt]
-
-(* ****** ****** *)
-
-implement
 lexbufobj_free (lbf) = let
   extern castfn __cast (lbf: lexbufobj)
     : [l:addr] (free_gc_v (lexbuf?, l), lexbuf @ l | ptr l)
@@ -435,6 +444,8 @@ lexbufobj_free (lbf) = let
 in
   ptr_free (pfgc, pfat | p)
 end // end of [lexbufobj_free]
+
+(* ****** ****** *)
 
 implement
 lexbufobj_get_tokenlst
@@ -485,21 +496,30 @@ staload
 TBF = "src/pats_tokbuf.sats"
 stadef tokbuf = $TBF.tokbuf
 
+(* ****** ****** *)
+
 implement
 tokbufobj_make_lexbufobj
   (lbf) = let
-  val (pfgc1, pfat1 | p1) = let
-    extern castfn __cast (lbf: lexbufobj)
-    : [l:addr] (free_gc_v (lexbuf?, l), lexbuf @ l | ptr l)
-  in
-    __cast (lbf)
-  end // end of [val]
-  val [l2:addr] (pfgc2, pfat2 | p2) = ptr_alloc<tokbuf> ()
-  val () = $TBF.tokbuf_initialize_lexbuf (!p2, !p1)
-  val () = ptr_free (pfgc1, pfat1 | p1)
+//
+val (pfgc1, pfat1 | p1) = let
   extern castfn __cast
-    (pf1: free_gc_v (tokbuf?, l2), pf2: tokbuf @ l2 | p: ptr l2): tokbufobj
-  // end of [extern]
+    (lbf: lexbufobj): [l:addr] (free_gc_v(lexbuf?, l), lexbuf@l | ptr l)
+  // end of [castfn] // end of [extern]
+in
+  __cast (lbf)
+end // end of [val]
+//
+val [l2:addr]
+  (pfgc2, pfat2 | p2) = ptr_alloc<tokbuf> ()
+val () = $TBF.tokbuf_initialize_lexbuf (!p2, !p1)
+//
+val ((*void*)) = ptr_free (pfgc1, pfat1 | p1)
+//
+extern castfn __cast
+  (pf1: free_gc_v (tokbuf?, l2), pf2: tokbuf @ l2 | p: ptr l2): tokbufobj
+// end of [castfn] // end of [extern]
+//
 in
   __cast (pfgc2, pfat2 | p2)
 end // end of [tokbufobj_make_lexbufobj]
@@ -508,10 +528,13 @@ end // end of [tokbufobj_make_lexbufobj]
 
 implement
 tokbufobj_free (tbf) = let
-  extern castfn __cast (tbf: tokbufobj)
-    : [l:addr] (free_gc_v (tokbuf?, l), tokbuf @ l | ptr l)
-  val (pfgc, pfat | p) = __cast (tbf)
-  val () = $TBF.tokbuf_uninitialize (!p)
+//
+extern castfn __cast
+  (tbf: tokbufobj): [l:addr] (free_gc_v (tokbuf?, l), tokbuf @ l | ptr l)
+val (pfgc, pfat | p) = __cast (tbf)
+//
+val () = $TBF.tokbuf_uninitialize (!p)
+//
 in
   ptr_free (pfgc, pfat | p)
 end // end of [tokbufobj_free]
@@ -522,12 +545,14 @@ implement
 tokbufobj_unget_token
   (tbf, tok) = let
 //
-val (pf, fpf | p) =
-  __cast (tbf) where {
+val (pf, fpf | p) = __cast (tbf) where
+{
   extern castfn __cast (tbf: !tokbufobj)
     : [l:addr] (tokbuf @ l, tokbuf @ l -<lin,prf> void | ptr l)
-} // end of [val]
+} (* end of [val] *)
+//
 val () = $TBF.tokbuf_unget_token (!p, tok)
+//
 prval () = fpf (pf)
 //
 in
@@ -553,8 +578,7 @@ test_symbol_p0at
 in
 //
 case+ p0t.p0at_node of
-| $SYN.P0Tide (sym1) => sym = sym1
-| _ => false
+| $SYN.P0Tide (sym1) => sym = sym1 | _ => false
 //
 end // end of [test_symbol_p0at]
 

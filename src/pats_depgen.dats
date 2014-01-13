@@ -61,16 +61,15 @@ viewtypedef pathlst_vt = List_vt (path)
 
 extern
 fun pathtry_givename
-  (give: string): Option_vt (string)
+  (given: string): Option_vt (string)
 // end of [pathtry_givename]
 
 (* ****** ****** *)
 
 implement
-pathtry_givename
-  (given: string): Option_vt (string) = let
+pathtry_givename (given) = let
 //
-extern castfn p2s {l:agz} (x: !strptr l):<> string
+extern castfn p2s{l:agz} (x: !strptr l):<> string
 //
 (*
 val () = printf ("pathtry_givename: given = %s\n", @(given))
@@ -79,9 +78,11 @@ val () = printf ("pathtry_givename: given = %s\n", @(given))
 fun loop
 (
   ps: List (string), given: string
-) : Option_vt(string) =
+) : Option_vt(string) = let
+in
   case+ ps of
-  | list_cons (p, ps) => let
+  | list_cons 
+      (p, ps) => let
       val pname =
         $FIL.filename_append (p, given)
       val test = test_file_exists ((p2s)pname)
@@ -98,7 +99,7 @@ fun loop
       end // end of [if]
     end // end of [list_cons]
   | list_nil () => None_vt ()
-// end of [loop]
+end // end of [loop]
 //
 val knd = $FIL.givename_srchknd (given)
 //
@@ -127,20 +128,20 @@ end // end of [pathtry_givename]
 (* ****** ****** *)
 
 typedef
-depgen_type
+depgen_ftype
   (a: type) = (a, &pathlst_vt) -> void
-// end of [depgen_type]
+// end of [depgen_ftype]
 
 (* ****** ****** *)
 
-extern fun depgen_d0exp : depgen_type (d0exp)
-extern fun depgen_d0explst : depgen_type (d0explst)
-extern fun depgen_d0expopt : depgen_type (d0expopt)
-extern fun depgen_labd0explst : depgen_type (labd0explst)
+extern fun depgen_d0exp : depgen_ftype (d0exp)
+extern fun depgen_d0explst : depgen_ftype (d0explst)
+extern fun depgen_d0expopt : depgen_ftype (d0expopt)
+extern fun depgen_labd0explst : depgen_ftype (labd0explst)
 
-extern fun depgen_d0ecl : depgen_type (d0ecl)
-extern fun depgen_d0eclist : depgen_type (d0eclist)
-extern fun depgen_guad0ecl_node : depgen_type (guad0ecl_node)
+extern fun depgen_d0ecl : depgen_ftype (d0ecl)
+extern fun depgen_d0eclist : depgen_ftype (d0eclist)
+extern fun depgen_guad0ecl_node : depgen_ftype (guad0ecl_node)
 
 (* ****** ****** *)
 
@@ -400,7 +401,7 @@ end // end of [fprint_target]
 (* ****** ****** *)
 
 implement
-fprint_entry
+fprint_entlst
   (out, given, ents) = let
 //
 fun loop
@@ -432,7 +433,7 @@ val () = fprint_newline (out)
 //
 in
   // nothing
-end // end of [fprint_entry]
+end // end of [fprint_entlst]
 
 (* ****** ****** *)
 

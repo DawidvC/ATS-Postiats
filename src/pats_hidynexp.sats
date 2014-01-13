@@ -226,12 +226,14 @@ hidecl_node =
 //
   | HIDsaspdec of (s2aspdec)
 //
+  | HIDextype of (string(*name*), hisexp)
+  | HIDextval of (string(*name*), hidexp)
   | HIDextcode of
       (int(*knd*), int(*pos*), string(*code*))
     // end of [HIDextcode]
 //
-  | HIDdatdecs of (int(*knd*), s2cstlst)
-  | HIDexndecs of (d2conlst) // HX: exception decls
+  | HIDexndecs of (d2conlst) // exception decls
+  | HIDdatdecs of (int(*knd*), s2cstlst) // DT decls
 //
   | HIDdcstdecs of (dcstkind, d2cstlst)
 //
@@ -361,7 +363,7 @@ and hidexp_node =
 //
   | HDEtrywith of (hidexp(*try-exp*), hiclaulst(*with-clauses*))
 //
-  | HDEerr of () // HX: indication of error
+  | HDEerrexp of ((*void*)) // HX: indication of error
 // end of [hidexp_node]
 
 and labhidexp = LABHIDEXP of (label, hidexp)
@@ -786,7 +788,7 @@ fun hidexp_trywith
 
 (* ****** ****** *)
 
-fun hidexp_err (loc: location, hse: hisexp): hidexp
+fun hidexp_errexp (loc: location, hse: hisexp): hidexp
 
 (* ****** ****** *)
 
@@ -870,19 +872,32 @@ fun hidecl_list (loc: location, hids: hideclist): hidecl
 
 fun hidecl_saspdec (loc: location, d2c: s2aspdec): hidecl
 
+(* ****** ****** *)
+
+fun hidecl_extype
+  (loc: location, name: string, hse_def: hisexp): hidecl
+fun hidecl_extval
+  (loc: location, name: string, hde_def: hidexp): hidecl
+
 fun hidecl_extcode
   (loc: location, knd: int, pos: int, code: string): hidecl
 // end of [hidecl_extcode]
+
+(* ****** ****** *)
+
+fun hidecl_exndecs
+  (loc: location, d2cs: d2conlst) : hidecl
 
 fun hidecl_datdecs
   (loc: location, knd: int, s2cs: s2cstlst) : hidecl
 // end of [hidecl_datdecs]
 
-fun hidecl_exndecs (loc: location, d2cs: d2conlst) : hidecl
+(* ****** ****** *)
 
 fun hidecl_dcstdecs
-  (loc: location, knd: dcstkind, d2cs: d2cstlst) : hidecl
-// end of [hidecl_dcstdecs]
+(
+  loc: location, dck: dcstkind, d2cs: d2cstlst
+) : hidecl // end of [hidecl_dcstdecs]
 
 fun hidecl_impdec
   (loc: location, knd: int, himp: hiimpdec): hidecl

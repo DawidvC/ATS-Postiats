@@ -252,7 +252,8 @@ s2exp_extkind_srt
 (* ****** ****** *)
 
 implement
-s2exp_at (s2e1, s2e2) = hnf '{
+s2exp_at
+  (s2e1, s2e2) = hnf '{
   s2exp_srt= s2rt_view, s2exp_node= S2Eat (s2e1, s2e2)
 } // end of [s2exp_at]
 
@@ -264,12 +265,14 @@ s2exp_sizeof (s2e) = hnf '{
 (* ****** ****** *)
 
 implement
-s2exp_eff (s2fe) = hnf '{
+s2exp_eff
+  (s2fe) = hnf '{
   s2exp_srt= s2rt_eff, s2exp_node= S2Eeff (s2fe)
 } // end of [s2exp_eff]
 
 implement
-s2exp_eqeq (s2e1, s2e2) = hnf '{
+s2exp_eqeq 
+  (s2e1, s2e2) = hnf '{
   s2exp_srt= s2rt_bool, s2exp_node= S2Eeqeq (s2e1, s2e2)
 } // end of [s2exp_eqeq]
 
@@ -581,19 +584,29 @@ s2exp_is_impred
 (* ****** ****** *)
 
 implement
-s2exp_is_tyfun
-  (s2e) = let
-in
+s2exp_is_FUNCLOfun
+  (s2e0) = let
 //
+fun aux (s2e0: s2exp): bool =
+(
 case+
-  s2e.s2exp_node of
-| S2Efun _ => true
-| S2Euni (_, _, s2e) => s2exp_is_tyfun (s2e)
-| S2Eexi (_, _, s2e) => s2exp_is_tyfun (s2e)
-| S2Emetfun (_, _, s2e) => s2exp_is_tyfun (s2e)
+  s2e0.s2exp_node of
+| S2Efun
+  (
+    fc, lin, s2fe, npf, s2es_arg, s2e_res
+  ) =>
+  (
+    case+ fc of FUNCLOfun () => true | _ => false
+  )
+| S2Euni (_, _, s2e) => aux (s2e)
+| S2Eexi (_, _, s2e) => aux (s2e)
+| S2Emetfun (_, _, s2e) => aux (s2e)
 | _ => false
+) (* end of [aux] *)
 //
-end // end of [s2exp_is_tyfun]
+in
+  aux (s2e0)
+end // end of [s2exp_is_FUNCLOfun]
 
 (* ****** ****** *)
 

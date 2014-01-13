@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -56,6 +56,13 @@ primplmnt
 unit_v_elim (pf) = let
   prval unit_v () = pf in (*nothing*)
 end // end of [unit_v_elim]
+
+#atscode_separator()
+
+implement{a}
+opt_unsome_get (x) =
+  let prval () = opt_unsome (x) in x end
+// end of [opt_unsome_get]
 
 #atscode_separator()
 

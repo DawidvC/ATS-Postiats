@@ -117,8 +117,10 @@ end // end of [local]
 
 (* ****** ****** *)
 
-fun d2exp_trup_item (
-  loc0: location, d2i: d2itm, t2mas: t2mpmarglst
+fun
+d2exp_trup_item
+(
+  loc0: loc_t, d2i: d2itm, t2mas: t2mpmarglst
 ) : d3exp = let
 (*
   val () = (
@@ -152,7 +154,7 @@ case+ d2i of
     val () = prerr_newline ()
     val () =  the_trans3errlst_add (T3E_d2exp_trup_item (loc0, d2i))
   in
-    d3exp_err (loc0)
+    d3exp_errexp (loc0)
   end // end of [_]
 //
 end // end of [d2exp_trup_item]
@@ -184,7 +186,7 @@ case+ d2i of
     // end of [if]
   ) // end of [D2ITMvar]
 | _ => let
-    val () = assertloc (false) in d3exp_err (loc0)
+    val () = assertloc (false) in d3exp_errexp (loc0)
   end // end of [_]
 //
 end // end of [d3exp_trup_item]
@@ -232,9 +234,9 @@ end // end of [fprint_d3pitm]
 
 datatype
 d3exparg = 
-  | D3EXPARGsta of (location(*arg*), s2exparglst)
+  | D3EXPARGsta of (loc_t(*arg*), s2exparglst)
   | D3EXPARGdyn of // HX: notice the argument list [d3es]
-      (int(*npf*), location(*arg*), d3explst) // are not opened
+      (int(*npf*), loc_t(*arg*), d3explst) // are not opened
     // end of [D3EXPARGdyn]
 typedef d3exparglst = List d3exparg
 viewtypedef d3exparglst_vt = List_vt d3exparg
@@ -328,7 +330,7 @@ local
 
 fun auxsel_arity
 (
-  locsym: location
+  locsym: loc_t
 , d2pis: d2pitmlst
 , d2piss: List_vt (d2pitmlst)
 , t2mas: t2mpmarglst
@@ -565,7 +567,7 @@ case+ d3pis of
       the_trans3errlst_add (T3E_d2exp_trup_applst_sym_cons2 (d2e0, d2s))
     // end of [val]
   in
-    d3exp_err (loc0)
+    d3exp_errexp (loc0)
   end // end of [list_cons2]
 | list_nil () => let
     val () = prerr_error3_loc (loc0)
@@ -575,7 +577,7 @@ case+ d3pis of
     val () = prerr_newline ()
     val () = the_trans3errlst_add (T3E_d2exp_trup_applst_sym_nil (d2e0, d2s))
   in
-    d3exp_err (loc0)
+    d3exp_errexp (loc0)
   end // end of [list_nil]
 //
 end // end of [d2exp_trup_applst_sym]

@@ -6,7 +6,7 @@
 
 /* (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
@@ -29,8 +29,8 @@
 
 /*
 (* Author: Hongwei Xi *)
-(* Authoremail: hwxi AT cs DOT bu DOT edu *)
-(* Start time: August, 2013 *)
+(* Authoremail: gmhwxiATgmailDOTcom *)
+(* Start time: September, 2013 *)
 */
 
 /* ****** ****** */
@@ -50,6 +50,16 @@
 
 #define atscntrb_libcurl_eq_CURLcode_CURLcode atspre_eq_int_int
 #define atscntrb_libcurl_eq_CURLerror_CURLcode atspre_eq_int_int
+
+/* ****** ****** */
+
+#define atscntrb_libcurl_neq_CURLcode_CURLcode atspre_neq_int_int
+#define atscntrb_libcurl_neq_CURLerror_CURLcode atspre_neq_int_int
+
+/* ****** ****** */
+
+#define atscntrb_libcurl_curl_global_init curl_global_init
+#define atscntrb_libcurl_curl_global_cleanup curl_global_cleanup
 
 /* ****** ****** */
 

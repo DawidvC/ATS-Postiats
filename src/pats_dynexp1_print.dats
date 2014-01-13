@@ -204,7 +204,7 @@ case+ p1t0.p1at_node of
     val () = prstr ")"
   }
 //
-| P1Terr () => prstr "P1Terr()"
+| P1Terrpat ((*void*)) => prstr "P1Terrpat()"
 //
 (*
 | _ => prstr "P1T...(...)"
@@ -653,9 +653,7 @@ case+ d1e0.d1exp_node of
     val () = prstr ")"
   }
 //
-| D1Eerr () => {
-    val () = prstr "D1Eerr()"
-  }
+| D1Eerrexp ((*void*)) => prstr "D1Eerrexp()"
 //
 (*
 | _ => prstr "D1E...(...)"
@@ -924,20 +922,23 @@ case+ d1c0.d1ecl_node of
   }
 //
 | D1Cdcstdecs
-    (dck, qarg, xs) => {
+    (knd, dck, qarg, xs) => {
     val () = prstr "D1Cdcstdecs("
+    val () = fprint_int (out, knd)
+    val () = prstr "; "
     val () = fprint_dcstkind (out, dck)
     val () = prstr "\n"
     val () = $UT.fprintlst (out, xs, "\n", fprint_d1cstdec)
     val () = prstr "\n)"
   }
 //
-| D1Cextype (name, def) =>
-  {
+| D1Cextype
+    (name, def) => {
     val () = prstr "D1Cextype("
-    val () = fprint_string (out, name)
-    val () = prstr " = "
-    val () = fprint_s1exp (out, def)
+    val () = (
+      fprint_string (out, name);
+      prstr " = "; fprint_s1exp (out, def)
+    ) (* end of [val] *)
     val () = prstr ")"
   }
 | D1Cextype
@@ -950,14 +951,18 @@ case+ d1c0.d1ecl_node of
     val () = fprint_s1exp (out, def)
     val () = prstr ")"
   }
-| D1Cextval (name, def) => {
+//
+| D1Cextval
+    (name, def) => {
     val () = prstr "D1Cextval("
     val () = fprint_string (out, name)
     val () = prstr " = "
     val () = fprint_d1exp (out, def)
     val () = prstr ")"
   }
-| D1Cextcode (knd, pos, code) => {
+//
+| D1Cextcode
+    (knd, pos, code) => {
     val () = prstr "D1Cextcode("
     val () = fprint_int (out, knd)
     val () = prstr "; "
@@ -967,7 +972,8 @@ case+ d1c0.d1ecl_node of
     val () = prstr "\n)"
   }
 //
-| D1Cmacdefs (knd, isrec, ds) => {
+| D1Cmacdefs
+    (knd, isrec, ds) => {
     val () = prstr "D1macdef("
     val () = fprint_int (out, knd)
     val () = prstr "; "
@@ -977,7 +983,8 @@ case+ d1c0.d1ecl_node of
     val () = prstr "\n)"
   }
 //
-| D1Cimpdec (knd, imparg, d) => {
+| D1Cimpdec
+    (knd, imparg, d) => {
     val qid = d.i1mpdec_qid
     val () = prstr "D1Cimpdec["
     val () = fprint_int (out, knd)
@@ -1038,6 +1045,7 @@ case+ d1c0.d1ecl_node of
   }
 //
   | _ => prstr "D1C...(...)"
+//
 end // end of [fprint_d1ecl]
 
 implement

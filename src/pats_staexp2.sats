@@ -33,6 +33,10 @@
 //
 (* ****** ****** *)
 
+staload "./pats_basics.sats"
+
+(* ****** ****** *)
+
 staload
 INT = "./pats_intinf.sats"
 typedef intinf = $INT.intinf
@@ -48,26 +52,37 @@ typedef symbol = $SYM.symbol
 
 (* ****** ****** *)
 
-staload LAB = "./pats_label.sats"
+staload
+LAB = "./pats_label.sats"
 typedef label = $LAB.label
 
-staload LOC = "./pats_location.sats"
+staload
+LOC = "./pats_location.sats"
 typedef location = $LOC.location
 
-staload FIL = "./pats_filename.sats"
+staload
+FIL = "./pats_filename.sats"
 typedef filename = $FIL.filename
 
-staload SYN = "./pats_syntax.sats"
+staload
+SYN = "./pats_syntax.sats"
 typedef c0har = $SYN.c0har
 typedef sl0abeled (a:type) = $SYN.sl0abeled (a)
 
 (* ****** ****** *)
 
-staload "./pats_basics.sats"
+staload
+EFF = "./pats_effect.sats"
+typedef effset = $EFF.effset
 
 (* ****** ****** *)
 
-staload "./pats_effect.sats"
+staload
+JSON = "./pats_jsonize.sats"
+typedef jsonval = $JSON.jsonval
+
+(* ****** ****** *)
+
 staload "./pats_staexp1.sats"
 
 (* ****** ****** *)
@@ -160,7 +175,7 @@ fun fprint_s2rtdat : fprint_type (s2rtdat)
 (* ****** ****** *)
 
 datatype s2rtbas =
-  | S2RTBASpre of (symbol) // predicative: bool, char, int, ...
+  | S2RTBASpre of (symbol) // predicative: int, bool, ...
   | S2RTBASimp of (int(*knd*), symbol) // impredicative sorts
   | S2RTBASdef of (s2rtdat) // user-defined datasorts
 // end of [s2rtbas]
@@ -185,7 +200,7 @@ datatype s2rt =
   | S2RTfun of (s2rtlst, s2rt) // function sort
   | S2RTtup of s2rtlst (* tuple sort *)
   | S2RTVar of s2rtVar // HX: unification variable
-  | S2RTerr of () // HX: indicating an error
+  | S2RTerr of ((*void*)) // HX: error indication
 // end of [s2rt]
 
 where
@@ -213,12 +228,14 @@ fun fprint_s2rtlst : fprint_type (s2rtlst)
 //
 // HX: pre-defined predicative sorts
 //
-val s2rt_int : s2rt
-val s2rt_bool : s2rt
-val s2rt_addr : s2rt
+val s2rt_int : s2rt // integers
+val s2rt_bool : s2rt // booleans
+val s2rt_addr : s2rt // addresses
 (*
-val s2rt_char : s2rt
+val s2rt_char : s2rt // = s2rt_int
 *)
+//
+val s2rt_real : s2rt // real numbers
 //
 val s2rt_cls : s2rt // nominal classes
 //
@@ -255,20 +272,26 @@ val s2rt_vt0ype_neg : s2rt
 val s2rt_types : s2rt
 //
 (* ****** ****** *)
-
+//
 fun s2rt_impred (knd: int): s2rt // selecting impredicative sorts
-
+//
 fun s2rt_fun (_arg: s2rtlst, _res: s2rt): s2rt // forming function sorts
 fun s2rt_tup (s2ts: s2rtlst): s2rt (* HX: tuple sorts are not yet supported *)
-
+//
 fun s2rt_err (): s2rt // HX: a placeholder indicating error
-
+//
 fun s2rt_is_int (x: s2rt): bool
 fun s2rt_is_addr (x: s2rt): bool
 fun s2rt_is_bool (x: s2rt): bool
+//
+(*
 fun s2rt_is_char (x: s2rt): bool
+*)
+//
+fun s2rt_is_real (x: s2rt): bool
+//
 fun s2rt_is_dat (x: s2rt): bool
-
+//
 fun s2rt_is_fun (x: s2rt): bool
 fun s2rt_is_prf (x: s2rt): bool // is proof?
 fun s2rt_is_lin (x: s2rt): bool
@@ -278,10 +301,10 @@ fun s2rt_is_boxed (x: s2rt): bool // is boxed?
 fun s2rt_is_prgm (x: s2rt): bool // is program?
 fun s2rt_is_impred (x: s2rt): bool // is impredicative?
 fun s2rt_is_tkind (x: s2rt): bool // is tkind?
-
+//
 fun s2rt_is_boxed_fun (x: s2rt): bool // is (... ->) boxed?
 fun s2rt_is_tkind_fun (x: s2rt): bool // is (... ->) tkind?
-
+//
 (* ****** ****** *)
 
 fun s2rt_get_pol (x: s2rt): int // neg/neu/pos: -1/0/1
@@ -382,9 +405,14 @@ datatype
 s2exp_node =
 //
   | S2Eint of int // integer
-  | S2Eintinf of intinf // integer of flexible precision
+  | S2Eintinf of intinf // integer of flex precision
+//
 (*
-  | S2Echar of char // character
+  | S2Echar of char // chars have been removed for now
+*)
+//
+(*
+  | S2Ereal of double // static reals are yet to be supported
 *)
 //
   | S2Ecst of s2cst // constant
@@ -401,7 +429,9 @@ s2exp_node =
   | S2Edatconptr of (* unfolded datatype *)
       (d2con, s2exp, s2explst) (* constructor and addrs of arguments *)
 //
-  | S2Eat of (s2exp, s2exp) // for at-views
+  | S2Eat of
+      (s2exp, s2exp) // for at-views
+//
   | S2Esizeof of (s2exp) // for sizes of types
 //
   | S2Eeff of (s2eff) // effects
@@ -412,16 +442,19 @@ s2exp_node =
   | S2Eapp of (s2exp, s2explst) // static application
   | S2Elam of (s2varlst, s2exp) // static abstraction
 //
-  | S2Efun of ( // function type
+  | S2Efun of
+    ( // function type
       funclo, int(*lin*), s2eff, int(*npf*), s2explst(*arg*), s2exp(*res*)
-    ) // end of S2Efun
+    ) (* end of S2Efun *)
 //
   | S2Emetfun of (stampopt, s2explst, s2exp) // metricked function
   | S2Emetdec of
-      (s2explst(*met*), s2explst(*metbound*)) // expected to strictly decrease
+      (s2explst(*met*), s2explst(*metbound*)) // strictly decreasing
     // end of [S2Emetdec]
 //
-  | S2Etop of (int(*knd*), s2exp) // knd: 0/1: topization/typization
+  | S2Etop of
+      (int(*knd*), s2exp) // knd: 0/1: topization/typization
+//
   | S2Ewithout of (s2exp) // for a component taken out by the [view@] operation
 //
   | S2Etyarr of (s2exp (*element*), s2explst (*dimension*))
@@ -1206,7 +1239,7 @@ fun s2exp_is_impred (x: s2exp): bool
 
 (* ****** ****** *)
 
-fun s2exp_is_tyfun (x: s2exp): bool
+fun s2exp_is_FUNCLOfun (x: s2exp): bool
 
 (* ****** ****** *)
 
@@ -1385,6 +1418,24 @@ fun s2aspdec_make (
   loc: location, s2c: s2cst, def: s2exp
 ) : s2aspdec // end of [s2aspdec_make]
 
+(* ****** ****** *)
+//
+fun jsonize_s2rt (s2t: s2rt): jsonval
+//
+fun jsonize_s2cst (s2c: s2cst): jsonval
+fun jsonize_s2var (s2v: s2var): jsonval
+fun jsonize_s2Var (s2V: s2Var): jsonval
+//
+fun jsonize_d2con (d2c: d2con): jsonval
+//
+fun jsonize0_s2exp (s2e: s2exp): jsonval // w/o hnfizing
+fun jsonize1_s2exp (s2e: s2exp): jsonval // with hnfizing
+//
+fun jsonize_s2exp (flag: int, s2e: s2exp): jsonval
+fun jsonize_s2explst (flag: int, s2es: s2explst): jsonval
+//
+fun jsonize_s2eff (s2fe: s2eff): jsonval
+//
 (* ****** ****** *)
 
 (* end of [pats_staexp2.sats] *)

@@ -1,0 +1,32 @@
+#
+# Computer Language Benchmarks Game
+# http://benchmarksgame.alioth.debian.org/
+#
+
+######
+
+fasta
+
+######
+
+fasta-redux
+
+######
+
+fannkuch
+
+######
+
+mandelbrot
+
+######
+
+n-body
+
+######
+
+pidigits
+
+######
+
+###### end of [README] ######

@@ -125,6 +125,10 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 
 (* ****** ****** *)
 
+#packfilename("prelude_checkast.dats")
+
+(* ****** ****** *)
+
 #packfilename("prelude_list.dats")
 #packfilename("prelude_list_vt.dats")
 
@@ -149,6 +153,7 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 (* ****** ****** *)
 
 #packfilename("libc_dirent.dats")
+#packfilename("libc_dlfcn.dats")
 #packfilename("libc_fcntl.dats")
 #packfilename("libc_fnmatch.dats")
 #packfilename("libc_malloc.dats")
@@ -181,6 +186,10 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 
 (* ****** ****** *)
 
+#packfilename("libats_hashtbl_chain.dats")
+
+(* ****** ****** *)
+
 #packfilename("libats_funset_listord.dats")
 #packfilename("libats_funset_avltree.dats")
 #packfilename("libats_funmap_list.dats")
@@ -199,10 +208,6 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 #packfilename("libats_linmap_avltree.dats")
 #packfilename("libats_linmap_randbst.dats")
 #packfilename("libats_linmap_skiplist.dats")
-
-(* ****** ****** *)
-
-#packfilename("libats_linhashtbl_chain.dats")
 
 (* ****** ****** *)
 

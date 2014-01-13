@@ -10,18 +10,27 @@
 #define ATS_DYNLOADFLAG 0
 //
 (* ****** ****** *)
-
-staload "../GameOf24.sats"
-
+//
+#include
+"share/atspre_define.hats"
+//
+(* ****** ****** *)
+//
+local
+#include "../GameOf24_card.dats"
+in (*nothing*) end
+//
+local
+#include "../GameOf24_cardset.dats"
+in (*nothing*) end
+//
+local
+#include "../GameOf24_solve.dats"
+in (*nothing*) end
+//
 (* ****** ****** *)
 
-local
-//
-#include "../GameOf24_card.dats"
-#include "../GameOf24_cardset.dats"
-#include "../GameOf24_solve.dats"
-//
-in (*nothing*) end
+staload "../GameOf24.sats"
 
 (* ****** ****** *)
 
@@ -30,7 +39,11 @@ UN = "prelude/SATS/unsafe.sats"
 
 (* ****** ****** *)
 
-staload JNI = "JNI/SATS/jni.sats"
+staload JNI = "{$JNI}/SATS/jni.sats"
+
+(* ****** ****** *)
+
+stadef jint = $JNI.jint
 
 (* ****** ****** *)
 
@@ -44,9 +57,12 @@ stadef jobject (l:addr) = $JNI.jobject(l)
 // [play24] is declared in Java class [GameOf24]
 //
 extern
-fun JNI_play24{l:addr}
+fun JNI_play24
+  {l:addr}
 (
-  env: !JNIEnvPtr, obj: !jobject l, n1: int, n2: int, n3: int, n4: int
+  env: !JNIEnvPtr
+, obj: jobject (l)
+, n1: jint, n2: jint, n3: jint, n4: jint
 ) : void = "ext#Java_GameOf24_play24" // endfun
 
 (* ****** ****** *)

@@ -11,7 +11,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -66,6 +66,13 @@ fun g0float2float_float_double (x: float):<> double = "mac\#%"
 fun g0float2float_double_float (x: double):<> float = "mac\#%"
 fun g0float2float_double_double (x: double):<> double = "mac\#%"
 
+#atscode_separator()
+//
+fun{tk:tk}
+g0string2float (str: NSH(string)):<> g0float (tk)
+//
+fun g0string2float_double (x: NSH(string)):<> double = "mac\#%"
+//
 #atscode_separator()
 
 typedef

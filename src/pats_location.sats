@@ -97,12 +97,20 @@ fun location_get_bchar (loc: location): lint
 
 (* ****** ****** *)
 
+fun location_beg_nrow (loc: location): int // beg row count
+
+(* ****** ****** *)
+
 fun location_beg_ntot (loc: location): lint // beg char count
 fun location_end_ntot (loc: location): lint // end char count
 
 (* ****** ****** *)
 
 fun location_get_filename (loc: location): filename
+
+(* ****** ****** *)
+
+fun fprint_locrange (out: FILEref, loc: location): void
 
 (* ****** ****** *)
 //
@@ -116,7 +124,7 @@ overload fprint with fprint_location
 //
 (* ****** ****** *)
 
-fun fprint_location2 (out: FILEref, loc: location): void
+fun fprint2_location (out: FILEref, loc: location): void
 
 (* ****** ****** *)
 

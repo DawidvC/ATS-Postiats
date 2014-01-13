@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner_for_C()
-#atscode_copyright_LGPL_for_C()
+#atscode_copyright_GPL_for_C()
 
 #atscode_separator_for_C()
 
@@ -46,8 +46,6 @@ do { \\
 
 #atscode_separator_for_C()
 
-#atscode_separator_for_C()
-
 \#define atslib_close close
 \#define atslib_close0 atslib_close
 \#define atslib_close1 atslib_close
@@ -65,6 +63,14 @@ do { \\
 
 \#define atslib_execv(path, argv) execv((char*)path, (char**)argv)
 \#define atslib_execvp(path, argv) execvp((char*)path, (char**)argv)
+
+#atscode_separator_for_C()
+
+\#define atslib_encrypt encrypt
+
+#atscode_separator_for_C()
+
+\#define atslib_fork fork
 
 #atscode_separator_for_C()
 

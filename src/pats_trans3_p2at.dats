@@ -58,11 +58,14 @@ INTINF = "./pats_intinf.sats"
 
 (* ****** ****** *)
 
-staload LAB = "./pats_label.sats"
+staload
+LAB = "./pats_label.sats"
 overload = with $LAB.eq_label_label
 
-staload LOC = "./pats_location.sats"
-macdef print_location = $LOC.print_location
+staload
+LOC = "./pats_location.sats"
+macdef
+print_location = $LOC.print_location
 
 (* ****** ****** *)
 
@@ -162,9 +165,9 @@ case+ p2t0.p2at_node of
 //
 | P2Tlist (npf, p2ts) => s2exp_t0ype_err ()
 //
-| P2Terr () => s2exp_t0ype_err ()
+| P2Terrpat () => s2exp_t0ype_err ()
 (*
-  | _ => exitloc (1)
+| _(*yet-to-be-processed*) => exitloc (1)
 *)
 //
 end // end of [aux_p2at]
@@ -332,7 +335,7 @@ p2at_trdn_arg_refarg_err
   val () = prerr_newline ()
   val () = the_trans3errlst_add (T3E_p2at_trdn (p2t0, s2e0))
 in
-  p3at_err (loc0, s2e0)
+  p3at_errpat (loc0, s2e0)
 end // end of [p2at_trdn_arg_refarg_err]
 
 in // in of [local]
@@ -397,7 +400,7 @@ fun aux
     case+ s2es of
     | list_cons (s2e, s2es) => let
         val () = serr := serr - 1
-        val p3t = p3at_err (loc0, s2e)
+        val p3t = p3at_errpat (loc0, s2e)
         val p3ts = aux (npf-1, p2ts, s2es, serr)
       in
         list_cons (p3t, p3ts)
@@ -515,8 +518,8 @@ case+ p2t0.p2at_node of
 //
 | P2Tann _ => p2at_trdn_ann (p2t0, s2f0)
 //
-| P2Terr () => let
-    val s2e = s2hnf2exp (s2f0) in p3at_err (loc0, s2e)
+| P2Terrpat () => let
+    val s2e = s2hnf2exp (s2f0) in p3at_errpat (loc0, s2e)
   end // end of [P2Terr]
 //
 | _ => let
@@ -559,7 +562,7 @@ case+ p2ts of
   case+ s2es of
   | list_cons (s2e, s2es) => let
       val () = serr := serr - 1
-      val p3t = p3at_err (loc0, s2e)
+      val p3t = p3at_errpat (loc0, s2e)
       val p3ts = p2atlst_trdn (loc0, p2ts, s2es, serr)
     in
       list_cons (p3t, p3ts)
@@ -807,8 +810,9 @@ end // end of [p2at_trdn_string]
 
 local
 
-fun auxcheck (
-  loc0: location, s2e: s2exp, s2e_pat: s2exp, nerr: &int
+fun auxcheck
+(
+  loc0: loc_t, s2e: s2exp, s2e_pat: s2exp, nerr: &int
 ) : void = let
 //
 val-S2Eapp
@@ -949,8 +953,10 @@ end // end of [p2at_trdn_empty]
 (* ****** ****** *)
 
 extern
-fun labp2atlst_trdn (
-  loc0: location
+fun
+labp2atlst_trdn
+(
+  loc0: loc_t
 , lp2ts: labp2atlst, ls2es: labs2explst, nerr: &int
 ) : labp3atlst // end of [labp2atlst_trdn_labs2explst]
 
@@ -1048,7 +1054,7 @@ case+ ls2es of
           val () = prerr "]"
           val () = prerr_newline ()
           val () = err := err + 1
-          val () = p3t := p3at_err (loc0, s2e)
+          val () = p3t := p3at_errpat (loc0, s2e)
         } // end of [val]
         val lp3t = LABP3AT (l, p3t)
         val lp3ts = auxcheck (lp2ts, ls2es, err)
@@ -1114,7 +1120,7 @@ case+ s2e.s2exp_node of
     val s2e0 = s2hnf2exp (s2f0)
     val () = the_trans3errlst_add (T3E_p2at_trdn (p2t0, s2e0))
   in
-    p3at_err (loc0, s2e)
+    p3at_errpat (loc0, s2e)
   end // end of [_]
 //
 end // end of [p2at_trdn_rec]
@@ -1165,7 +1171,7 @@ case+ s2e.s2exp_node of
     val s2e0 = s2hnf2exp (s2f0)
     val () = the_trans3errlst_add (T3E_p2at_trdn (p2t0, s2e0))
   in
-    p3at_err (loc0, s2e)
+    p3at_errpat (loc0, s2e)
   end // end of [_]
 //
 end // end of [p2at_trdn_lst]
@@ -1210,8 +1216,9 @@ end // end of [p2at_trdn_refas]
 
 local
 
-fun auxerr1 (
-  loc0: location
+fun auxerr1
+(
+  loc0: loc_t
 , s2v1: s2var, s2v2: s2var
 ) : void = let
   val s2t1 = s2var_get_srt (s2v1)
@@ -1229,8 +1236,9 @@ in
   // nothing
 end // end of [auxerr1]
 //
-fun auxerr2 (
-  loc0: location, s2v1: s2var
+fun auxerr2
+(
+  loc0: loc_t, s2v1: s2var
 ) : void = let
    val () = prerr_error3_loc (loc0)
    val () = prerr ": there is no binding for the static variable [";
@@ -1241,8 +1249,9 @@ in
   // nothing
 end // end of [auxerr2]
 //
-fun auxbind (
-  loc0: location
+fun auxbind
+(
+  loc0: loc_t
 , sub: &stasub, s2vs1: s2varlst, s2vs2: s2varlst
 , err: &int
 ) : void = let
@@ -1321,7 +1330,7 @@ case+ s2e0.s2exp_node of
     val () = prerr_newline ()
     val () = the_trans3errlst_add (T3E_p2at_trdn (p2t0, s2e0))
   in
-    p3at_err (loc0, s2e0)
+    p3at_errpat (loc0, s2e0)
   end (* end of [_] *)
 //
 end // end of [p2at_trdn_exist]
@@ -1365,7 +1374,7 @@ case+ opt of
     val () = prerr_newline ()
     val () = the_trans3errlst_add (T3E_p2at_trdn (p2t0, s2e0))
   in
-    p3at_err (loc0, s2e0)
+    p3at_errpat (loc0, s2e0)
   end // end of [None_vt]
 //
 end // end of [p2at_trdn_vbox]
@@ -1441,8 +1450,9 @@ p3at_mutablize
   (p3t0) = let
   val loc0 = p3t0.p3at_loc
 //
-fun auxvar (
-  loc0: location, d2v: d2var
+fun auxvar
+(
+  loc0: loc_t, d2v: d2var
 ) : void = let
   val-Some
     (s2e0) = d2var_get_mastype (d2v)

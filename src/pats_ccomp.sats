@@ -101,6 +101,11 @@ fun the_saspdeclst_add (hid: hidecl): void
 
 (* ****** ****** *)
 
+fun the_extypelst_get (): hideclist
+fun the_extypelst_add (hid: hidecl): void
+
+(* ****** ****** *)
+
 fun the_extcodelst_get (): hideclist
 fun the_extcodelst_add (hid: hidecl): void
 
@@ -726,19 +731,27 @@ fun primdec_local
 // end of [primdec_local]
 
 (* ****** ****** *)
-
+//
 fun print_primval (x: primval): void
-overload print with print_primval
 fun prerr_primval (x: primval): void
+//
+overload print with print_primval
 overload prerr with prerr_primval
+//
 fun fprint_primval : fprint_type (primval)
 fun fprint_primvalist : fprint_type (primvalist)
-
+//
+overload fprint with fprint_primval
+overload fprint with fprint_primvalist
+//
 (* ****** ****** *)
-
+//
 fun fprint_primlab : fprint_type (primlab)
 fun fprint_primlablst : fprint_type (primlablst)
-
+//
+overload fprint with fprint_primlab
+overload fprint with fprint_primlablst
+//
 (* ****** ****** *)
 
 fun fprint_labprimvalist : fprint_type (labprimvalist)
@@ -1927,6 +1940,7 @@ fun emit_saspdec (out: FILEref, hid: hidecl): void
 
 (* ****** ****** *)
 
+fun emit_extype (out: FILEref, hid: hidecl): void
 fun emit_extcode (out: FILEref, hid: hidecl): void
 
 (* ****** ****** *)
@@ -1975,7 +1989,7 @@ fun emit_tmpdeclst (out: FILEref, tmps: tmpvarlst): void
 (* ****** ****** *)
 //
 // HX-2013-01:
-// these are implemented in [pats_hitype.dats]
+// these are implemented in [pats_ccomp_hitype.dats]
 //
 abstype hitype_type
 typedef hitype = hitype_type

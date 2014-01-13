@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -115,6 +115,13 @@ overload ptr_vtake with ptr1_vtake of 10
 
 #atscode_separator()
 
+castfn
+ref_vtake{a:vt0p}
+  {l:addr} (r: ref (a)):<> [l:addr] (a@l, a@l -<lin,prf> void | ptr l)
+// end of [ref_vtake]
+
+#atscode_separator()
+
 praxi
 vtakeout_void {v:view} (pf: !v): vtakeout0 (v)
 castfn
@@ -136,6 +143,11 @@ fun{a:vt0p} ptr1_exch (p: Ptr1, x: &INV(a) >> a):<!wrt> void
 fun{a:vt0p} ptr0_intch (p1: ptr, p2: ptr):<!wrt> void
 fun{a:vt0p} ptr1_intch (p1: Ptr1, p2: Ptr1):<!wrt> void
 //
+#atscode_separator()
+
+fun{a:vt0p} ptr0_get_at (p: ptr, i: int):<> a
+fun{a:vt0p} ptr0_set_at (p: ptr, i: int, x: a):<!wrt> void
+
 #atscode_separator()
 //
 // HX-2012-06:

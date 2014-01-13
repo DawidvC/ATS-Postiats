@@ -116,6 +116,8 @@ castfn
 redisReply2ptr{l:addr} (rep: !redisReply (l)):<> ptr (l)
 overload ptrcast with redisReply2ptr
 
+praxi redisReply_free_null (redisReply (null)):<prf> void
+
 (* ****** ****** *)
 /*
 void freeReplyObject(void *reply);
@@ -283,7 +285,7 @@ fun redisConnectWithTimeout_fsec
 symintr redisConnectWithTimeout
 overload redisConnectWithTimeout with redisConnectWithTimeout_tval
 overload redisConnectWithTimeout with redisConnectWithTimeout_fsec
-
+//
 (* ****** ****** *)
 
 fun redisConnectNonBlock
@@ -306,7 +308,7 @@ fun redisConnectUnixWithTimeout_fsec
 symintr redisConnectUnixWithTimeout
 overload redisConnectUnixWithTimeout with redisConnectUnixWithTimeout_tval
 overload redisConnectUnixWithTimeout with redisConnectUnixWithTimeout_fsec
-
+//
 (* ****** ****** *)
 
 fun redisConnectUnixNonBlock

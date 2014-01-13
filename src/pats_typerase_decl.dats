@@ -125,18 +125,27 @@ case+
 //
 | D3Csaspdec (d2c) => hidecl_saspdec (loc0, d2c)
 //
+| D3Cextype
+    (name, s2e_def) => let
+    val hse_def =
+      s2exp_tyer_deep (loc0, s2e_def)
+    // end of [val]
+  in
+    hidecl_extype (loc0, name, hse_def)
+  end // end of [D3Cextype]
+| D3Cextval (name, d3e_def) =>
+    hidecl_extval (loc0, name, d3exp_tyer (d3e_def))
 | D3Cextcode
     (knd, pos, code) => hidecl_extcode (loc0, knd, pos, code)
   // end of [D3Cextcode]
 //
-| D3Cdatdecs (
-    knd, s2cs
-  ) => hidecl_datdecs (loc0, knd, s2cs)
 | D3Cexndecs
     (d2cs) => hidecl_exndecs (loc0, d2cs)
+| D3Cdatdecs
+    (knd, s2cs) => hidecl_datdecs (loc0, knd, s2cs)
 //
 | D3Cdcstdecs
-    (knd, d2cs) => hidecl_dcstdecs (loc0, knd, d2cs)
+    (knd, dck, d2cs) => hidecl_dcstdecs (loc0, dck, d2cs)
 //
 | D3Cimpdec _ => d3ecl_tyer_impdec (d3c0)
 //
@@ -253,13 +262,17 @@ val-D3Cimpdec (knd, impdec) = d3c0.d3ecl_node
 in
 //
 if knd = 0 then let
+//
   val loc = impdec.i3mpdec_loc
   val d2c = impdec.i3mpdec_cst
   val imparg = impdec.i3mpdec_imparg
   val tmparg = impdec.i3mpdec_tmparg
   val tmparg = s2explstlst_mhnfize (tmparg)
+//
+  val d2c = d2cst_tyer (d2c)
   val hse_def = d3exp_tyer (impdec.i3mpdec_def)
   val himp = hiimpdec_make (loc, d2c, imparg, tmparg, hse_def)
+//
 in
   hidecl_impdec (loc0, knd(*0*), himp)
 end else

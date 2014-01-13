@@ -17,7 +17,7 @@
 
 staload _ = "libats/DATS/hashfun.dats"
 staload _ = "libats/DATS/linmap_list.dats"
-staload _ = "libats/DATS/linhashtbl_chain.dats"
+staload _ = "libats/DATS/hashtbl_chain.dats"
 
 (* ****** ****** *)
 
@@ -33,7 +33,7 @@ staload "libats/ML/SATS/string.sats"
 
 staload _ = "libats/ML/DATS/list0.dats"
 staload _ = "libats/ML/DATS/string.dats"
-staload _ = "libats/ML/DATS/hashtbl.dats"
+staload _ = "libats/ML/DATS/hashtblref.dats"
 
 (* ****** ****** *)
 
@@ -132,12 +132,12 @@ end // end of [word_get]
 (* ****** ****** *)
 
 local
-
+//
 staload
-HT = "libats/ML/SATS/hashtbl.sats"
-
+HT = "libats/ML/SATS/hashtblref.sats"
+//
 assume wcmap_type = $HT.hashtbl (string, int)
-
+//
 in (* in of [local] *)
 
 implement

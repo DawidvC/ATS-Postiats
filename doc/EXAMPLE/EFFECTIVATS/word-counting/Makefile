@@ -4,45 +4,77 @@
 
 ######
 
-PATSCC=$(PATSHOME)/bin/patscc
+include $(PATSHOME)/share/atsmake-pre.mk
 
 ######
 
-all::wordcnt
-all::wordcnt2
-all::wordcnt_vt
+PATSCC2=$(PATSCC) -DATS_MEMALLOC_LIBC -O2
 
 ######
 
+MYTARGET=MYTARGET
+MYCCRULE=MYCCRULE
+
+######
+
+include $(PATSHOME)/share/atsmake-post.mk
+
+######
+
+all:: wordcnt
 wordcnt: wordcnt.dats ; \
-  $(PATSCC) -DATS_MEMALLOC_LIBC -O2 -o $@ $< -L$(PATSHOME)/ccomp/atslib -latslib
-
-######
-
-wordcnt2: wordcnt2.dats ; \
-  $(PATSCC) -DATS_MEMALLOC_LIBC -O2 -o $@ $< -L$(PATSHOME)/ccomp/atslib -latslib
-
-######
-
-wordcnt_vt: wordcnt_vt.dats ; \
-  $(PATSCC) -DATS_MEMALLOC_LIBC -O2 -o $@ $< -L$(PATSHOME)/ccomp/atslib -latslib
-
-######
-
-RMF=rm -f
-
-######
-
-clean:: ; $(RMF) *~
-clean:: ; $(RMF) *_?ats.o
-clean:: ; $(RMF) *_?ats.c
-
-######
-
-cleanall:: clean
+  $(PATSCC2) -o $@ $< -L$(PATSLIB) -latslib
 cleanall:: ; $(RMF) wordcnt
+
+######
+
+all:: wordcnt2
+wordcnt2: wordcnt2.dats ; \
+  $(PATSCC2) -o $@ $< -L$(PATSLIB) -latslib
 cleanall:: ; $(RMF) wordcnt2
+
+######
+
+all:: wordcnt_vt
+wordcnt_vt: wordcnt_vt.dats ; \
+  $(PATSCC2) -o $@ $< -L$(PATSLIB) -latslib
 cleanall:: ; $(RMF) wordcnt_vt
+
+######
+
+ATSHOMEQ="$(ATSHOME)"
+ATSCC=$(ATSHOMEQ)/bin/atscc
+ATSDOC=$(ATSHOMEQ)/bin/atsdoc
+
+######
+
+main.exe: \
+  main_atxt.dats ; \
+  $(ATSCC) \
+  -IATS $(PATSHOME) -IATS $(ATSHOME) \
+  -I$(PATSHOME)/src -D_ATS_GCATS -o $@ $< \
+  -L$(PATSHOME)/libatsynmark -latsynmark -latsdoc
+
+main_atxt.dats: \
+  main.atxt; $(ATSDOC) --outcode $@ -i main.atxt > main_atxt.txt
+main.html: main.exe ; ./main.exe > $@
+
+######
+
+upload_main: \
+  main.html ; \
+  scp main.html \
+  ats-hwxi,ats-lang@web.sourceforge.net:htdocs/EXAMPLE/EFFECTIVATS/word-counting/
+
+######
+
+cleanats:: ; $(RMF) main_atxt.txt
+cleanats:: ; $(RMF) main_atxt.dats
+
+######
+
+cleanall:: ; $(RMF) main.exe
+cleanall:: ; $(RMF) main.html
 
 ######
 

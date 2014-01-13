@@ -10,15 +10,15 @@
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-**
+** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-**
+** 
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -58,7 +58,7 @@ val A = arrayptr_make_uninitized<a> (cap)
 //
 val (pfat, pfgc | p) = ptr_alloc<stkarray_tsize> ()
 //
-val (pfngc | stk) = stkarray_make_ngc (pfat | p, A, cap, sizeof<a>)
+val (pfngc | stk) = stkarray_make_ngc__tsz (pfat | p, A, cap, sizeof<a>)
 //
 prval ((*void*)) = mfree_gcngc_v_nullify (pfgc, pfngc)
 //
@@ -123,8 +123,6 @@ end // end of [fprint_stkarray_sep]
 
 (* ****** ****** *)
 
-local
-
 extern fun
 stkarray_get_ptrcur{a:vt0p}
   {m,n:int} (stk: !stkarray (INV(a), m, n)):<> ptr = "mac#%"
@@ -134,7 +132,7 @@ stkarray_set_ptrcur{a:vt0p}
   {m,n:int} (stk: !stkarray (INV(a), m, n), ptr):<!wrt> void = "mac#%"
 // end of [stkarray_set_ptrcur]
 
-in (* in of [local] *)
+(* ****** ****** *)
 
 implement{a}
 stkarray_insert
@@ -156,6 +154,22 @@ end // end of [stkarray_insert]
 (* ****** ****** *)
 
 implement{a}
+stkarray_insert_opt
+  (stk, x0) = let
+//
+val isnot = stkarray_isnot_full (stk)
+//
+in
+//
+if isnot then let
+  val () = stkarray_insert (stk, x0) in None_vt()
+end else Some_vt{a}(x0)
+//
+end // end of [stkarray_insert_opt]
+
+(* ****** ****** *)
+
+implement{a}
 stkarray_takeout
   {m,n} (stk) = x0 where
 {
@@ -171,24 +185,6 @@ extern praxi __assert (!stkarray (a, m, n) >> stkarray (a, m, n-1)): void
 } (* end of [prval] *)
 //
 } // end of [stkarray_takeout]
-
-end // end of [local]
-
-(* ****** ****** *)
-
-implement{a}
-stkarray_insert_opt
-  (stk, x0) = let
-//
-val isnot = stkarray_isnot_full (stk)
-//
-in
-//
-if isnot then let
-  val () = stkarray_insert (stk, x0) in None_vt()
-end else Some_vt{a}(x0)
-//
-end // end of [stkarray_insert_opt]
 
 (* ****** ****** *)
 

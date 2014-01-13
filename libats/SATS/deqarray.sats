@@ -2,19 +2,17 @@
 (*                                                                     *)
 (*                         Applied Type System                         *)
 (*                                                                     *)
-(*                              Hongwei Xi                             *)
-(*                                                                     *)
 (***********************************************************************)
 
 (*
-** ATS - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, Boston University
+** ATS/Postiats - Unleashing the Potential of Types!
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the  terms of the  GNU General Public License as published by the Free
-** Software Foundation; either version 2.1, or (at your option) any later
-** version.
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
+** later version.
 ** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
@@ -22,15 +20,11 @@
 ** for more details.
 ** 
 ** You  should  have  received  a  copy of the GNU General Public License
-** along  with  ATS;  see  the  file  COPYING.  If not, write to the Free
-** Software Foundation, 51  Franklin  Street,  Fifth  Floor,  Boston,  MA
+** along  with  ATS;  see the  file COPYING.  If not, please write to the
+** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
 ** 02110-1301, USA.
 *)
 
-(* ****** ****** *)
-//
-// License: LGPL 3.0 (available at http://www.gnu.org/licenses/lgpl.txt)
-//
 (* ****** ****** *)
 
 (*
@@ -71,7 +65,7 @@ deqarray_vtype (a:vt@ype+, m:int, n:int) = ptr
 stadef deqarray = deqarray_vtype
 //
 vtypedef
-deqarray (a:vt0p, m:int) = [n:int] deqarray_vtype (a, m, n)
+deqarray (a:vt0p) = [m,n:int] deqarray_vtype (a, m, n)
 //
 (* ****** ****** *)
 
@@ -83,7 +77,7 @@ deqarray_tsize = $extype"atslib_deqarray_struct"
 praxi
 lemma_deqarray_param
   {a:vt0p}{m,n:int}
-  (!deqarray (INV(a), m, m)): [m >= n; n >= 0] void
+  (!deqarray (INV(a), m, n)): [m >= n; n >= 0] void
 // end of [lemma_deqarray_param]
 
 (* ****** ****** *)
@@ -96,12 +90,12 @@ deqarray_make_cap
 (* ****** ****** *)
 
 fun
-deqarray_make_ngc
+deqarray_make_ngc__tsz
   {a:vt0p}
   {l:addr}{m:int}
 (
   deqarray_tsize? @ l
-| ptr(l), arrayptr(a?, m), size_t(m), sizeof_t(a)
+| ptr(l), arrayptr(a?, m+1), size_t(m), sizeof_t(a)
 ) :<!wrt> (mfree_ngc_v (l) | deqarray (a, m, 0)) = "mac#%"
 
 (* ****** ****** *)
@@ -134,13 +128,11 @@ deqarray_isnot_nil
 //
 (* ****** ****** *)
 //
-fun
-deqarray_is_full
-  {a:vt0p}{m,n:int}
+fun{a:vt0p}
+deqarray_is_full{m,n:int}
   (deq: !deqarray (INV(a), m, n)):<> bool (m==n) = "mac#%"
-fun
-deqarray_isnot_full
-  {a:vt0p}{m,n:int}
+fun{a:vt0p}
+deqarray_isnot_full{m,n:int}
   (deq: !deqarray (INV(a), m, n)):<> bool (m > n) = "mac#%"
 //
 (* ****** ****** *)
@@ -148,55 +140,79 @@ deqarray_isnot_full
 fun{}
 fprint_deqarray$sep (out: FILEref): void
 fun{a:vt0p}
-fprint_deqarray{m:int}
-  (out: FILEref, q: !deqarray (INV(a), m)): void
+fprint_deqarray
+  (out: FILEref, q: !deqarray (INV(a))): void
 fun{a:vt0p}
-fprint_deqarray_sep{m:int}
-  (out: FILEref, q: !deqarray (INV(a), m), sep: string): void
+fprint_deqarray_sep
+  (out: FILEref, q: !deqarray (INV(a)), sep: string): void
 overload fprint with fprint_deqarray
 overload fprint with fprint_deqarray_sep
 
 (* ****** ****** *)
 
 fun{a:vt0p}
-deqarray_insert
+deqarray_insert_atbeg
   {m,n:int | m > n}
 (
   deq: !deqarray (INV(a), m, n) >> deqarray (a, m, n+1), x0: a
 ) :<!wrt> void // endfun
 
+fun{a:vt0p}
+deqarray_insert_atbeg_opt
+  (deq: !deqarray (INV(a)) >> _, x0: a):<!wrt> Option_vt (a)
+// end of [deqarray_insert_atbeg_opt]
+
 (* ****** ****** *)
 
 fun{a:vt0p}
-deqarray_insert_opt{m:int}
-  (deq: !deqarray (INV(a), m) >> _, x0: a):<!wrt> Option_vt (a)
-// end of [deqarray_insert_opt]
-
-(* ****** ****** *)
-
-fun{a:vt0p}
-deqarray_takeout
-  {m,n:int | n > 0}
+deqarray_insert_atend
+  {m,n:int | m > n}
 (
-  deq: !deqarray (INV(a), m, n) >> deqarray (a, m, n-1)
-) :<!wrt> (a) // endfun
+  deq: !deqarray (INV(a), m, n) >> deqarray (a, m, n+1), x0: a
+) :<!wrt> void // endfun
 
 fun{a:vt0p}
-deqarray_takeout_opt{m:int}
-  (deq: !deqarray (INV(a), m) >> _):<!wrt> Option_vt (a)
-// end of [deqarray_takeout_opt]
+deqarray_insert_atend_opt
+  (deq: !deqarray (INV(a)) >> _, x0: a):<!wrt> Option_vt (a)
+// end of [deqarray_insert_atend_opt]
 
 (* ****** ****** *)
 
 fun{a:vt0p}
-deqarray_getref_top
-  {m,n:int | n > 0} (deq: !deqarray (INV(a), m, n)):<> cPtr1 (a)
-// end of [deqarray_getref_top]
+deqarray_takeout_atbeg
+  {m,n:int | n > 0}
+  (deq: !deqarray (INV(a), m, n) >> deqarray (a, m, n-1)):<!wrt> (a)
+// end of [deqarray_takeout_atbeg]
 
 fun{a:vt0p}
-deqarray_getref_bot
+deqarray_takeout_atbeg_opt
+  (deq: !deqarray (INV(a)) >> _):<!wrt> Option_vt (a)
+// end of [deqarray_takeout_atbeg_opt]
+
+(* ****** ****** *)
+
+fun{a:vt0p}
+deqarray_takeout_atend
+  {m,n:int | n > 0}
+  (deq: !deqarray (INV(a), m, n) >> deqarray (a, m, n-1)):<!wrt> (a)
+// end of [deqarray_takeout_atend]
+
+fun{a:vt0p}
+deqarray_takeout_atend_opt
+  (deq: !deqarray (INV(a)) >> _):<!wrt> Option_vt (a)
+// end of [deqarray_takeout_atend_opt]
+
+(* ****** ****** *)
+
+fun{a:vt0p}
+deqarray_getref_atbeg
   {m,n:int | n > 0} (deq: !deqarray (INV(a), m, n)):<> cPtr1 (a)
-// end of [deqarray_getref_bot]
+// end of [deqarray_getref_atbeg]
+
+fun{a:vt0p}
+deqarray_getref_atend
+  {m,n:int | n > 0} (deq: !deqarray (INV(a), m, n)):<> cPtr1 (a)
+// end of [deqarray_getref_atend]
 
 (* ****** ****** *)
 //
@@ -215,6 +231,23 @@ deqarray_getref_at_size
 overload deqarray_getref_at with deqarray_getref_at_int
 overload deqarray_getref_at with deqarray_getref_at_size
 //
+(* ****** ****** *)
+
+fun{
+a:vt0p}{env:vt0p
+} deqarray_foreach$cont (x: &a, env: &env): bool
+fun{
+a:vt0p}{env:vt0p
+} deqarray_foreach$fwork (x: &a >> _, env: &(env) >> _): void
+fun{
+a:vt0p
+} deqarray_foreach{m,n:int}
+  (deq: !deqarray (INV(a), m, n)): sizeLte(n)
+fun{
+a:vt0p}{env:vt0p
+} deqarray_foreach_env{m,n:int}
+  (deq: !deqarray (INV(a), m, n), env: &(env) >> _): sizeLte(n)
+
 (* ****** ****** *)
 
 (* end of [deqarray.sats] *)

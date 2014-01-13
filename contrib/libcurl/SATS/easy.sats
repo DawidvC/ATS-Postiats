@@ -55,9 +55,11 @@ CURLcode curl_easy_perform(CURL *curl);
 fun curl_easy_perform (curl: !CURLptr1): CURLerror = "mac#%"
 
 (* ****** ****** *)
-
+//
 fun curl_easy_cleanup (curl: CURLptr1): void = "mac#%"
-
+//
+praxi curl_easy_cleanup_null (curl: CURLptr(null)): void
+//
 (* ****** ****** *)
 
 /*

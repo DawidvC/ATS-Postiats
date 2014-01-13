@@ -4,12 +4,16 @@
 
 ######
 
-PATSCC=patscc
-PATSHOMEQ="$(PATSHOME)"
+include $(PATSHOME)/share/atsmake-pre.mk
 
 ######
 
-all::
+MYTARGET=MYTARGET
+MYCCRULE=MYCCRULE
+
+######
+
+include $(PATSHOME)/share/atsmake-post.mk
 
 ######
 
@@ -37,6 +41,21 @@ cleanall:: ; $(RMF) dotoverld
 all:: extfcall
 extfcall: extfcall.dats ; $(PATSCC) -cleanaft -o $@ $<
 cleanall:: ; $(RMF) extfcall
+
+######
+
+all:: fieldarr
+fieldarr: fieldarr.dats ; \
+  $(PATSCC) -DATS_MEMALLOC_LIBC -cleanaft -o $@ $<
+cleanall:: ; $(RMF) fieldarr
+
+######
+
+all:: findexn
+findexn: findexn_dats.c ; \
+  $(PATSCC) -D_GNU_SOURCE -DATS_MEMALLOC_LIBC -o $@ $<
+findexn_dats.c: findexn.dats ; $(PATSCC) -ccats $<
+cleanall:: ; $(RMF) findexn
 
 ######
 
@@ -112,20 +131,16 @@ cleanall:: ; $(RMF) trywith
 
 ######
 
+all:: union
+union: union.dats ; $(PATSCC) -cleanaft -o $@ $<
+cleanall:: ; $(RMF) union
+
+######
+
 all:: weekday
 weekday: weekday.dats ; $(PATSCC) -cleanaft -o $@ $<
 cleanall:: ; $(RMF) weekday
 
 ######
-
-RMF=rm -f
-
-######
-
-clean:: ; $(RMF) *~
-clean:: ; $(RMF) *_?ats.c
-clean:: ; $(RMF) *_?ats.o
-
-cleanall:: clean
 
 ###### end of [Makefile] ######

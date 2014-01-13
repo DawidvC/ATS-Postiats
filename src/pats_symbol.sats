@@ -98,7 +98,12 @@ val symbol_REFAT : symbol // ref@
 val symbol_INT : symbol
 val symbol_BOOL : symbol
 val symbol_ADDR : symbol
+//
+(*
 val symbol_CHAR : symbol
+*)
+//
+val symbol_REAL : symbol
 //
 val symbol_CLS : symbol // for nominal classes
 //
@@ -177,10 +182,11 @@ fun fprint_symbol (out: FILEref, x: symbol): void
 
 (* ****** ****** *)
 
-typedef stamp = uint
-
 fun symbol_get_name (x: symbol):<> string
-fun symbol_get_stamp (x: symbol):<> stamp
+fun symbol_get_stamp (x: symbol):<> uint
+
+(* ****** ****** *)
+
 fun symbol_make_string (name: string): symbol
 
 (* ****** ****** *)

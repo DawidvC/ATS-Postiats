@@ -83,6 +83,12 @@ fun eq_CURLerror_CURLcode (CURLerror, CURLcode):<> bool = "mac#%"
 overload = with eq_CURLcode_CURLcode
 overload = with eq_CURLerror_CURLcode
 //
+fun neq_CURLcode_CURLcode (CURLcode, CURLcode):<> bool = "mac#%"
+fun neq_CURLerror_CURLcode (CURLerror, CURLcode):<> bool = "mac#%"
+//
+overload != with neq_CURLcode_CURLcode
+overload != with neq_CURLerror_CURLcode
+//
 (* ****** ****** *)
 
 macdef CURLE_OK = $extval(CURLcode, "CURLE_OK")
@@ -112,6 +118,9 @@ macdef CURLOPT_REFERER = $extval(CURLoption, "CURLOPT_REFERER") // 16
 macdef CURLOPT_FTPPORT = $extval(CURLoption, "CURLOPT_FTPPORT") // 17
 macdef CURLOPT_USERAGENT = $extval(CURLoption, "CURLOPT_USERAGENT") // 18
 //
+macdef CURLOPT_READDATA = $extval(CURLoption, "CURLOPT_READDATA") // = CURLOPT_INFILE
+macdef CURLOPT_WRITEDATA = $extval(CURLoption, "CURLOPT_WRITEDATA") // = CURLOPT_FILE
+//
 (* ****** ****** *)
 
 abst@ype CURLINFO = $extype"CURLINFO"
@@ -129,6 +138,22 @@ macdef CURLINFO_SSL_DATA_OUT = $extval(CURLINFO, "CURLINFO_SSL_DATA_OUT")
 (* ****** ****** *)
 
 fun curl_version ((*void*)): string = "mac#%"
+
+(* ****** ****** *)
+
+/*
+CURLcode
+curl_global_init(long flags);
+*/
+fun
+curl_global_init (flags: lint): CURLcode = "mac#%"
+
+(* ****** ****** *)
+
+/*
+void curl_global_cleanup(void) ;
+*/
+fun curl_global_cleanup ((*void*)): void = "mac#%"
 
 (* ****** ****** *)
 

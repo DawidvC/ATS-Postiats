@@ -7,13 +7,18 @@ ATSCC=$(ATSHOME)/bin/atscc
 
 ######
 
-test1: test1.dats
-	$(ATSCC) -IATS $(PATSHOME) -o $@ $< -L $(PATSHOME)/libatsyntax -latsyntax
-cleanall:: ; $(RMF) test1
+all:: test01
+all:: test02
 
-test2: test2.dats
-	$(ATSCC) -IATS $(PATSHOME) -o $@ $< -L $(PATSHOME)/libatsyntax -latsyntax
-cleanall:: ; $(RMF) test2
+######
+
+test01: test01.dats
+	$(ATSCC) -I$(PATSHOME)/src -IATS $(PATSHOME) -o $@ $< -L $(PATSHOME)/libatsynmark -latsynmark
+cleanall:: ; $(RMF) test01
+
+test02: test02.dats
+	$(ATSCC) -I$(PATSHOME)/src -IATS $(PATSHOME) -IATS $(ATSHOME) -o $@ $< -L $(PATSHOME)/libatsynmark -latsynmark
+cleanall:: ; $(RMF) test02
 
 ######
 

@@ -630,7 +630,7 @@ the_s2expenv_add_datconptr (d2c) = let
   val sym = d2con_get_sym d2c
   val name = $SYM.symbol_get_name (sym)
   val id = $SYM.symbol_make_string (name + "_unfold")
-  val () = the_s2expenv_add (id, S2ITMdatconptr d2c)
+  val () = the_s2expenv_add (id, S2ITMdatconptr (d2c))
 in
   // empty
 end // end of [the_s2expenv_add_datconptr]
@@ -640,7 +640,7 @@ the_s2expenv_add_datcontyp (d2c) = let
   val sym = d2con_get_sym d2c
   val name = $SYM.symbol_get_name (sym)
   val id = $SYM.symbol_make_string (name + "_pstruct")
-  val () = the_s2expenv_add (id, S2ITMdatcontyp d2c)
+  val () = the_s2expenv_add (id, S2ITMdatcontyp (d2c))
 in
   // empty
 end // end of [the_s2expenv_add_datcontyp]
@@ -1284,8 +1284,13 @@ the_s2rtenv_initialize (): void = {
 (*
   val () = the_s2rtenv_add ($SYM.symbol_CHAR, S2TEsrt s2rt_char)
 *)
+//
+  val () = the_s2rtenv_add ($SYM.symbol_REAL, S2TEsrt s2rt_real)
+//
   val () = the_s2rtenv_add ($SYM.symbol_CLS, S2TEsrt s2rt_cls)
+//
   val () = the_s2rtenv_add ($SYM.symbol_EFF, S2TEsrt s2rt_eff)
+//
   val () = the_s2rtenv_add ($SYM.symbol_TKIND, S2TEsrt s2rt_tkind)
 //
 // HX: pre-defined impredicative sorts

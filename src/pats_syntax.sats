@@ -50,13 +50,16 @@ typedef symbolopt = $SYM.symbolopt
 
 (* ****** ****** *)
 
-staload LAB = "./pats_label.sats"
+staload
+LAB = "./pats_label.sats"
 typedef label = $LAB.label
 
-staload FIX = "./pats_fixity.sats"
+staload
+FIX = "./pats_fixity.sats"
 typedef assoc = $FIX.assoc
 
-staload FIL = "./pats_filename.sats"
+staload
+FIL = "./pats_filename.sats"
 typedef filename = $FIL.filename
 
 (* ****** ****** *)
@@ -888,7 +891,8 @@ fun s0expdef_make
 
 (* ****** ****** *)
 
-typedef s0aspdec = '{
+typedef
+s0aspdec = '{
   s0aspdec_loc= location
 , s0aspdec_qid= sqi0de
 , s0aspdec_arg= s0marglst
@@ -959,6 +963,8 @@ dcstextdef =
   | DCSTEXTDEFsome_mac of string // macro
   | DCSTEXTDEFsome_sta of string // static
 // end of [dcstextdef]
+
+fun dcstextdef_sta (sym: symbol): dcstextdef
 
 fun dcstextdef_is_ext (x: dcstextdef):<> bool
 fun dcstextdef_is_mac (x: dcstextdef):<> bool
@@ -1249,7 +1255,7 @@ d0ecl_node =
   | D0Ce0xpundef of (symbol) (* undefinition *)
   | D0Ce0xpact of (e0xpactkind, e0xp)
 //
-  | D0Cdatsrts of d0atsrtdeclst (* datasort declaration *)
+  | D0Cdatsrts of d0atsrtdeclst (* datasorts *)
   | D0Csrtdefs of s0rtdeflst (* sort definition *)
 //
   | D0Cstacsts of (s0tacstlst) (* static constants *)
@@ -1261,7 +1267,7 @@ d0ecl_node =
   | D0Csexpdefs of (int(*knd*), s0expdeflst) (* staexp definition *)
   | D0Csaspdec of s0aspdec (* static assumption *)
 //
-  | D0Cexndecs of e0xndeclst
+  | D0Cexndecs of (e0xndeclst)
   | D0Cdatdecs of (int(*knd*), d0atdeclst, s0expdeflst)
 //
   | D0Cclassdec of (i0de, s0expopt) // class declaration
@@ -1273,19 +1279,21 @@ d0ecl_node =
   | D0Cextcode of
       (int(*knd*), int(*pos*), string(*code*)) // external code
 //
-  | D0Cdcstdecs of (int(*knd*), token, q0marglst, d0cstdeclst)
+  | D0Cdcstdecs of
+      (int(*0/1:sta/ext*), token, q0marglst, d0cstdeclst) // dyncst
+//
+  | D0Cimpdec of
+      (int(*knd*), i0mparg, i0mpdec) // knd=0/1: implement/primplmnt
+    // end of [D0Cimpdec]
 //
   | D0Cmacdefs of
       (int(*knd*), bool(*rec*), m0acdeflst) // macro definitions
+//
   | D0Cfundecs of (funkind, q0marglst, f0undeclst) // fun declarations
   | D0Cvaldecs of (valkind, bool(*isrec*), v0aldeclst) // val declarations
   | D0Cvardecs of
       (int(*knd*), v0ardeclst) // variable declarations // knd=0/1:var/prvar
     // end of [D0Cvardec]
-//
-  | D0Cimpdec of
-      (int(*knd*), i0mparg, i0mpdec) // knd=0/1: implement/primplmnt
-    // end of [D0Cimpdec]
 //
   | D0Cinclude of (* file inclusion *)
       (filename(*pfil*), int(*0:sta/1:dyn*), string(*filename*))
@@ -1816,20 +1824,27 @@ fun d0exp_ann (_1: d0exp, _2: s0exp): d0exp
 
 (* ****** ****** *)
 
+fun labd0exp_make (ent1: l0ab, ent2: d0exp): labd0exp
+
+(* ****** ****** *)
+//
 fun fprint_d0exp : fprint_type (d0exp)
 fun fprint_d0explst : fprint_type (d0explst)
 fun fprint_d0expopt : fprint_type (d0expopt)
-
+//
+overload fprint with fprint_d0exp
+overload fprint with fprint_d0explst
+//
 (* ****** ****** *)
-
-fun labd0exp_make (ent1: l0ab, ent2: d0exp): labd0exp
 
 fun fprint_labd0exp : fprint_type (labd0exp)
 
 (* ****** ****** *)
 
-fun d0arrind_sing
-  (d0es: d0explst, t_rbracket: token): d0arrind
+(*
+** HX: d0arrind_sing: tok is RBRACKET
+*)
+fun d0arrind_sing (d0es: d0explst, tok: token): d0arrind
 fun d0arrind_cons (d0es: d0explst, ind: d0arrind): d0arrind
 
 (* ****** ****** *)

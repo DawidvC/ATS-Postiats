@@ -70,13 +70,13 @@ fprintln! (out, "where a <command> is of one of the following forms:\n");
 fprintln! (out, "  -h (for printing out this help usage)");
 fprintln! (out, "  --help (for printing out this help usage)");
 //
-fprintln! (out, "  -i filenames (for compiling (many) static <filenames>)");
-fprintln! (out, "  --input filenames (for compiling (many) static <filenames>)");
+fprintln! (out, "  -i <filenames> (for processing (many) static <filenames>)");
+fprintln! (out, "  --input <filenames> (for processing (many) static <filenames>)");
 //
-fprintln! (out, "  -o filename (output into <filename>)");
-fprintln! (out, "  --output filename (output into <filename>)");
+fprintln! (out, "  -o <filename> (output into <filename>)");
+fprintln! (out, "  --output <filename> (output into <filename>)");
 //
-fprintln! (out, "  --delim string (for setting delimiter to <string>)");
+fprintln! (out, "  --delim <string> (for setting delimiter to <string>)");
 //
 end // end of [jsonlst2arr]
 
@@ -165,7 +165,7 @@ fun{
 (* ****** ****** *)
 //
 extern
-fun jsonlst2arr_parse
+fun jsonlst2arr_cmdline
   {n:int} (argc: int n, argv: !argv(n)): commarglst
 // 
 (* ****** ****** *)
@@ -302,7 +302,7 @@ end // end of [aux1_delim]
 in (* in of [local] *)
 
 implement
-jsonlst2arr_parse
+jsonlst2arr_cmdline
   (argc, argv) = let
 //
 prval (
@@ -314,7 +314,7 @@ val res = list_vt_reverse (res)
 //
 in
   list_vt2t(res)
-end // end of [jsonlst2arr_commline]
+end // end of [jsonlst2arr_cmdline]
 
 end // end of [local]
 
@@ -513,7 +513,7 @@ main0 (argc, argv) =
 {
 //
 val cas =
-  jsonlst2arr_parse (argc, argv)
+  jsonlst2arr_cmdline (argc, argv)
 val-list_cons (_, cas) = cas
 //
 val ((*void*)) = jsonlst2arr_proc (argv[0], cas)

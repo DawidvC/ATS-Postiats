@@ -42,7 +42,7 @@
 (* ****** ****** *)
 //
 #include
-"share/atspre_staload_tmpdef.hats"
+"share/atspre_staload.hats"
 //
 (* ****** ****** *)
 
@@ -144,7 +144,7 @@ fun search
       val bd1 = board_set (bd, i, j)
     in
       if i+1 = N then let
-        val () = print! ("Solution #", nsol+1, ":\n\n")
+        val () = print! ("Solution #", nsol+1, ":\n")
         val () = print_board (bd1)
       in
         search (bd, i, j+1, nsol+1)

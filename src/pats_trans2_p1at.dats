@@ -73,8 +73,10 @@ staload "./pats_e1xpval.sats"
 staload "./pats_dynexp1.sats"
 staload "./pats_staexp2.sats"
 staload "./pats_staexp2_util.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp2.sats"
-staload "./pats_dynexp2_util.sats"
 
 (* ****** ****** *)
 
@@ -433,7 +435,7 @@ in
         val () = prerr_newline ()
         val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
       in
-        p2at_err (loc0)
+        p2at_errpat (loc0)
       end // end of [_] 
     ) // end of [list_cons]
   | _ => let
@@ -442,7 +444,7 @@ in
       val () = prerr_newline ()
       val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
     in
-      p2at_err (loc0)
+      p2at_errpat (loc0)
     end // end of [list_nil]
 end // end of [p2at_vbox_err]
 
@@ -463,7 +465,8 @@ case+ ans of
   | D2ITMcon (d2cs) =>
       p1at_tr_con (p1t0, p1t1, d2cs, list_nil(*sarg*), npf, darg)
   | _ => let
-      val () = auxerr1 (p1t0, p1t1, dq, id) in p2at_err (p1t0.p1at_loc)
+      val () =
+      auxerr1 (p1t0, p1t1, dq, id) in p2at_errpat (p1t0.p1at_loc)
     end // end of [_]
   ) // end of [Some_vt]
 | ~None_vt () => (
@@ -472,7 +475,8 @@ case+ ans of
       val p2ts = p1atlst_tr (darg) in p2at_vbox_err (p1t0, p2ts)
     end // end of [vbox]
   | _ => let
-      val () = auxerr2 (p1t0, p1t1, dq, id) in p2at_err (p1t0.p1at_loc)
+      val () =
+      auxerr2 (p1t0, p1t1, dq, id) in p2at_errpat (p1t0.p1at_loc)
     end // end of [_]
   ) // end of [None_vt]
 //
@@ -506,7 +510,7 @@ case+ p1t_fun.p1at_node of
     val () = prerr_newline ()
     val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
   in
-    p2at_err (p1t0.p1at_loc)
+    p2at_errpat (p1t0.p1at_loc)
   end // end of [_]
 //
 end // end of [p1at_tr_app_dyn]
@@ -539,7 +543,7 @@ case+ d2i of
     val () = prerr_newline ()
     val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
   in
-    p2at_err (p1t0.p1at_loc)
+    p2at_errpat (p1t0.p1at_loc)
   end
 end // end of [p1at_tr_app_sta_dyn_itm]
 
@@ -575,7 +579,7 @@ p1t_fun.p1at_node of
         val dq = $SYN.the_d0ynq_none
         val () = auxerr (p1t0, p1t1, p1t_fun, dq, id)
       in
-        p2at_err (p1t_fun.p1at_loc)
+        p2at_errpat (p1t_fun.p1at_loc)
       end (* end of [None] *)
   end // end of [P1Tide]
 | P1Tdqid (dq, id) => let
@@ -587,7 +591,7 @@ p1t_fun.p1at_node of
     | ~None_vt () => let
         val () = auxerr (p1t0, p1t1, p1t_fun, dq, id)
       in
-        p2at_err (p1t_fun.p1at_loc)
+        p2at_errpat (p1t_fun.p1at_loc)
       end // end of [None_vt]
   end // end of [P1Tdqid]
 | _ => let
@@ -596,7 +600,7 @@ p1t_fun.p1at_node of
     val () = prerr_newline ()
     val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
   in
-    p2at_err (p1t0.p1at_loc)
+    p2at_errpat (p1t0.p1at_loc)
   end // end of [_]
 //
 end // end of [p1at_tr_app_sta_dyn]
@@ -629,7 +633,7 @@ case+ p2t.p2at_node of
     val () = prerr_newline ()
     val () = the_trans2errlst_add (T2E_p1at_tr (p1t0))
   in
-    p2at_err (loc0)
+    p2at_errpat (loc0)
   end // end of [_]
 //
 end // end of [p1at_tr_free_unfold]
@@ -751,7 +755,7 @@ case+ p1t0.p1at_node of
     val () = prerr ": p1at_tr: P1Tsvararg: this pattern should have been eliminated."
     val () = prerr_newline ()
   in
-    p2at_err (loc0)
+    p2at_errpat (loc0)
   end // end of [P1Tavararg]
 //
 | P1Tann (p1t, ann) => let
@@ -762,15 +766,12 @@ case+ p1t0.p1at_node of
     p2at_ann (loc0, p2t, ann)
   end
 //
-| P1Terr () => p2at_err (loc0)
+| P1Terrpat () => p2at_errpat (loc0)
 //
 (*
 | _ => let
     val () = prerr_interror_loc (loc0)
-    val () = prerr ": p1at_tr: not yet implemented: p1t0 = "
-    val () = prerr_p1at (p1t0)
-    val () = prerr "]"
-    val () = prerr_newline ()
+    val () = prerrln! (": p1at_tr: not yet implemented: p1t0 = ", p1t0, "]")
   in
     $ERR.abort {p2at} ()
   end // end of [_]
@@ -782,13 +783,17 @@ implement
 p1atlst_tr (p1ts) = l2l (list_map_fun (p1ts, p1at_tr))
 
 implement
-labp1at_tr (lp1t) =
-  case+ lp1t.labp1at_node of
-  | LABP1ATnorm (l0, p1t) => let
-      val p2t = p1at_tr (p1t) in LABP2ATnorm (l0, p2t)
-    end // end of [LABP1ATnorm]
-  | LABP1ATomit () => LABP2ATomit (lp1t.labp1at_loc)
-// end of [labp1at_tr]
+labp1at_tr (lp1t) = let
+in
+//
+case+
+lp1t.labp1at_node of
+| LABP1ATnorm (l0, p1t) => let
+    val p2t = p1at_tr (p1t) in LABP2ATnorm (l0, p2t)
+  end // end of [LABP1ATnorm]
+| LABP1ATomit ((*void*)) => LABP2ATomit (lp1t.labp1at_loc)
+//
+end // end of [labp1at_tr]
 
 (* ****** ****** *)
 

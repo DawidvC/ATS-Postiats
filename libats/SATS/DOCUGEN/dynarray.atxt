@@ -148,7 +148,7 @@ function is O(n), where n is the current size of DA.
 #declnamesynop("dynarray_insert_at_opt")
 #decldescrpt('\
 
-This function is just an optional variant of #dyncode("dynarray_insert_at").
+This function is the optional variant of #dyncode("dynarray_insert_at").
 
 ')
 
@@ -201,7 +201,7 @@ this function is O(n), where n is the current size of DA.\
 #declnamesynop("dynarray_takeout_at_opt")
 #decldescrpt('\
 
-This function is just an optional variant of #dyncode("dynarray_takeout_at").
+This function is the optional variant of #dyncode("dynarray_takeout_at").
 
 ')
 
@@ -255,10 +255,13 @@ This function is called in the implementation of
 elements, and its default implementation is based on
 #dyncode("gcompare_ref"):
 
-#pats2xhtmld_tryit("\
+#pats2xhtmld_tryit('\
+//
+staload "libats/SATS/dynarray.sats"
+//
 implement{a}
 dynarray_quicksort$cmp (x, y) = gcompare_ref<a> (x, y)
-")
+')
 ")
 
 (* ****** ****** *)

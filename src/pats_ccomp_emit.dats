@@ -367,18 +367,24 @@ end // end of [local]
 
 local
 
-fun aux (
+fun aux
+(
   out: FILEref, c: char
 ) = let
-  val isalnum_ = 
-    if char_isalnum (c) then true else (c = '_')
-  // end of [val]
 in
-  case+ 0 of
-  | _ when isalnum_ => fprint_char (out, c)
-  | _ => {
-      val () = fprintf (out, "_%.3o$", @($UN.cast2uint(c)))
-    } // end of [_]
+//
+case+ 0 of
+//
+| _ when
+    char_isalnum (c) => fprint_char (out, c)
+//
+| _ when (c = '_') => fprint_char (out, '_')
+| _ when (c = '$') => fprint_string (out, "__")
+//
+| _ => {
+    val () = fprintf (out, "_%.3o_", @($UN.cast2uint(c)))
+  } (* end of [_] *)
+//
 end // end of [aux]
 
 in (* in of [local] *)
@@ -413,7 +419,7 @@ emit_label
 implement
 emit_atslabel
   (out, lab) = () where {
-  val () = emit_text (out, "atslab$")
+  val () = emit_text (out, "atslab__")
   val () = $LAB.fprint_label (out, lab)
 } // end of [emit_atslabel]
 
@@ -527,7 +533,7 @@ implement
 emit_s2cst
   (out, s2c) = let
   val () = aux_prfx (out, s2c)
-  val () = emit_text (out, "_")
+  val () = emit_text (out, "__")
   val name = $S2E.s2cst_get_name (s2c)
   val () = emit_ident (out, name)
 in
@@ -566,23 +572,33 @@ in (* in of [local] *)
 
 implement
 emit_d2con
-  (out, d2c) = let
-  val fil = $S2E.d2con_get_fil (d2c)
-  val packopt = $S2E.d2con_get_pack (d2c)
-  val () = aux_prfx (out, fil, packopt)
-  val () = emit_text (out, "_")
-  val name = $S2E.d2con_get_name (d2c)
-  val () = emit_ident (out, name)
-  val tag = $S2E.d2con_get_tag (d2c)
-  val () = if
-    tag >= 0 then let // HX: not exncon
-    val () = fprintf (out, "_%i", @(tag))
-  in
-    // nothing
-  end // end of [val]
-in
-  // nothing
-end // end of [emit_d2con]
+  (out, d2c) =
+{
+//
+val fil =
+  $S2E.d2con_get_fil (d2c)
+val packopt =
+  $S2E.d2con_get_pack (d2c)
+val () = aux_prfx (out, fil, packopt)
+//
+val name =
+  $S2E.d2con_get_name (d2c)
+val () = emit_text (out, "__")
+val () = emit_ident (out, name)
+//
+val tag = $S2E.d2con_get_tag (d2c)
+val () =
+(
+  if tag >= 0
+    then let // HX: not exncon
+      val () = fprintf (out, "__%i", @(tag))
+    in
+      // nothing
+    end // end of [then]
+  // end of [if]
+) (* end of [val] *)
+//
+} (* end of [emit_d2con] *)
 
 (* ****** ****** *)
 
@@ -599,7 +615,7 @@ case+ extdef of
     val fil = $D2E.d2cst_get_fil (d2c)
     val packopt = $D2E.d2cst_get_pack (d2c)
     val () = aux_prfx (out, fil, packopt)
-    val () = emit_text (out, "_")
+    val () = emit_text (out, "__")
     val name = $D2E.d2cst_get_name (d2c)
     val () = emit_ident (out, name)
   in
@@ -626,7 +642,9 @@ emit2_d2cst
 implement
 emit_tmplab
   (out, tlab) = let
-  val () = emit_text (out, "__patstlab_")
+//
+val () = emit_text (out, "__atstmplab")
+//
 in
   $STMP.fprint_stamp (out, tmplab_get_stamp (tlab))
 end // end of [emit_tmplab]
@@ -635,7 +653,7 @@ implement
 emit_tmplabint
   (out, tlab, i) = let
   val () = emit_tmplab (out, tlab)
-  val () = fprintf (out, "$%i", @(i))
+  val () = fprintf (out, "__%i", @(i))
 in
   // nothing
 end // end of [emit_tmplabint]
@@ -712,7 +730,7 @@ case+ opt of
     val sfx = tmpvar_get_suffix (tmp)
     val stmp = tmpvar_get_stamp (tmpp)
     val () = $STMP.fprint_stamp (out, stmp)
-    val () = fprintf (out, "$%i", @(sfx))
+    val () = fprintf (out, "__%i", @(sfx))
   in
     // nothing
   end // end of [Some]
@@ -764,7 +782,7 @@ val tmpknd =
   funlab_get_tmpknd (flab)
 val () =
   if tmpknd > 0 then {
-  val () = emit_text (out, "$")
+  val () = emit_text (out, "__")
   val stamp = funlab_get_stamp (flab)
   val () = $STMP.fprint_stamp (out, stamp)
 } // end of [val]
@@ -788,7 +806,7 @@ val () = (
   | None () => auxmain (out, flab)
 ) // end of [val]
 val sfx = funlab_get_suffix (flab)
-val () = if sfx > 0 then fprintf (out, "$%i", @(sfx))
+val () = if sfx > 0 then fprintf (out, "__%i", @(sfx))
 //
 in
   // nothing
@@ -1555,14 +1573,16 @@ emit_instr
   (out, ins) = let
 //
 val loc0 = ins.instr_loc
-// (*
+//
+// HX: This is extremely valuable for debugging!!!
+//
 val () =
 (
   fprint (out, "/*\n");
-  fprint (out, "emit_instr: loc0 = "); $LOC.fprint_location2 (out, loc0);
+  fprint (out, "emit_instr: loc0 = "); $LOC.fprint2_location (out, loc0);
   fprint (out, "\n*/\n");
 )
-// *)
+//
 (*
 val (
 ) = fprintln!
@@ -2377,19 +2397,27 @@ case+ xys of
     val hse = xy.0
     val pml = xy.1
 //
-    var hse: hisexp = hse
-    var pmv: primval = pmv
+(*
+    val () = fprintln! (stdout_ref, "auxmain: pmv = ", pmv)
+    val () = fprintln! (stdout_ref, "auxmain: hse = ", hse)
+    val () = fprintln! (stdout_ref, "auxmain: pml = ", pml)
+*)
+//
+    var hse2: hisexp = hse
+    var pmv2: primval = pmv
     val () = (
       case+
         hse.hisexp_node of
       | HSEtyarr
           (hse_elt, _) => {
-          val () = hse := hse_elt
+          val () = hse2 := hse_elt
+          val istop = list_vt_is_nil (xys)
           val () =
-            pmv := primval_ptrof (pmv.primval_loc, hisexp_typtr, pmv)
-          // end of [val]
+          if istop then (
+            pmv2 := primval_ptrof (pmv.primval_loc, hisexp_typtr, pmv)
+          ) // end of if // end of [val]
         } // end of [HSEtyarr]
-      | _ => () // end of [_]
+      | _(*HSEtyrec*) => () // end of [_]
     ) : void // end of [val]
 //
     var issin: bool = false
@@ -2414,10 +2442,10 @@ case+ xys of
       // end of [if]
     ) : void // end of [val]
 //
-    val () = auxmain (out, knd, pmv, hse_rt, xys, i + 1)
+    val () = auxmain (out, knd, pmv2, hse_rt, xys, i+1)
 //
     val () = emit_text (out, ", ")
-    val () = emit_hisexp_sel (out, hse)
+    val () = emit_hisexp_sel (out, hse2)
     val () = emit_text (out, ", ")
     val extknd = hisexp_get_extknd (hse)
     val () = emit_primlab (out, extknd, pml)

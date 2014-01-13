@@ -1,6 +1,6 @@
 (***********************************************************************)
 (*                                                                     *)
-(*                         ATS/contrib/atshwxi                         *)
+(*                       ATS/contrib/libats-hwxi                       *)
 (*                                                                     *)
 (***********************************************************************)
 
@@ -30,6 +30,11 @@
 //
 // HX-2013-02: a simple drawing package
 //
+(* ****** ****** *)
+
+staload
+M = "libc/SATS/math.sats"
+
 (* ****** ****** *)
 
 staload "./../SATS/mydraw.sats"
@@ -110,11 +115,33 @@ sub_vector_vector
 // end of [sub_vector_vector]
 
 (* ****** ****** *)
+//
+implement{}
+mul_scalar_vector
+  (k, v) = vector_make (k * v.x, k * v.y)
+//
+implement{}
+div_vector_scalar (v, k) = let
+  val _1k = 1.0 / k in vector_make (_1k * v.x, _1k * v.y)
+end // end of [div_vector_scalar]
+//
+(* ****** ****** *)
 
 implement{}
-mul_scalar_vector (k, v) = vector_make (k * v.x, k * v.y)
+vector_length (v) = let
+  val x = v.x and y = v.y in $M.sqrt (x*x + y*y)
+end // end of [vector_length]
+
+(* ****** ****** *)
+
 implement{}
-mul_vector_scalar (v, k) = vector_make (k * v.x, k * v.y)
+vector_rotate
+  (v, delta) = let
+  val dx = v.x and dy = v.y
+  val c0 = $M.cos (delta) and s0 = $M.sin (delta)
+in
+  vector_make (c0 * dx - s0 * dy, s0 * dx + c0 * dy)
+end // end of [vector_rotate]
 
 (* ****** ****** *)
 

@@ -1,6 +1,7 @@
 (*  
 ** Handling JS events within ATS.
-** Author: Will Blair (wdblair At cs Dot bu Dot edu)
+** Author: Will Blair
+** Authoremail: wdblairATcsDOTbuDOTedu
 ** Start time: October 2013
 *)
 
@@ -59,6 +60,13 @@ end // end of [fact_handle_keypress_fun]
 // HX-2013:
 // this one works, but may not be of a good style ...
 //
+extern
+fun document_element_addEventListener_fun
+(
+  !element1, type: string, func: (event1) -> void
+) : void
+  = "ext#JS_document_element_addEventListener_fun"
+// end of [document_element_addEventListener_fun]
 implement
 main0 ((*void*)) =
 {

@@ -6,19 +6,19 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-**
+** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-**
+** 
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -831,8 +831,8 @@ val nx = g2node_decode (nx)
 //
 val+@DLNODE (elt, _, _) = nx
 val p_elt = addr@ (elt)
-prval () = fold@ (nx)
-prval () = dlnode_vfree (nx)
+prval ((*void*)) = fold@ (nx)
+prval ((*void*)) = dlnode_vfree (nx)
 //
 in
   $UN.cast{cPtr1(a)}(p_elt)
@@ -848,8 +848,8 @@ val nx = g2node_decode (nx)
 //
 val+@DLNODE (_, next, _) = nx
 val p_next = addr@ (next)
-prval () = fold@ (nx)
-prval () = dlnode_vfree (nx)
+prval ((*void*)) = fold@ (nx)
+prval ((*void*)) = dlnode_vfree (nx)
 //
 in
   $UN.cast{cPtr1(g2node0(a))}(p_next)
@@ -865,8 +865,8 @@ val nx = g2node_decode (nx)
 //
 val+@DLNODE (_, _, prev) = nx
 val p_prev = addr@ (prev)
-prval () = fold@ (nx)
-prval () = dlnode_vfree (nx)
+prval ((*void*)) = fold@ (nx)
+prval ((*void*)) = dlnode_vfree (nx)
 //
 in
   $UN.cast{cPtr1(g2node0(a))}(p_prev)
@@ -877,9 +877,12 @@ end // end of [gnode_getref_prev]
 implement{a}
 dllist_cons_ngc
   (nx0, xs) = let
-  val () = gnode_set_prev_null (nx0)
-  val nxs = dllist_decode (xs)
-  val () = gnode_link10 (nx0, nxs)
+//
+val () =
+  gnode_set_prev_null (nx0)
+val nxs = dllist_decode (xs)
+val () = gnode_link10 (nx0, nxs)
+//
 in
   dllist_encode (nx0)
 end // end of [dllist_cons_ngc]

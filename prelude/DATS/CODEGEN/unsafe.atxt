@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -97,6 +97,17 @@ ptr0_intch
 
 implement{a} ptr1_intch = ptr0_intch<a>
 
+#atscode_separator()
+//
+implement
+{a}(*tmp*)
+ptr0_get_at (p, i) =
+  ptr0_get<a> (ptr0_add_gint<a> (p, i))
+implement
+{a}(*tmp*)
+ptr0_set_at (p, i, x) =
+  ptr0_set<a> (ptr0_add_gint<a> (p, i), x)
+//
 #atscode_separator()
 
 implement{a}

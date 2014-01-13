@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -324,6 +324,11 @@ fun{
 } strnptr_append {n1,n2:nat}
   (x1: !strnptr n1, x2: !strnptr n2):<!wrt> strnptr (n1+n2)
 //
+#atscode_separator()
+
+fun{
+} strptrlst_free (xs: List_vt (Strptr0)):<!wrt> void
+
 #atscode_separator()
 
 fun{

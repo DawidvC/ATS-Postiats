@@ -1,6 +1,9 @@
 #
 # A few simple steps to build ATS2
-# This is primarily for people developing ATS2
+# This is primarily for people wanting to use the
+# (unreleased) version of ATS2 available at GitHub:
+#
+# https://github.com/githwxi/ATS-Postiats
 #
 
 ######
@@ -9,17 +12,30 @@
 # author: Brandon Barker (Brandon.BarkerATgmailDOTcom)
 #
 ######
+#
+# Note:
+# Please execute the following command-line if you have
+# never done it explicitly before:
+#
+# make -f codegen/Makefile_atslib
+#
+######
 
 all:: bin_patscc
 all:: atslib_update
 
 ######
-
+#
 src_depend: ; touch src/.depend
 src_cleanall: ; make -C src cleanall
-bin_patscc: bin_patsopt ; make -C utils/atscc
+#
+bin_patscc: src_patscc ; cp -f utils/atscc/patscc bin/patscc
+src_patscc: bin_patsopt ; make -C utils/atscc -f Makefile all
+#
 bin_patsopt: src_patsopt ; cp -f src/patsopt bin/patsopt
 src_patsopt: src_depend src_cleanall ; make -C src -f Makefile all
-atslib_update: ; make -f codegen/Makefile_atslib
-
+#
+atslib_update:: ; make -f codegen/Makefile_atslib
+atslib_update:: ; make -C ccomp/atslib -f Makefile
+#
 ###### end of [Makefile_devl] ######

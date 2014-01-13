@@ -81,7 +81,7 @@ datatype p1at_node =
 //
   | P1Tann of (p1at, s1exp(*ann*)) // ascribed pattern
 //
-  | P1Terr of () // HX: for indicating an error
+  | P1Terrpat of () // HX: for indicating an error
 // end of [p1at_node]
 
 and labp1at_node =
@@ -154,7 +154,7 @@ fun p1at_svararg (loc: location, arg: s1vararg): p1at
 
 fun p1at_ann (loc: location, p1t: p1at, s1e: s1exp): p1at
 
-fun p1at_err (loc: location): p1at
+fun p1at_errpat (loc: location): p1at
 
 (* ****** ****** *)
 
@@ -243,6 +243,7 @@ datatype d1ecl_node =
 //
   | D1Cdatsrts of d1atsrtdeclst // datasorts
   | D1Csrtdefs of s1rtdeflst // sort definitions
+//
   | D1Cstacsts of s1tacstlst // static constants
   | D1Cstacons of (int(*knd*), s1taconlst) // static constructors
 (*
@@ -252,8 +253,8 @@ datatype d1ecl_node =
   | D1Csexpdefs of (int(*knd*), s1expdeflst) // static definitions
   | D1Csaspdec of s1aspdec // static assumption
 //
-  | D1Cdatdecs of (int(*knd*), d1atdeclst, s1expdeflst) // DT declarations
-  | D1Cexndecs of e1xndeclst // exception declaration
+  | D1Cexndecs of e1xndeclst // exception declarations
+  | D1Cdatdecs of (int(*knd*), d1atdeclst, s1expdeflst) // DT decls
 //
   | D1Cclassdec of (i0de, s1expopt)
 //
@@ -265,10 +266,12 @@ datatype d1ecl_node =
       (string (*name*), d1exp (*definition*))
 //
   | D1Cextcode of (
-      int (*knd: 0/1*), int (*pos: 0/1/2 : top/?/end*), string (*code*)
+      int(*knd: 0/1*), int(*pos: 0/1/2: top/?/end*), string(*code*)
     ) // end of [D1Cextcode]
 //
-  | D1Cdcstdecs of (dcstkind, q1marglst, d1cstdeclst) // dyn constants
+  | D1Cdcstdecs of (
+      int(*0/1:sta/ext*), dcstkind, q1marglst, d1cstdeclst // dyncst
+    ) // end of [D2Cdcstdecs]
 //
   | D1Cmacdefs of (int(*knd*), bool(*isrec*), m1acdeflst)
 //
@@ -411,7 +414,7 @@ and d1exp_node =
   | D1Eann_effc of (d1exp, effcst) // ascribed with effects
   | D1Eann_funclo of (d1exp, funclo) // ascribed with funtype
 //
-  | D1Eerr of () // HX: placeholder for indicating an error
+  | D1Eerrexp of () // HX: placeholder for indicating an error
 // end of [d1exp_node]
 
 and d1lab_node =
@@ -777,7 +780,7 @@ fun d1exp_ann_funclo_opt
 
 (* ****** ****** *)
 
-fun d1exp_err (loc: location): d1exp
+fun d1exp_errexp (loc: location): d1exp
 
 (* ****** ****** *)
 
@@ -916,17 +919,21 @@ fun d1ecl_sexpdefs
 
 fun d1ecl_saspdec (loc: location, d: s1aspdec): d1ecl
 
-fun d1ecl_datdecs (
+fun d1ecl_exndecs (loc: location, ds: e1xndeclst): d1ecl
+
+fun d1ecl_datdecs
+(
   loc: location, knd: int, ds1: d1atdeclst, ds2: s1expdeflst
 ) : d1ecl // end of [d1ecl_datdecs]
 
-fun d1ecl_exndecs (loc: location, ds: e1xndeclst): d1ecl
-
-fun d1ecl_classdec (loc: location, id: i0de, sup: s1expopt): d1ecl
+fun d1ecl_classdec
+  (loc: location, id: i0de, sup: s1expopt): d1ecl
 
 fun d1ecl_dcstdecs
 (
-  loc: location, dck: dcstkind, qarg: q1marglst, ds: d1cstdeclst
+  loc: location
+, knd: int(*0/1:sta/ext*)
+, dck: dcstkind, qarg: q1marglst, d1cs: d1cstdeclst
 ) : d1ecl // end of [d1ec_dcstdecs]
 
 fun d1ecl_extype (

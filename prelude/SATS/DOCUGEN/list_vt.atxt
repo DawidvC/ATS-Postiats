@@ -200,7 +200,23 @@ pointer requires great caution. ')
 (* ****** ****** *)
 
 #declnamesynop("list_vt_insert_at")
-#declnamesynop("list_vt_remove_at")
+#decldescrpt('\
+
+Given a linear list xs of length n, a natural number i <= n, and an element
+x, this inserts x into xs immediately after the first i elements so that x
+becomes element i+1 in the returned list.\
+
+')
+
+(* ****** ****** *)
+
+#declnamesynop("list_vt_takeout_at")
+#decldescrpt('\
+
+Given a linear list xs of length n and a natural number i < n, this function
+takes out element i from xs.\
+
+')
 
 (* ****** ****** *)
 
@@ -372,6 +388,59 @@ the input as linear elements cannot be either discarded or duplicated.
 
 (* ****** ****** *)
 
+#declnamesynop("list_vt_filter")
+#declnamesynop("list_vt_filter$pred")
+
+(* ****** ****** *)
+
+#declnamesynop("list_vt_filterlin")
+#declnamesynop("list_vt_filterlin$pred")
+#declnamesynop("list_vt_filterlin$clear")
+
+(* ****** ****** *)
+
+#declnamesynop("list_vt_app")
+#declnamesynop("list_vt_appfree")
+#decldescrpt("\
+
+This function is similar to #dyncode("list_vt_app"). However, it frees each
+list node after applying to the node the function implemented by
+#dyncode("list_vt_appfree$fwork").  ")
+
+#declnamesynop("list_vt_app$fwork")
+#declnamesynop("list_vt_appfree$fwork")
+
+(* ****** ****** *)
+
+#declnamesynop("list_vt_map")
+#decldescrpt("\
+
+Given a linear list xs of length n, this function returns a linear list
+consisting f(xs[i]), where i ranges from 0 until n-1, xs[i] refers to
+element i in xs and f is the function implemented by
+#dyncode("list_map_vt$fopr"). Note that the given list xs is kept after the
+function returns.  The implementation of this function in ATSLIB is
+tail-recursive.\
+
+")
+
+#declnamesynop("list_vt_map$fopr")
+
+(* ****** ****** *)
+
+#declnamesynop("list_vt_mapfree")
+#decldescrpt("\
+
+This function is similar to #dyncode("list_vt_map"). However, it frees each
+list node after applying to the node the function implemented by
+#dyncode("list_vt_mapfree$fopr").\
+
+")
+
+#declnamesynop("list_vt_mapfree$fopr")
+
+(* ****** ****** *)
+
 #declnamesynop("list_vt_foreach")
 #decldescrpt("\
 
@@ -409,46 +478,6 @@ The default implementation of this function always returns true.\
 ')
 
 #declnamesynop("list_vt_iforeach$fwork")
-
-(* ****** ****** *)
-
-#declnamesynop("list_vt_filter")
-#declnamesynop("list_vt_filter$pred")
-
-(* ****** ****** *)
-
-#declnamesynop("list_vt_filterlin")
-#declnamesynop("list_vt_filterlin$pred")
-#declnamesynop("list_vt_filterlin$clear")
-
-(* ****** ****** *)
-
-#declnamesynop("list_vt_app")
-#declnamesynop("list_vt_appfree")
-#decldescrpt("\
-
-This function is similar to #dyncode("list_vt_app"). However, it frees each
-list node after applying to the node the function implemented by
-#dyncode("list_vt_appfree$fwork").  ")
-
-#declnamesynop("list_vt_app$fwork")
-#declnamesynop("list_vt_appfree$fwork")
-
-(* ****** ****** *)
-
-#declnamesynop("list_vt_map")
-#declnamesynop("list_vt_map$fopr")
-
-(* ****** ****** *)
-
-#declnamesynop("list_vt_mapfree")
-#decldescrpt("\
-
-This function is similar to #dyncode("list_vt_map"). However, it frees each
-list node after applying to the node the function implemented by
-#dyncode("list_vt_mapfree$fopr"). ")
-
-#declnamesynop("list_vt_mapfree$fopr")
 
 (* ****** ****** *)
 

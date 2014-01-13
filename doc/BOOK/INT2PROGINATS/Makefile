@@ -57,12 +57,23 @@ allchap:: CHAP_POLYMORPH
 # PART II
 #
 allchap:: CHAP_EFFECTFUL
+allchap:: CHAP_MODULARITY
+allchap:: CHAP_CINTERACT
 #
 ######
 #
 # PART III
 #
 allchap:: CHAP_DEPTYPES
+allchap:: CHAP_DEPDTREF
+allchap:: CHAP_THMPRVING
+allchap:: CHAP_PRGTHMPRV
+#
+######
+#
+# PART IV
+#
+allchap:: CHAP_VVTINTRO
 #
 ######
 
@@ -100,10 +111,52 @@ CHAP_EFFECTFUL:: ; \
 
 ######
 
+CHAP_MODULARITY:: ; \
+  make -C CHAP_MODULARITY -f ../Makefile.chap main.db
+CHAP_MODULARITY:: ; \
+  make -C CHAP_MODULARITY -f ../Makefile.chap clean
+
+######
+
+CHAP_CINTERACT:: ; \
+  make -C CHAP_CINTERACT -f ../Makefile.chap main.db
+CHAP_CINTERACT:: ; \
+  make -C CHAP_CINTERACT -f ../Makefile.chap clean
+
+######
+
 CHAP_DEPTYPES:: ; \
   make -C CHAP_DEPTYPES -f ../Makefile.chap main.db
 CHAP_DEPTYPES:: ; \
   make -C CHAP_DEPTYPES -f ../Makefile.chap clean
+
+######
+
+CHAP_DEPDTREF:: ; \
+  make -C CHAP_DEPDTREF -f ../Makefile.chap main.db
+CHAP_DEPDTREF:: ; \
+  make -C CHAP_DEPDTREF -f ../Makefile.chap clean
+
+######
+
+CHAP_THMPRVING:: ; \
+  make -C CHAP_THMPRVING -f ../Makefile.chap main.db
+CHAP_THMPRVING:: ; \
+  make -C CHAP_THMPRVING -f ../Makefile.chap clean
+
+######
+
+CHAP_PRGTHMPRV:: ; \
+  make -C CHAP_PRGTHMPRV -f ../Makefile.chap main.db
+CHAP_PRGTHMPRV:: ; \
+  make -C CHAP_PRGTHMPRV -f ../Makefile.chap clean
+
+######
+
+CHAP_VVTINTRO:: ; \
+  make -C CHAP_VVTINTRO -f ../Makefile.chap main.db
+CHAP_VVTINTRO:: ; \
+  make -C CHAP_VVTINTRO -f ../Makefile.chap clean
 
 ######
 

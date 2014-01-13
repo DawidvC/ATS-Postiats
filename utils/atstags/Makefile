@@ -19,8 +19,19 @@ PATSOPT=$(PATSHOMEQ)/bin/patsopt
 
 ######
 
+CFLAGS :=
+CFLAGS += -I $(PATSHOMEQ)/contrib
+CFLAGS += $(shell pkg-config --cflags json-c)
+
+######
+
+LDFLAGS :=
+LDFLAGS += $(shell pkg-config --libs json-c)
+
+######
+
 jsonlst2arr: jsonlst2arr.dats ; \
-  $(PATSCC) -DATS_MEMALLOC_LIBC -I${PATSHOME}/contrib -O2 -o $@ $< -ljson-c
+  $(PATSCC) -DATS_MEMALLOC_LIBC $(CFLAGS) -O2 -o $@ $< $(LDFLAGS)
 
 ######
 
@@ -31,6 +42,9 @@ RMF=rm -f
 clean:: ; $(RMF) *~
 clean:: ; $(RMF) *_?ats.o
 clean:: ; $(RMF) *_?ats.c
+
+######
+
 cleanall:: clean
 cleanall:: ; $(RMF) ats2ctags
 cleanall:: ; $(RMF) ats2etags

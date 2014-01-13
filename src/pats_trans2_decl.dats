@@ -59,18 +59,23 @@ implement prerr_FILENAME<> () = prerr "pats_trans2_decl"
 
 (* ****** ****** *)
 
-staload SYM = "./pats_symbol.sats"
+staload
+SYM = "./pats_symbol.sats"
 macdef EQEQ = $SYM.symbol_EQEQ
 overload = with $SYM.eq_symbol_symbol
 overload != with $SYM.neq_symbol_symbol
 
-staload SYN = "./pats_syntax.sats"
+(* ****** ****** *)
+
+staload
+SYN = "./pats_syntax.sats"
 typedef i0de = $SYN.i0de
 typedef i0delst = $SYN.i0delst
 typedef s0taq = $SYN.s0taq
 typedef d0ynq = $SYN.d0ynq
 typedef dqi0de = $SYN.dqi0de
 typedef impqi0de = $SYN.impqi0de
+typedef dcstextdef = $SYN.dcstextdef
 
 macdef
 prerr_dqid (dq, id) =
@@ -88,8 +93,10 @@ staload "./pats_dynexp1.sats"
 staload "./pats_staexp2.sats"
 staload "./pats_stacst2.sats"
 staload "./pats_staexp2_util.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp2.sats"
-staload "./pats_dynexp2_util.sats"
 
 (* ****** ****** *)
 
@@ -1197,6 +1204,30 @@ val () = the_s2expenv_add_scst (s2c)
 
 local
 
+fun
+dckfun_check
+(
+  d1c: d1cstdec
+, dck: dcstkind, s2e_cst: s2exp
+) : void =
+(
+case+ dck of
+| DCKfun () => let
+    val isfun =
+      s2exp_is_FUNCLOfun (s2e_cst)
+    // end of [val]
+  in
+    if not(isfun) then {
+      val () =
+        prerr_error2_loc (d1c.d1cstdec_loc)
+      val () = filprerr_ifdebug "d1cstdec_tr" // for debugging
+      val () = prerrln! ": the function may need to be declard as a value"
+      val () = the_trans2errlst_add (T2E_d1cstdec_tr (d1c))
+    } (* end of [if] *)
+  end (* end of [DCKfun] *)
+| _(*rest*) => ((*void*))
+) (* end of [dckfun_check] *)
+
 fun s2exp_get_arylst
   (s2e: s2exp): List int =
   case+ s2e.s2exp_node of
@@ -1212,10 +1243,12 @@ in (* in of [local] *)
 
 fun d1cstdec_tr
 (
-  dck: dcstkind
+  knd: int
+, dck: dcstkind
 , s2qs: s2qualst
 , d1c: d1cstdec
-) : d2cst = let
+) : d2cst = d2c where
+{
   val loc = d1c.d1cstdec_loc
   val fil = d1c.d1cstdec_fil
   val sym = d1c.d1cstdec_sym
@@ -1229,32 +1262,44 @@ fun d1cstdec_tr
     (if isprf then s2rt_prop else s2rt_t0ype): s2rt
 //
   val s1e_cst = d1c.d1cstdec_type
-  var s2e_cst =
-    s1exp_trdn (s1e_cst, s2t_cst)
+  val s2e_cst = s1exp_trdn (s1e_cst, s2t_cst)
+  val s2e_cst = s2exp_hnfize (s2e_cst)
+  val ((*void*)) = dckfun_check (d1c, dck, s2e_cst)
+//
   val arylst = s2exp_get_arylst (s2e_cst)
-  val extdef = d1c.d1cstdec_extdef
+  val extdef =
+  (
+    if knd = 0 // static dyncst
+      then $SYN.dcstextdef_sta (sym) else d1c.d1cstdec_extdef
+    // end of [if]
+  ) : dcstextdef // end of [val]
+//
   val d2c =
     d2cst_make (sym, loc, fil, dck, s2qs, arylst, s2e_cst, extdef)
   // end of [val]
 //
-  val () = the_d2expenv_add_dcst (d2c)
+  val ((*void*)) = the_d2expenv_add_dcst (d2c)
 //
-in
-  d2c
-end // end of [d1cstdec_tr]
+} (* end of [d1cstdec_tr] *)
 
 end // end of [local]
 
+(* ****** ****** *)
+
 fun d1cstdeclst_tr
 (
-  dck: dcstkind, s2qs: s2qualst, d1cs: d1cstdeclst
+  knd: int
+, dck: dcstkind
+, s2qs: s2qualst
+, d1cs: d1cstdeclst
 ) : d2cstlst = let
 in
   case+ d1cs of
-  | list_cons (d1c, d1cs) => let
-      val d2c = d1cstdec_tr (dck, s2qs, d1c)
+  | list_cons
+      (d1c, d1cs) => let
+      val d2c = d1cstdec_tr (knd, dck, s2qs, d1c)
     in
-      list_cons (d2c, d1cstdeclst_tr (dck, s2qs, d1cs))
+      list_cons (d2c, d1cstdeclst_tr (knd, dck, s2qs, d1cs))
     end // end of [cons]
   | list_nil () => list_nil ()
 end // end of [d1cstdeclst_tr]
@@ -1935,6 +1980,10 @@ case+ d1c0.d1ecl_node of
     // end of [case]
   end // end of [D1Csaspdec]
 //
+| D1Cexndecs (d1cs) =>
+  (
+    d2ecl_exndecs (loc0, e1xndeclst_tr (d1cs))
+  ) (* end of [D1Cexndecs] *)
 | D1Cdatdecs
   (
     knd, d1cs_dat, d1cs_def
@@ -1943,9 +1992,6 @@ case+ d1c0.d1ecl_node of
   in
     d2ecl_datdecs (loc0, knd, s2cs)
   end // end of [D1Cdatdecs]
-| D1Cexndecs (d1cs) => let
-    val d2cs = e1xndeclst_tr d1cs in d2ecl_exndecs (loc0, d2cs)
-  end // end of [D1Cexndecs]
 //
 | D1Cclassdec (id, sup) => let
     val () = c1lassdec_tr (id, sup) in d2ecl_none (loc0)
@@ -1974,14 +2020,16 @@ case+ d1c0.d1ecl_node of
 //
 | D1Cdcstdecs
   (
-    dck, decarg, d1cs
+    knd, dck, decarg, d1cs
   ) => let
-    val (pfenv | ()) = the_s2expenv_push_nil ()
+    val (
+      pfenv | ()
+    ) = the_s2expenv_push_nil ()
     val s2qs = l2l (list_map_fun (decarg, q1marg_tr_dec))
-    val d2cs = d1cstdeclst_tr (dck, s2qs, d1cs)
-    val () = the_s2expenv_pop_free (pfenv | (*none*))
+    val d2cs = d1cstdeclst_tr (knd, dck, s2qs, d1cs)
+    val ((*void*)) = the_s2expenv_pop_free (pfenv | (*none*))
   in
-    d2ecl_dcstdecs (loc0, dck, d2cs)
+    d2ecl_dcstdecs (loc0, knd, dck, d2cs)
   end // end of [D1Cdcstdecs]
 //
 | D1Cmacdefs
@@ -2077,10 +2125,17 @@ case+ d1c0.d1ecl_node of
     s1taload_tr
       (loc0, idopt, fil, loadflag, d1cs, loaded)
 //
-    val () = {
-      val d2cs = filenv_get_d2eclist (fenv)
-      val ((*void*)) = overload_tr_d2eclist (d2cs)
-    } (* end of [if] *)
+// HX-2013-10-30:
+// Overloading declarations cannot permeate a NAMED namespace!!!
+//
+    val () = (
+    case+ idopt of
+    | None () => {
+        val d2cs = filenv_get_d2eclist (fenv)
+        val ((*void*)) = overload_tr_d2eclist (d2cs)
+      } (* end of [None] *)
+    | Some id => ()
+    ) (* end of [val] *)
 //
   in
     d2ecl_staload (loc0, idopt, fil, loadflag, fenv, loaded)

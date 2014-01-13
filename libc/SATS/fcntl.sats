@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-20?? Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 ** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -85,13 +85,27 @@ fun fildes_iget_int
 //
 (* ****** ****** *)
 
-typedef fcntlflags = int
-
-(* ****** ****** *)
-
+abst@ype fcntlflags = int
+//
+macdef O_CREAT  = $extval (fcntlflags, "O_CREAT")
+macdef O_EXCL   = $extval (fcntlflags, "O_EXCL")
+macdef O_TRUNC  = $extval (fcntlflags, "O_TRUNC")
+macdef O_APPEND = $extval (fcntlflags, "O_APPEND")
+//
 macdef O_RDWR   = $extval (fcntlflags, "O_RDWR")
 macdef O_RDONLY = $extval (fcntlflags, "O_RDONLY")
 macdef O_WRONLY = $extval (fcntlflags, "O_WRONLY")
+//
+macdef O_SYNC   = $extval (fcntlflags, "O_SYNC")
+macdef O_ASYNC  = $extval (fcntlflags, "O_ASYNC")
+//
+macdef O_NOCTTY = $extval (fcntlflags, "O_NOCTTY")
+//  
+(* ****** ****** *)
+
+fun lor_fcntlflags_fcntlflags
+  : (fcntlflags, fcntlflags) -<> fcntlflags = "ext#atspre_lor_int_int"
+overload lor with lor_fcntlflags_fcntlflags
 
 (* ****** ****** *)
 

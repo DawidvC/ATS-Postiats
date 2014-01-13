@@ -6,7 +6,7 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
@@ -36,6 +36,12 @@
 #define ATS_PACKNAME "ATSLIB.libats.ML"
 #define ATS_STALOADFLAG 0 // no need for staloading at run-time
 #define ATS_EXTERN_PREFIX "atslib_ML_" // prefix for external names
+
+(* ****** ****** *)
+
+%{#
+#include "libats/ML/CATS/array0.cats"
+%} // end of [%{#]
 
 (* ****** ****** *)
 
@@ -73,7 +79,7 @@ sortdef t0p = t@ype and vt0p = viewt@ype
 //
 fun{}
 array0_of_arrszref
-  {a:vt0p} (A: arrszref (a)):<> array0 (a)
+  {a:vt0p} (arrszref (a)):<> array0 (a)
 //
 fun{}
 arrszref_of_array0
@@ -107,8 +113,8 @@ overload .ref with array0_get_ref
 overload .size with array0_get_size
 //
 fun{}
-array0_get_refsize{a:vt0p}
-  (A: array0 (a)):<> [n:nat] (arrayref (a, n), size_t (n))
+array0_get_refsize
+  {a:vt0p} (array0 (a)):<> [n:nat] (arrayref (a, n), size_t (n))
 //
 (* ****** ****** *)
 //
@@ -169,13 +175,13 @@ overload array0_set_at with array0_set_at_guint
 
 fun{a:vt0p}
 array0_exch_at_size
-  (A: array0 (a), i: size_t, x: &a):<!exn,!refwrt> void
+  (A: array0 (a), i: size_t, x: &a >> _):<!exn,!refwrt> void
 fun{a:vt0p}{tk:tk}
 array0_exch_at_gint
-  (A: array0 (a), i: g0int(tk), x: &a):<!exn,!refwrt> void
+  (A: array0 (a), i: g0int(tk), x: &a >> _):<!exn,!refwrt> void
 fun{a:vt0p}{tk:tk}
 array0_exch_at_guint
-  (A: array0 (a), i: g0uint(tk), x: &a):<!exn,!refwrt> void
+  (A: array0 (a), i: g0uint(tk), x: &a >> _):<!exn,!refwrt> void
 //
 symintr array0_exch_at
 overload array0_exch_at with array0_exch_at_gint

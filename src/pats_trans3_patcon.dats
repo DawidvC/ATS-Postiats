@@ -111,7 +111,7 @@ end // end of [val]
 //
 val () = let
   fun loop (
-    loc0: location, s2qs: s2qualst
+    loc0: loc_t, s2qs: s2qualst
   ) : void = case+ s2qs of
     | list_cons (s2q, s2qs) => let
         val () = trans3_env_hypadd_proplst (loc0, s2q.s2qua_sps)
@@ -523,7 +523,7 @@ case+ 0 of
   in
     p3t0
   end // end of [flag>0]
-| _ => p3at_err (loc0, s2e) // HX: error already registered
+| _ => p3at_errpat (loc0, s2e) // HX: error already registered
 ) : p3at // end of [val]
 //
 in

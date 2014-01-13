@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner_for_C()
-#atscode_copyright_LGPL_for_C()
+#atscode_copyright_GPL_for_C()
 
 #atscode_separator_for_C()
 
@@ -40,22 +40,24 @@ size_t strlen (const char *str) ;
 extern
 int // (sign)
 strcmp (const char *x1, const char *x2) ;
-
+//
 extern
 char *strchr(const char *str1, int c2) ;
 extern
 char *strrchr(const char *str1, int c2) ;
 extern
 char *strstr(const char *str1, const char *str2) ;
-
+//
 extern
 size_t strspn(const char *str1, const char *acc2) ;
 extern
 size_t strcspn(const char *str1, const char *rej2) ;
-
+//
+\#ifndef memcpy
 extern
 void *memcpy(void *dest, const void *src, size_t n) ;
-
+\#endif // \#ifndef
+//
 #atscode_separator_for_C()
 //
 // [stdio.h]
@@ -153,6 +155,26 @@ atspre_fprint_string
 
 #atscode_separator_for_C()
 
+ATSinline()
+atsvoid_t0ype
+atspre_fprint_substring
+(
+  atstype_ref out
+, atstype_string x
+, atstype_size st, atstype_size ln  
+) {
+  int err = 0 ;
+  err += fwrite(((char*)x)+st, 1, ln, out) ;
+/*
+  if (err < 0) {
+    fprintf(stderr, "exit(ATS): [fprint_substring] failed.") ; exit(1) ;
+  } // end of [if]
+*/
+  return ;
+} // end of [atspre_fprint_substring]
+
+#atscode_separator_for_C()
+
 \#define atspre_strlen strlen
 \#define atspre_strchr strchr
 \#define atspre_strrchr strrchr
@@ -187,6 +209,21 @@ atspre_fprint_stropt
 \#define atspre_print_stropt(x) atspre_fprint_stropt(stdout, (x))
 \#define atspre_prerr_stropt(x) atspre_fprint_stropt(stderr, (x))
 
+#atscode_separator_for_C()
+//
+\#include <stdarg.h>
+//
+// HX-2013-11:
+// these are implemented in [string.dats]
+//
+extern
+atstype_string // Strptr0
+atspre_string_make_snprintf(atstype_string fmt, ...) ;
+extern
+atstype_string // Strptr0
+atspre_string_make_vsnprintf
+  (atstype_size bsz0, atstype_string fmt, va_list ap0) ;
+//
 #atscode_separator_for_C()
 
 \#endif // ifndef ATSLIB_PRELUDE_STRING_CATS

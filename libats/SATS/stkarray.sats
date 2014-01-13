@@ -2,19 +2,17 @@
 (*                                                                     *)
 (*                         Applied Type System                         *)
 (*                                                                     *)
-(*                              Hongwei Xi                             *)
-(*                                                                     *)
 (***********************************************************************)
 
 (*
-** ATS - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, Boston University
+** ATS/Postiats - Unleashing the Potential of Types!
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the  terms of the  GNU General Public License as published by the Free
-** Software Foundation; either version 2.1, or (at your option) any later
-** version.
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
+** later version.
 ** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
@@ -22,15 +20,11 @@
 ** for more details.
 ** 
 ** You  should  have  received  a  copy of the GNU General Public License
-** along  with  ATS;  see  the  file  COPYING.  If not, write to the Free
-** Software Foundation, 51  Franklin  Street,  Fifth  Floor,  Boston,  MA
+** along  with  ATS;  see the  file COPYING.  If not, please write to the
+** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
 ** 02110-1301, USA.
 *)
 
-(* ****** ****** *)
-//
-// License: LGPL 3.0 (available at http://www.gnu.org/licenses/lgpl.txt)
-//
 (* ****** ****** *)
 
 (*
@@ -71,7 +65,8 @@ stkarray_vtype (a:vt@ype+, m:int, n:int) = ptr
 stadef stkarray = stkarray_vtype
 //
 vtypedef
-stkarray (a:vt0p) = [m,n:int] stkarray_vtype (a, m, n)
+stkarray
+  (a:vt0p) = [m,n:int] stkarray_vtype (a, m, n)
 //
 (* ****** ****** *)
 
@@ -96,7 +91,7 @@ stkarray_make_cap
 (* ****** ****** *)
 
 fun
-stkarray_make_ngc
+stkarray_make_ngc__tsz
   {a:vt0p}
   {l:addr}{m:int}
 (

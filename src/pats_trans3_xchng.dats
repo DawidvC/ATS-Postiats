@@ -40,7 +40,6 @@ ATSPRE = "./pats_atspre.dats"
 
 staload
 LOC = "./pats_location.sats"
-stadef location = $LOC.location
 
 (* ****** ****** *)
 
@@ -53,9 +52,17 @@ implement prerr_FILENAME<> () = prerr "pats_trans3_xchng"
 staload "./pats_staexp2.sats"
 staload "./pats_staexp2_error.sats"
 staload "./pats_staexp2_util.sats"
+
+(* ****** ****** *)
+
 staload "./pats_stacst2.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp2.sats"
-staload "./pats_dynexp2_util.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp3.sats"
 
 (* ****** ****** *)
@@ -71,8 +78,9 @@ staload "./pats_trans3_env.sats"
 
 local
 
-fun auxerr_pfobj (
-  loc0: location, loc1: location, s2l: s2exp
+fun auxerr_pfobj
+(
+  loc0: loc_t, loc1: loc_t, s2l: s2exp
 ) : void = let
   val () = prerr_error3_loc (loc1)
   val () = prerr ": exchange cannot be performed"
@@ -84,9 +92,11 @@ in
   the_trans3errlst_add (T3E_pfobj_search_none (loc1, s2l))
 end // end of [auxerr_pfobj]
 
-fun auxmain .<>. (
-  loc0: location // all
-, loc1: location // right
+fun
+auxmain .<>.
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , pfobj: pfobj
 , d3ls: d3lablst
 , s2f0_sel: s2hnf // left
@@ -135,7 +145,7 @@ case+ ctxtopt of
 //
 end // end of [auxmain]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 s2addr_xchng_check (
@@ -174,9 +184,10 @@ in
   the_trans3errlst_add (T3E_d3exp_nonderef (d3e))
 end // end of [auxerr_nonderef]
 
-fun auxerr1 (
-  loc0: location // all
-, loc1: location // right
+fun auxerr1
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , s2f0_sel: s2hnf // left
 , s2f1_sel: s2hnf // right
 ) : void = let
@@ -190,9 +201,10 @@ in
   the_trans3errlst_add (T3E_s2addr_xchng_check_LHS (loc1, s2e0_sel, s2e1_sel))
 end // end of [auxerr1]
 
-fun auxerr2 (
-  loc0: location // all
-, loc1: location // right
+fun auxerr2
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , s2f0_sel: s2hnf // left
 , s2f1_sel: s2hnf // right
 ) : void = let
@@ -206,9 +218,10 @@ in
   the_trans3errlst_add (T3E_s2addr_xchng_check_RHS (loc0, s2e0_sel, s2e1_sel))
 end // end of [auxerr2]
 
-fun aux1 (
-  loc0: location // all
-, loc1: location // right
+fun aux1
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , s2f0: s2hnf // right
 , d3e: d3exp, d3ls: d3lablst
 , s2f0_sel: s2hnf // left
@@ -232,9 +245,10 @@ case+ opt of
 //
 end // end of [aux1]
 
-and aux2 (
-  loc0: location // all
-, loc1: location // right
+and aux2
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , s2f0: s2hnf // right
 , d3e: d3exp, d3ls: d3lablst
 , s2f0_sel: s2hnf // left
@@ -262,17 +276,18 @@ case+ opt of
 //
 end // end of [aux2]
 
-and aux3 (
-  loc0: location // all
-, loc1: location // right
+and aux3
+(
+  loc0: loc_t // all
+, loc1: loc_t // right
 , s2f0: s2hnf // right
 , d3e: d3exp, d3ls: d3lablst
 , s2f0_sel: s2hnf // left
 ) : d3exp = let
-  val () = auxerr_nonderef (d3e) in d3exp_err (loc0)
+  val () = auxerr_nonderef (d3e) in d3exp_errexp (loc0)
 end // end of [aux3]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 d2exp_trdn_xchng_deref
@@ -320,7 +335,7 @@ case+ d2lv of
     val () = prerr_newline ()
     val () = the_trans3errlst_add (T3E_d2exp_nonlval (d2e))
   in
-    d3exp_err (loc1)
+    d3exp_errexp (loc1)
   end // end of [_]
 //
 end // end of [d2exp_trdn_xchng]
@@ -331,8 +346,10 @@ end // end of [local]
 
 local
 
-fun auxerr_pfobj (
-  loc0: location, s2l: s2exp
+fun
+auxerr_pfobj
+(
+  loc0: loc_t, s2l: s2exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": exchange cannot be performed"
@@ -344,8 +361,10 @@ in
   the_trans3errlst_add (T3E_pfobj_search_none (loc0, s2l))
 end // end of [auxerr_pfobj]
 
-fun auxmain .<>. (
-  loc0: location
+fun
+auxmain .<>.
+(
+  loc0: loc_t
 , pfobj: pfobj, d3ls: d3lablst
 , d2e_r: d2exp
 , s2rt: &s2exp? >> s2exp
@@ -363,7 +382,7 @@ in
   d2exp_trdn_xchng (loc0, d2e_r, s2f_sel)
 end // end of [auxmain]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 s2addr_xchng_deref (
@@ -388,8 +407,9 @@ end // end of [local]
 
 local
 
-fun aux1 (
-  loc0: location
+fun aux1
+(
+  loc0: loc_t
 , s2f0: s2hnf // left
 , d3e_l: d3exp
 , d3ls: d3lablst
@@ -411,8 +431,9 @@ case+ opt of
 //
 end // end of [aux1]
 
-and aux2 (
-  loc0: location
+and aux2
+(
+  loc0: loc_t
 , s2f0: s2hnf // left
 , d3e_l: d3exp
 , d3ls: d3lablst
@@ -439,18 +460,19 @@ case+ opt of
 //
 end // end of [aux2]
 
-and aux3 (
-  loc0: location
+and aux3
+(
+  loc0: loc_t
 , s2f0: s2hnf // left
 , d3e_l: d3exp
 , d3ls: d3lablst
 , d2e_r: d2exp
 ) : d3exp = let
 in
-  d3exp_void_err (loc0)
+  d3exp_errexp_void (loc0)
 end // end of [aux3]
 
-in // end of [local]
+in (* in of [local] *)
 
 implement
 d2exp_trup_xchng_deref
@@ -478,7 +500,7 @@ end // end of [local]
 local
 
 fn auxerr_wrt_if
-  (loc0: location): void = let
+  (loc0: loc_t): void = let
   val err = the_effenv_check_wrt (loc0)
 in
   if (err > 0) then (
@@ -504,7 +526,7 @@ in
   the_trans3errlst_add (T3E_d2exp_nonlval (d2e))
 end // end of [auxerr_nonlval]
 
-in // in of [local]
+in (* in of [local] *)
 
 (*
 ** HX-2012-05-04:
@@ -538,14 +560,14 @@ case+ d2lv_l of
   end // end of [D2LVALderef]
 //
 | D2LVALvar_lin _ => let
-    val () = auxerr_lproof (d2e_l) in d3exp_void_err (loc0)
+    val () = auxerr_lproof (d2e_l) in d3exp_errexp_void (loc0)
   end // end of [_]
 | D2LVALviewat _ => let
-    val () = auxerr_lproof (d2e_l) in d3exp_void_err (loc0)
+    val () = auxerr_lproof (d2e_l) in d3exp_errexp_void (loc0)
   end // end of [_]
 //
 | _ => let
-    val () = auxerr_nonlval (d2e_l) in d3exp_void_err (loc0)
+    val () = auxerr_nonlval (d2e_l) in d3exp_errexp_void (loc0)
   end // end of [_]
 //
 end // end of [d2exp_trup_xchng]

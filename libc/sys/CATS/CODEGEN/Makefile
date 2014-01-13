@@ -17,6 +17,15 @@ all::
 
 ######
 
+all:: mman.cats
+mman.cats: mman_atxt.exe ; ./$< > $@
+mman_atxt.exe: mman_atxt.dats
+	$(ATSCC) $(ATSGCFLAG) -o $@ mman_atxt.dats -latsdoc
+mman_atxt.dats: mman.atxt
+	$(ATSDOC) --outcode $@ -i mman.atxt > mman_atxt.txt
+clean:: ; $(RMF) mman_atxt.exe
+cleanall:: ; $(RMF) mman.cats
+
 all:: stat.cats
 stat.cats: stat_atxt.exe ; ./$< > $@
 stat_atxt.exe: stat_atxt.dats
@@ -43,6 +52,15 @@ types_atxt.dats: types.atxt
 	$(ATSDOC) --outcode $@ -i types.atxt > types_atxt.txt
 clean:: ; $(RMF) types_atxt.exe
 cleanall:: ; $(RMF) types.cats
+
+all:: wait.cats
+wait.cats: wait_atxt.exe ; ./$< > $@
+wait_atxt.exe: wait_atxt.dats
+	$(ATSCC) $(ATSGCFLAG) -o $@ wait_atxt.dats -latsdoc
+wait_atxt.dats: wait.atxt
+	$(ATSDOC) --outcode $@ -i wait.atxt > wait_atxt.txt
+clean:: ; $(RMF) wait_atxt.exe
+cleanall:: ; $(RMF) wait.cats
 
 
 ######

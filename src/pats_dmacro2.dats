@@ -48,7 +48,8 @@ staload ERR = "./pats_error.sats"
 
 staload "./pats_errmsg.sats"
 staload _(*anon*) = "./pats_errmsg.dats"
-implement prerr_FILENAME<> () = prerr "pats_dmacro2"
+implement
+prerr_FILENAME<> () = prerr "pats_dmacro2"
 
 (* ****** ****** *)
 
@@ -88,7 +89,7 @@ in
       val () = prerr ": a value representing code (AST) cannot be lifted."
       val () = prerr_newline ()
     in
-      d2exp_err (loc0)
+      d2exp_errexp (loc0)
     end // end of [_]
 end // end of [liftval2dexp]
 
@@ -107,7 +108,7 @@ dataviewtype alphenv =
 
 assume alphenv_viewtype = alphenv
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 alphenv_nil () = ALPHENVnil ()
@@ -254,7 +255,7 @@ dataviewtype evalctx =
 
 assume evalctx_viewtype = evalctx
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 evalctx_nil () = EVALCTXnil ()
@@ -440,7 +441,7 @@ case+ m2v of
     val () = prerr_m2val (m2v)
     val () = prerr_newline ()
   in
-    d2exp_err (loc0)
+    d2exp_errexp (loc0)
   end // end of [_]
 //
 end // end of [dmacro_eval_decode]

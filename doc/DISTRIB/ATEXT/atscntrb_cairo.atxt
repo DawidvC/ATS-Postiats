@@ -104,13 +104,16 @@ packfilesynop (x) = atext_nil ()
 (* ****** ****** *)
 
 #packfilename("SATS/cairo.sats")
-#packfilename("SATS/cairo_header.sats")
+#packfilename("SATS/mybasis.sats")
 
 (* ****** ****** *)
 
 #packfilename("SATS/Drawing/cairo-cairo-t.sats")
-#packfilename("SATS/Drawing/cairo-Paths.sats")
 #packfilename("SATS/Drawing/cairo-cairo-pattern-t.sats")
+
+(* ****** ****** *)
+
+#packfilename("SATS/Drawing/cairo-Paths.sats")
 #packfilename("SATS/Drawing/cairo-Regions.sats")
 #packfilename("SATS/Drawing/cairo-Transformations.sats")
 #packfilename("SATS/Drawing/cairo-text.sats")
@@ -124,6 +127,9 @@ packfilesynop (x) = atext_nil ()
 
 #packfilename("SATS/Surfaces/cairo-cairo-device-t.sats")
 #packfilename("SATS/Surfaces/cairo-cairo-surface-t.sats")
+
+(* ****** ****** *)
+
 #packfilename("SATS/Surfaces/cairo-Image-Surfaces.sats")
 #packfilename("SATS/Surfaces/cairo-PDF-Surfaces.sats")
 #packfilename("SATS/Surfaces/cairo-PNG-Support.sats")

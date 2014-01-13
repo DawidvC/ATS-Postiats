@@ -50,12 +50,24 @@
 
 (* ****** ****** *)
 
-#include "./cairo_header.sats"
+#include "./mybasis.sats"
 
 (* ****** ****** *)
 
 fun cairo_version ((*void*)): int = "mac#%"
 fun cairo_version_string ((*void*)): string = "mac#%"
+
+(* ****** ****** *)
+
+macdef CAIRO_VERSION_MAJOR = $extval (int, "CAIRO_VERSION_MAJOR")
+macdef CAIRO_VERSION_MINOR = $extval (int, "CAIRO_VERSION_MINOR")
+macdef CAIRO_VERSION_MICRO = $extval (int, "CAIRO_VERSION_MICRO")
+
+(* ****** ****** *)
+
+fun CAIRO_VERSION_ENCODE
+  (major: int, minor: int, micro: int): int = "mac#CAIRO_VERSION_ENCODE"
+// end of [CAIRO_VERSION_ENCODE]
 
 (* ****** ****** *)
 

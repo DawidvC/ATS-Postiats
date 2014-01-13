@@ -649,7 +649,9 @@ hidexp_trywith
 (* ****** ****** *)
 
 implement
-hidexp_err (loc, hse) = hidexp_make_node (loc, hse, HDEerr ())
+hidexp_errexp
+  (loc, hse) = hidexp_make_node (loc, hse, HDEerrexp ())
+// end of [hidexp_errexp]
 
 (* ****** ****** *)
 
@@ -809,6 +811,18 @@ hidecl_saspdec (loc, d2c) =
 (* ****** ****** *)
 
 implement
+hidecl_extype
+  (loc, name, hse_def) =
+  hidecl_make_node (loc, HIDextype (name, hse_def))
+// end of [hidecl_extype]
+
+implement
+hidecl_extval
+  (loc, name, hde_def) =
+  hidecl_make_node (loc, HIDextval (name, hde_def))
+// end of [hidecl_extval]
+
+implement
 hidecl_extcode
   (loc, knd, pos, code) =
   hidecl_make_node (loc, HIDextcode (knd, pos, code))
@@ -832,8 +846,8 @@ hidecl_exndecs
 
 implement
 hidecl_dcstdecs
-  (loc, knd, d2cs) =
-  hidecl_make_node (loc, HIDdcstdecs (knd, d2cs))
+  (loc, dck, d2cs) =
+  hidecl_make_node (loc, HIDdcstdecs (dck, d2cs))
 // end of [hidecl_dcstdecs]
 
 (* ****** ****** *)

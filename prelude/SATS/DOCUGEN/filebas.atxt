@@ -314,7 +314,7 @@ end // end of [fileref_get_line_string]
 
 This function returns a line read from a given file handle and records
 the length of the line in its second (call-by-reference) argument. Note
-that the length information can be trusted only if there are no occurrences
+that the length information can only be trusted if there are no occurrences
 of the NUL char in the line.\
 
 ')
@@ -380,7 +380,7 @@ end // end of [main]
 
 (* ****** ****** *)
 
-#declnamesynop("fileref_nget_file_charlst")
+#declnamesynop("fileref_get2_file_charlst")
 #decldescrpt('\
 
 This function reads chars from a given file handle until either the number
@@ -444,6 +444,50 @@ end // end of [main]
 Clearly, this is a wasteful and inefficient way of removing empty lines.
 
 ")
+
+(* ****** ****** *)
+
+#declnamesynop("fileref_foreach")
+#decldescrpt('\
+
+This function reads from a given file handle multiple characters and then
+applies to them the function implemented by
+#dyncode("fileref_foreach$fworkv"). It does so repeatedly until it can read
+no more characters from the file handle.
+
+')
+
+#declnamesynop("fileref_foreach_env")
+#decldescrpt('\
+
+This function does essentially the same as #dyncode("fileref_foreach")
+except for taking an additional argument that serves as an environment.
+Actually, #dyncode("fileref_foreach") is implemented as a special case of
+#dyncode("fileref_foreach_env").
+
+')
+
+#declnamesynop("fileref_foreach$bufsize")
+#decldescrpt('\
+
+This function determines the size of the buffer allocated for storing
+characters during the evaluation of a call to #dyncode("fileref_foreach_env").\
+
+')
+
+#declnamesynop("fileref_foreach$fwork")
+#decldescrpt('\
+
+This function is used in the default implementation of #dyncode("fileref_foreach$fworkv").\
+
+')
+
+#declnamesynop("fileref_foreach$fworkv")
+#decldescrpt('\
+
+This function is directly called in the implementation of #dyncode("fileref_foreach_env").\
+
+')
 
 (* ****** ****** *)
 //

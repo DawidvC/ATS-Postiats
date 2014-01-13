@@ -111,18 +111,28 @@ all_script::
 
 ######
 #
+#make_entry("atscntrb_pcre")
+#
 #make_entry("atscntrb_libgmp")
+#
+#make_entry("atscntrb_zeromq")
+#
+#make_entry("atscntrb_libcurl")
 #
 #make_entry("atscntrb_GTK")
 #make_entry("atscntrb_glib")
 #make_entry("atscntrb_cairo")
+#
+#make_entry("atscntrb_json-c")
+#make_entry("atscntrb_jansson")
 #make_entry("atscntrb_hiredis")
+#
+#make_entry("atscntrb_JNI")
 #
 #make_entry("atscntrb_HTML")
 #make_entry("atscntrb_HTML_canvas-2d")
 #
-#make_entry("atscntrb_libatshwxi_intinf")
-#make_entry("atscntrb_libatshwxi_testing")
+#make_entry("atscntrb_libatshwxi")
 #make_entry("atscntrb_libatshwxi_teaching")
 #
 ######
@@ -157,6 +167,12 @@ srcget_share:: ; \\
   $(CPF) ../../share/atspre_define_pkgreloc.hats $(ATSDIST)/share/
 srcget_share:: ; \\
   $(CPF) ../../share/atspre_staload.hats $(ATSDIST)/share/
+srcget_share:: ; \\
+  $(CPF) ../../share/atspre_staload_libats_ML.hats $(ATSDIST)/share/
+srcget_share:: ; \\
+  $(CPF) ../../share/atsmake-pre.mk $(ATSDIST)/share/
+srcget_share:: ; \\
+  $(CPF) ../../share/atsmake-post.mk $(ATSDIST)/share/
 
 ######
 
@@ -200,8 +216,23 @@ atscontribing:: srcget_atscntrb
 
 ######
 
+srcget_atscntrb:: srcget_atscntrb_pcre
+srcget_atscntrb_pcre:: SCRIPT/atscntrb_pcre.bash ; bash $<
+
+######
+
 srcget_atscntrb:: srcget_atscntrb_libgmp
 srcget_atscntrb_libgmp:: SCRIPT/atscntrb_libgmp.bash ; bash $<
+
+######
+
+srcget_atscntrb:: srcget_atscntrb_zeromq
+srcget_atscntrb_zeromq:: SCRIPT/atscntrb_zeromq.bash ; bash $<
+
+######
+
+srcget_atscntrb:: srcget_atscntrb_libcurl
+srcget_atscntrb_libcurl:: SCRIPT/atscntrb_libcurl.bash ; bash $<
 
 ######
 
@@ -217,8 +248,20 @@ srcget_atscntrb_cairo:: SCRIPT/atscntrb_cairo.bash ; bash $<
 
 ######
 
+srcget_atscntrb:: srcget_atscntrb_json-c
+srcget_atscntrb_json-c:: SCRIPT/atscntrb_json-c.bash ; bash $<
+srcget_atscntrb:: srcget_atscntrb_jansson
+srcget_atscntrb_jansson:: SCRIPT/atscntrb_jansson.bash ; bash $<
+
+######
+
 srcget_atscntrb:: srcget_atscntrb_hiredis
 srcget_atscntrb_hiredis:: SCRIPT/atscntrb_hiredis.bash ; bash $<
+
+######
+
+srcget_atscntrb:: srcget_atscntrb_JNI
+srcget_atscntrb_JNI:: SCRIPT/atscntrb_JNI.bash ; bash $<
 
 ######
 
@@ -229,16 +272,14 @@ srcget_atscntrb_HTML_canvas-2d:: SCRIPT/atscntrb_HTML_canvas-2d.bash ; bash $<
 
 ######
 
-srcget_atscntrb:: srcget_atscntrb_libatshwxi_intinf
-srcget_atscntrb_libatshwxi_intinf:: SCRIPT/atscntrb_libatshwxi_intinf.bash ; bash $<
-srcget_atscntrb:: srcget_atscntrb_libatshwxi_testing
-srcget_atscntrb_libatshwxi_testing:: SCRIPT/atscntrb_libatshwxi_testing.bash ; bash $<
+srcget_atscntrb:: srcget_atscntrb_libatshwxi
+srcget_atscntrb_libatshwxi:: SCRIPT/atscntrb_libatshwxi.bash ; bash $<
 srcget_atscntrb:: srcget_atscntrb_libatshwxi_teaching
 srcget_atscntrb_libatshwxi_teaching:: SCRIPT/atscntrb_libatshwxi_teaching.bash ; bash $<
 
 ######
 
-PACKNAME=ATS2-Postiats-0.0.3
+PACKNAME=ATS2-Postiats-0.0.5
 atspacktar:: ; rm -rf $(PACKNAME)
 atspacktar:: ; cp -rf ATS-Postiats $(PACKNAME)
 atspacktar:: ; $(RMF) $(PACKNAME)/Makefile_conf
@@ -247,7 +288,7 @@ atspacktar:: ; $(RMF) $(PACKNAME)/install-sh ; $(CPF) ATS-Postiats/install-sh $(
 atspacktar:: ; make -C $(PACKNAME) cleanall
 atspacktar:: ; tar -zvcf  $(PACKNAME).tgz  $(PACKNAME)/
 
-CNTRBNAME=ATS2-Postiats-contrib-0.0.2
+CNTRBNAME=ATS2-Postiats-contrib-0.0.4
 atscntrbtar:: ; rm -rf $(CNTRBNAME)
 atscntrbtar:: ; cp -rf ATS-Postiats-contrib $(CNTRBNAME)
 atscntrbtar:: ; tar -zvcf  $(CNTRBNAME).tgz  $(CNTRBNAME)/

@@ -1,29 +1,29 @@
-/***********************************************************************/
+/* ******************************************************************* */
 /*                                                                     */
 /*                         Applied Type System                         */
 /*                                                                     */
-/***********************************************************************/
+/* ******************************************************************* */
 
-/* (*
+/*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-20?? Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-**
+** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-**
+** 
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
 ** 02110-1301, USA.
-*) */
+*/
 
 /* ****** ****** */
 
@@ -53,11 +53,11 @@ extern void exit (int) ; // in [stdlib.h]
 #ifndef _ATS_EXCEPTION_NONE
 //
 atstype_exncon
-ATSLIB_056$prelude_AssertExn = { 10, "AssertException" } ;
+ATSLIB_056_prelude__AssertExn = { 10, "AssertException" } ;
 atstype_exncon
-ATSLIB_056$prelude_GenerallyExn = { 20, "GenerallyException" } ;
+ATSLIB_056_prelude__GenerallyExn = { 20, "GenerallyException" } ;
 atstype_exncon
-ATSLIB_056$prelude_IllegalArgExn = { 30, "IllegalArgException" } ;
+ATSLIB_056_prelude__IllegalArgExn = { 30, "IllegalArgException" } ;
 //
 #endif // end of [_ATS_EXCEPTION_NONE]
 
@@ -66,14 +66,18 @@ ATSLIB_056$prelude_IllegalArgExn = { 30, "IllegalArgException" } ;
 #ifndef _ATS_EXCEPTION_NONE
 //
 atstype_exncon
-ATSLIB_056$prelude_NotFoundExn = { 40, "NotFoundException" } ;
+ATSLIB_056_prelude__NotFoundExn = { 40, "NotFoundException" } ;
+//
 atstype_exncon
-ATSLIB_056$prelude_ListSubscriptExn = { 50, "ListSubscriptException" } ;
+ATSLIB_056_prelude__ListSubscriptExn = { 50, "ListSubscriptException" } ;
+//
 atstype_exncon
-ATSLIB_056$prelude_ArraySubscriptExn = { 60, "ArraySubscriptException" } ;
-atstype_exncon ATSLIB_056$prelude_NotSomeExn = { 70, "NotSomeException" } ;
+ATSLIB_056_prelude__ArraySubscriptExn = { 60, "ArraySubscriptException" } ;
+//
+atstype_exncon ATSLIB_056_prelude__NotSomeExn = { 70, "NotSomeException" } ;
+//
 atstype_exncon
-ATSLIB_056$prelude_StreamSubscriptExn = { 80, "StreamSubscriptException" } ;
+ATSLIB_056_prelude__StreamSubscriptExn = { 80, "StreamSubscriptException" } ;
 //
 #endif // end of [_ATS_EXCEPTION_NONE]
 

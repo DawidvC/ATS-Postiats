@@ -79,10 +79,15 @@ named <filename>hello</filename> in the current working directory:
 </programlisting></informalexample>
 
 where <filename>hello.dats</filename> refers to a file containing the above
-program.  Note that the filename extension #emphasis(".dats") should not be
-altered as it has already been assigned a special meaning that the
-compilation command #command("atscc") recognizes. Another special filename
-extension is #emphasis(".sats"), which we will soon encounter.\
+program.  The command #command("atscc") is essentially a convenience
+wrapper around the command #command("atsopt"), which triggers the process
+of typechecking and compiling ATS programs. Note that #command("atscc") and
+#command("atsopt") may actually be given the names #command("patscc") and
+#command("patsopt"), respectively, in certain installations of ATS.  The filename
+extension #emphasis(".dats") should not be altered as it has already been
+assigned a special meaning that the compilation command #command("atscc")
+recognizes. Another special filename extension is #emphasis(".sats"), which
+we will soon encounter.\
 
 ")#comment("para")
 
@@ -98,7 +103,7 @@ id="a_template_for_single-file_programs"
 
 #para("
 The following code template, which is available
-#mycodelink("CHAPTER_START/mytest.dats", "on-line"), is designed for constructing a
+#mycodelink("CHAP_START/mytest.dats", "on-line"), is designed for constructing a
 single-file program in ATS:
 
 #atscode('\
@@ -110,7 +115,8 @@ single-file program in ATS:
 
 (* ****** ****** *)
 //
-\#include "share/atspre_staload_tmpdef.hats"
+\#include "share/atspre_define.hats"
+\#include "share/atspre_staload.hats"
 //
 (* ****** ****** *)
 
@@ -125,9 +131,9 @@ implement main0 () = () // a dummy implementation for [main]
 ')#comment("atscode")
 
 The line starting with the keyword #dyncode("\#include") enables the ATS
-compiler #command("atsopt") to gain access to the definition of certain
-library functions. I will cover elsewhere in the book the topic on
-programming with library functions in ATS.\
+compiler #command("atsopt") to gain access to certain external library
+packages and the definitions of various library functions. I will cover
+elsewhere in the book the topic on making use of library in ATS.\
 
 ")#comment("para")
 
@@ -149,12 +155,15 @@ familiar with the #command("make") utility, you could readily find plenty
 resources on-line to help yourself learn it.
 
 #atscode('\
-\#\#
-\#\#
-\#\# A Makefile template for compiling ATS programs
-\#\#
-\#\#
-
+\#\#\#\#\#\#
+\#
+\# Note that
+\# certain installations require the following changes:
+\#
+\# atscc -> patscc
+\# atsopt -> patsopt
+\# ATSHOME -> PATSHOME
+\#
 \#\#\#\#\#\#
 
 ATSHOMEQ="$(ATSHOME)"
@@ -167,12 +176,12 @@ ATSOPT=$(ATSHOMEQ)/bin/atsopt
 \#\#\#\#\#\#
 
 \#
-\# Please uncomment the one you want, or skip it entirely
+\# HX: Please uncomment the one you want, or skip it entirely
 \#
 ATSCCFLAGS=
 \#ATSCCFLAGS=-O2
 \#
-\# [-flto] enables link-time optimization such as inlining lib functions
+\# \'-flto\' enables link-time optimization such as inlining lib functions
 \#
 \#ATSCCFLAGS=-O2 -flto
 \#
@@ -188,7 +197,7 @@ cleanall::
 \# with the name of the file you want to compile
 \#
 
-\# foo: foo.dats ; \\\\
+\# foo: foo.dats ; \
 \#   $(ATSCC) $(ATSCCFLAGS) -o $@ $< || echo $@ ": ERROR!!!"
 \# cleanall:: ; $(RMF) foo
 

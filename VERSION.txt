@@ -1,3 +1,50 @@
+0.0.5
+<pre>
+This is the fifth release of ATS2, the successor of the ATS
+programming language. The compiler for ATS2 is given the name
+ATS/Positats, ATS2/Postiats or simply Postiats.
+
+The official website for ATS is:
+
+http://www.ats-lang.org
+
+ATS-Postiats is hosted at github:
+
+https://github.com/githwxi/ATS-Postiats
+
+Major releases of ATS2 are available at:
+
+https://sourceforge.net/projects/ats2-lang/
+
+Major releases of external packages for ATS2 are available at:
+
+https://sourceforge.net/projects/ats2-lang-contrib/
+
+Here is a list of major additions and changes since the last release:
+
+1. Fixing a glitch in initializing flat boxed-singleton records
+   (see doc/BUGS/bug-2013-11-29)
+2. Adding support for jsonizing level-2 syntax trees; this is planned
+   for support tasks like meta-programming, constraint-exporting, etc.
+3. Adding support for exporting constraints gathered during typechecking
+   (command-line flag for this feature: --constraint-export)
+4. Fixing bug-2013-12-04 (erroneous compilation of pattern matching)
+5. Adding a direct API for the json-c package
+6. Adding a direct API for the jansson package
+7. Adding a minimal API for the pcre package
+8. Adding support for 'static' dynamic constant declarations:
+   static fun foo (...): res // this one is equivalent to the next one
+   extern fun foo (...): res = "sta#" // it is equivalent to the above one
+9. Improving support for exporting ATS-types to C
+10. Requiring that each declared toplevel function be envless; closures
+    need to be declared as values.
+11. Supporting the flag -CSignore for patscc to ignore constraint-solving.
+    Please only use it with proper justification!
+
+</pre>
+
+######
+
 0.0.4
 <pre>
 
@@ -23,12 +70,19 @@ https://sourceforge.net/projects/ats2-lang-contrib/
 
 Here is a list of major additions and changes since the last release:
 
-1. Fixing a glitch in the support for ATS_DYNLOADFLAG (reported by MD)
-
+1. Fixing a glitch in handling ATS_DYNLOADFLAG (bug-2013-10-11)
 2. Adding -D_ATS_EXCEPTION_NONE support for eliminating the code in the
-   run-time of ATS2 that deals with exceptions.
-
-3. Fixing a glitch in proof-assignment compilation.
+   run-time of ATS2 that are exception-related.
+3. Fixing a glitch in proof-assignment compilation (reported by MD)
+4. Allowing overloading declarations to permeates OPENED namespace.
+5. Fixing a glitch in handling overloading (bug-2013-10-30 reported by WB)
+6. Fixing a glitch in handling flat arrays (bug-2013-10-30-2 reported by WB)
+7. Fixing a glitch in handling arrays in structs (bug-2013-11-01 reported by WB)
+8. Fixing a glitch in handling implementation of values (bug-2013-11-06 reported by HX)
+9. All the occurances of LGPL-2.1 in ATS2/Postiats have been changed to GPL-3.
+   LGPL-2.1 still occurs in certain packages contained in ats2-lang-contrib   
+10. Supporting that ATS-types be exported for use in C (extern typedef ...)
+11. Supporting generation of ats-lang-tags via the command-line flag --taggen
 
 </pre>
 

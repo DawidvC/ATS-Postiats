@@ -1,24 +1,19 @@
 #
-#
-# This Makefile is automatically generated
-# from executing the following command-line:
-#
-# make -f Makefile.gen
-#
+# A simple Makefile
 #
 
 ######
 
-ATSHOMEQ="$(ATSHOME)"
-ATSCC=$(ATSHOMEQ)/bin/atscc
-ATSOPT=$(ATSHOMEQ)/bin/atsopt
-ATSDOC=$(ATSHOMEQ)/bin/atsdoc
+ifeq ("$(PATSHOME)","")
+  PATSHOMEQ="$(ATSHOME)"
+else
+  PATSHOMEQ="$(PATSHOME)"
+endif
 
 ######
 
-GCC=gcc
-PATSHOMEQ="$(PATSHOME)"
-PATSOPT=$(PATSHOMEQ)/src/patsopt
+PATSCC=$(PATSHOMEQ)/bin/patscc
+PATSOPT=$(PATSHOMEQ)/bin/patsopt
 
 ######
 
@@ -26,57 +21,94 @@ all::
 
 ######
 
+all:: Ackermann
+Ackermann: Ackermann.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: BinaryTreeLemmas
+BinaryTreeLemmas: BinaryTreeLemmas.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: CPS
+CPS: CPS.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: CutElimIL
+CutElimIL: CutElimIL.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: CutElimILL
+CutElimILL: CutElimILL.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: HilbertCalc
+HilbertCalc: HilbertCalc.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: infprime
+infprime: infprime.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: irrationality-of-sqrt2
+irrationality-of-sqrt2: irrationality-of-sqrt2.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: KolmogorovTrans
+KolmogorovTrans: KolmogorovTrans.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: naive-set
+naive-set: naive-set.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: PHP
+PHP: PHP.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: SMI
+SMI: SMI.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: STLC-SN-foas
+STLC-SN-foas: STLC-SN-foas.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: YonedaLemma
+YonedaLemma: \
+  YonedaLemma.dats ; $(PATSCC) -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) YonedaLemma
+
+######
+
+all:: CoYonedaLemma
+CoYonedaLemma: \
+  CoYonedaLemma.dats ; $(PATSCC) -CSignore -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) CoYonedaLemma
+
+######
+
 RMF=rm -f
 
 ######
 
-all:: Ackermann
-Ackermann:: Ackermann.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic Ackermann.dats
-
-all:: BinaryTreeLemmas
-BinaryTreeLemmas:: BinaryTreeLemmas.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic BinaryTreeLemmas.dats
-
-all:: CPS
-CPS:: CPS.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic CPS.dats
-
-all:: CutElimIL
-CutElimIL:: CutElimIL.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic CutElimIL.dats
-
-all:: CutElimILL
-CutElimILL:: CutElimILL.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic CutElimILL.dats
-
-all:: HilbertCalc
-HilbertCalc:: HilbertCalc.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic HilbertCalc.dats
-
-all:: infprime
-infprime:: infprime.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic infprime.dats
-
-all:: irrationality-of-sqrt2
-irrationality-of-sqrt2:: irrationality-of-sqrt2.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic irrationality-of-sqrt2.dats
-
-all:: KolmogorovTrans
-KolmogorovTrans:: KolmogorovTrans.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic KolmogorovTrans.dats
-
-all:: naive-set
-naive-set:: naive-set.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic naive-set.dats
-
-all:: PHP
-PHP:: PHP.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic PHP.dats
-
-all:: SMI
-SMI:: SMI.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic SMI.dats
-
-all:: STLC-SN-foas
-STLC-SN-foas:: STLC-SN-foas.dats ;   $(PATSOPT) -IATS$(PATSHOMEQ)/contrib --typecheck --dynamic STLC-SN-foas.dats
-
+clean:: ; $(RMF) *~
+clean:: ; $(RMF) *_?ats.o
+clean:: ; $(RMF) *_?ats.c
 
 ######
-
-clean:: ; $(RMF) *~
-clean:: ; $(RMF) *_?ats.o *_?ats.c
-clean:: ; $(RMF) *_atxt.txt
-clean:: ; $(RMF) *_atxt.dats
-clean:: ; $(RMF) Makefile.exe
 
 cleanall:: clean
 

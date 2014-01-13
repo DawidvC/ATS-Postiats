@@ -297,7 +297,7 @@ case+ x.p2at_node of
     val () = fprint_s2exp (out, s2f)
     val () = prstr ")"
   }
-| P2Terr () => prstr "P2Terr()"
+| P2Terrpat ((*void*)) => prstr "P2Terrpat()"
 (*
 | _ => prstr "P2T...(...)"
 *)
@@ -837,9 +837,7 @@ case+ d2e0.d2exp_node of
     val () = prstr ")"
   } // end of [D2Eann_funclo]
 //
-| D2Eerr () => {
-    val () = prstr "D2Eerr()"
-  } // end of [D2Eerr]
+| D2Eerrexp ((*void*)) => prstr "D2Eerr()"
 //
 (*
 | _ => prstr "D2E...(...)"
@@ -1045,7 +1043,18 @@ case+ x.d2ecl_node of
     val () = prstr ")"
   } // end of [D2Coverload]
 //
-| D2Cdatdecs (knd, s2cs) => {
+| D2Cextype
+    (name, s2e) => {
+    val () = fprint! (out, "D2Cextype(", name, " = ", s2e)
+  } (* end of [D2Cextype] *)
+| D2Cextval 
+    (name, d2e) => {
+    val () = fprint! (out, "D2Cextval(", name, " = ", d2e)
+  } (* end of [D2Cextval] *)
+| D2Cextcode _ => prstr "D2Cextcode(...)"
+//
+| D2Cdatdecs
+   (knd, s2cs) => {
     val () = prstr "D2Cdatdecs("
     val () = fprint_int (out, knd)
     val () = prstr "; "
@@ -1053,9 +1062,13 @@ case+ x.d2ecl_node of
     val () = prstr ")"
   } // end of [D2Cdatdecs]
 //
-| D2Cdcstdecs (knd, d2cs) => {
+| D2Cdcstdecs
+    (knd, dck, d2cs) =>
+  {
     val () = prstr "D2Cdcstdecs("
-    val () = fprint_dcstkind (out, knd)
+    val () = fprint_int (out, knd)
+    val () = prstr "; "
+    val () = fprint_dcstkind (out, dck)
     val () = prstr "; "
     val () = $UT.fprintlst (out, d2cs, ", ", fprint_d2cst)
     val () = prstr ")"

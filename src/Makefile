@@ -42,6 +42,8 @@ SOURCES := \
   pats_basics.sats \
   pats_basics.dats \
   pats_basics.hats \
+  pats_comarg.sats \
+  pats_comarg.dats \
   pats_stamp.sats \
   pats_stamp.dats \
   pats_symbol.sats \
@@ -52,6 +54,8 @@ SOURCES := \
   pats_location.sats \
   pats_location.dats \
   pats_location.cats \
+  pats_jsonize.sats \
+  pats_jsonize.dats \
   pats_errmsg.sats \
   pats_errmsg.dats \
   pats_reader.sats \
@@ -129,6 +133,7 @@ SOURCES := \
   pats_stacst2.dats \
   pats_staexp2_print.dats \
   pats_staexp2_pprint.dats \
+  pats_staexp2_jsonize.dats \
   pats_staexp2_sort.dats \
   pats_staexp2_scst.dats \
   pats_staexp2_svar.dats \
@@ -153,10 +158,10 @@ SOURCES := \
   pats_dyncst2.sats \
   pats_dyncst2.dats \
   pats_dynexp2_print.dats \
+  pats_dynexp2_jsonize.dats \
   pats_dynexp2_dcst.dats \
   pats_dynexp2_dvar.dats \
   pats_dynexp2_dmac.dats \
-  pats_dynexp2_util.sats \
   pats_dynexp2_util.dats \
   pats_trans2.sats \
   pats_namespace.sats \
@@ -220,6 +225,7 @@ SOURCES := \
   pats_constraint3.dats \
   pats_constraint3_init.dats \
   pats_constraint3_print.dats \
+  pats_constraint3_jsonize.dats \
   pats_constraint3_simplify.dats \
   pats_constraint3_icnstr.dats \
   pats_constraint3_solve.dats \
@@ -263,8 +269,6 @@ SOURCES := \
   pats_ccomp_emit2.dats \
   pats_ccomp_emit3.dats \
   pats_ccomp_main.dats \
-  pats_comarg.sats \
-  pats_comarg.dats \
 
 
 SOURCESsta := $(filter %.sats, $(SOURCES))
@@ -285,6 +289,8 @@ OBJECTS := \
   pats_global_dats.o \
   pats_basics_sats.o \
   pats_basics_dats.o \
+  pats_comarg_sats.o \
+  pats_comarg_dats.o \
   pats_stamp_sats.o \
   pats_stamp_dats.o \
   pats_symbol_sats.o \
@@ -294,6 +300,8 @@ OBJECTS := \
   pats_filename_reloc_dats.o \
   pats_location_sats.o \
   pats_location_dats.o \
+  pats_jsonize_sats.o \
+  pats_jsonize_dats.o \
   pats_errmsg_sats.o \
   pats_errmsg_dats.o \
   pats_reader_sats.o \
@@ -365,6 +373,7 @@ OBJECTS := \
   pats_stacst2_dats.o \
   pats_staexp2_print_dats.o \
   pats_staexp2_pprint_dats.o \
+  pats_staexp2_jsonize_dats.o \
   pats_staexp2_sort_dats.o \
   pats_staexp2_scst_dats.o \
   pats_staexp2_svar_dats.o \
@@ -389,10 +398,10 @@ OBJECTS := \
   pats_dyncst2_sats.o \
   pats_dyncst2_dats.o \
   pats_dynexp2_print_dats.o \
+  pats_dynexp2_jsonize_dats.o \
   pats_dynexp2_dcst_dats.o \
   pats_dynexp2_dvar_dats.o \
   pats_dynexp2_dmac_dats.o \
-  pats_dynexp2_util_sats.o \
   pats_dynexp2_util_dats.o \
   pats_trans2_sats.o \
   pats_namespace_sats.o \
@@ -455,6 +464,7 @@ OBJECTS := \
   pats_constraint3_dats.o \
   pats_constraint3_init_dats.o \
   pats_constraint3_print_dats.o \
+  pats_constraint3_jsonize_dats.o \
   pats_constraint3_simplify_dats.o \
   pats_constraint3_icnstr_dats.o \
   pats_constraint3_solve_dats.o \
@@ -498,8 +508,6 @@ OBJECTS := \
   pats_ccomp_emit2_dats.o \
   pats_ccomp_emit3_dats.o \
   pats_ccomp_main_dats.o \
-  pats_comarg_sats.o \
-  pats_comarg_dats.o \
 
 
 ######
@@ -574,6 +582,12 @@ pats_basics_sats.o: pats_basics_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 pats_basics_dats.c: pats_basics.dats; $(ATSCC) -cc $<
 pats_basics_dats.o: pats_basics_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
+pats_comarg_sats.c: pats_comarg.sats; $(ATSCC) -cc $<
+pats_comarg_sats.o: pats_comarg_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
+pats_comarg_dats.c: pats_comarg.dats; $(ATSCC) -cc $<
+pats_comarg_dats.o: pats_comarg_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
 pats_stamp_sats.c: pats_stamp.sats; $(ATSCC) -cc $<
 pats_stamp_sats.o: pats_stamp_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
@@ -600,6 +614,12 @@ pats_location_sats.o: pats_location_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
 pats_location_dats.c: pats_location.dats; $(ATSCC) -cc $<
 pats_location_dats.o: pats_location_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
+pats_jsonize_sats.c: pats_jsonize.sats; $(ATSCC) -cc $<
+pats_jsonize_sats.o: pats_jsonize_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
+pats_jsonize_dats.c: pats_jsonize.dats; $(ATSCC) -cc $<
+pats_jsonize_dats.o: pats_jsonize_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
 pats_errmsg_sats.c: pats_errmsg.sats; $(ATSCC) -cc $<
 pats_errmsg_sats.o: pats_errmsg_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
@@ -814,6 +834,9 @@ pats_staexp2_print_dats.o: pats_staexp2_print_dats.c; $(ATSCC) $(ATSCCFLAGS) -c 
 pats_staexp2_pprint_dats.c: pats_staexp2_pprint.dats; $(ATSCC) -cc $<
 pats_staexp2_pprint_dats.o: pats_staexp2_pprint_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
+pats_staexp2_jsonize_dats.c: pats_staexp2_jsonize.dats; $(ATSCC) -cc $<
+pats_staexp2_jsonize_dats.o: pats_staexp2_jsonize_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
 pats_staexp2_sort_dats.c: pats_staexp2_sort.dats; $(ATSCC) -cc $<
 pats_staexp2_sort_dats.o: pats_staexp2_sort_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
@@ -886,6 +909,9 @@ pats_dyncst2_dats.o: pats_dyncst2_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 pats_dynexp2_print_dats.c: pats_dynexp2_print.dats; $(ATSCC) -cc $<
 pats_dynexp2_print_dats.o: pats_dynexp2_print_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
+pats_dynexp2_jsonize_dats.c: pats_dynexp2_jsonize.dats; $(ATSCC) -cc $<
+pats_dynexp2_jsonize_dats.o: pats_dynexp2_jsonize_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
 pats_dynexp2_dcst_dats.c: pats_dynexp2_dcst.dats; $(ATSCC) -cc $<
 pats_dynexp2_dcst_dats.o: pats_dynexp2_dcst_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
@@ -894,9 +920,6 @@ pats_dynexp2_dvar_dats.o: pats_dynexp2_dvar_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
 pats_dynexp2_dmac_dats.c: pats_dynexp2_dmac.dats; $(ATSCC) -cc $<
 pats_dynexp2_dmac_dats.o: pats_dynexp2_dmac_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
-
-pats_dynexp2_util_sats.c: pats_dynexp2_util.sats; $(ATSCC) -cc $<
-pats_dynexp2_util_sats.o: pats_dynexp2_util_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
 pats_dynexp2_util_dats.c: pats_dynexp2_util.dats; $(ATSCC) -cc $<
 pats_dynexp2_util_dats.o: pats_dynexp2_util_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
@@ -1084,6 +1107,9 @@ pats_constraint3_init_dats.o: pats_constraint3_init_dats.c; $(ATSCC) $(ATSCCFLAG
 pats_constraint3_print_dats.c: pats_constraint3_print.dats; $(ATSCC) -cc $<
 pats_constraint3_print_dats.o: pats_constraint3_print_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
+pats_constraint3_jsonize_dats.c: pats_constraint3_jsonize.dats; $(ATSCC) -cc $<
+pats_constraint3_jsonize_dats.o: pats_constraint3_jsonize_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
+
 pats_constraint3_simplify_dats.c: pats_constraint3_simplify.dats; $(ATSCC) -cc $<
 pats_constraint3_simplify_dats.o: pats_constraint3_simplify_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
@@ -1213,12 +1239,6 @@ pats_ccomp_emit3_dats.o: pats_ccomp_emit3_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 pats_ccomp_main_dats.c: pats_ccomp_main.dats; $(ATSCC) -cc $<
 pats_ccomp_main_dats.o: pats_ccomp_main_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
-pats_comarg_sats.c: pats_comarg.sats; $(ATSCC) -cc $<
-pats_comarg_sats.o: pats_comarg_sats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
-
-pats_comarg_dats.c: pats_comarg.dats; $(ATSCC) -cc $<
-pats_comarg_dats.o: pats_comarg_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
-
 pats_main_dats.c: pats_main.dats; $(ATSCC) -cc $<
 pats_main_dats.o: pats_main_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 
@@ -1231,8 +1251,8 @@ pats_main_dats.o: pats_main_dats.c; $(ATSCC) $(ATSCCFLAGS) -c $<
 #
 depend::
 	$(RMF) .depend
-	$(ATSOPT) -o .depend --depgen -s $(SOURCESsta) -d $(SOURCESdyn)
-	$(ATSOPT) -o .depend --depgen -d pats_main.dats
+	$(ATSOPT) --output-a .depend --depgen -d pats_main.dats
+	$(ATSOPT) --output-a .depend --depgen -s $(SOURCESsta) -d $(SOURCESdyn)
 include .depend
 
 ######
@@ -1244,7 +1264,7 @@ WCL=wc -l
 
 ######
 
-srclines:: ; $(WCL) $(SOURCES) pats_main.dats
+srclines:: ; $(WCL) pats_main.dats $(SOURCES)
 liblines:: ; $(WCL) ../prelude/*.sats ../prelude/?ATS/*.?ats ../libc/?ATS/*.?ats ../libats/?ATS/*.?ats
 
 ######

@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-20?? Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 ** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -151,17 +151,17 @@ fun memcpy
 | dst: ptr (l), src: &RD(@[byte][n2]), n: size_t (n)
 ) :<!wrt> ptr (l) = "mac#%" // end of [memcpy]
 //
-fun memcpy_unsafe {l:agz}
+fun memcpy_unsafe{l:agz}
   (dst: ptr (l), src: ptr, n: size_t):<!wrt> ptr (l) = "mac#%"
 //
 (* ****** ****** *)
 //
-fun memmove_unsafe {l:agz}
+fun memmove_unsafe{l:agz}
   (dst: ptr (l), src: ptr, n: size_t):<!wrt> ptr (l) = "mac#%"
 //
 (* ****** ****** *)
 //
-fun memccpy_unsafe {l:agz}
+fun memccpy_unsafe{l:agz}
   (dst: ptr (l), src: ptr, c: int, n: size_t):<!wrt> Ptr0 = "mac#%"
 //
 (* ****** ****** *)
@@ -175,7 +175,7 @@ fun mempcpy
 | dst: ptr (l), src: &RD(@[byte][n2]), n: size_t (n)
 ) :<!wrt> ptr (l+n) = "mac#%" // end of [mempcpy]
 //
-fun mempcpy_unsafe {l:agz}{n:int}
+fun mempcpy_unsafe{l:agz}{n:int}
   (dst: ptr (l), src: ptr, n: size_t (n)):<!wrt> ptr (l+n) = "mac#%"
 //
 (* ****** ****** *)

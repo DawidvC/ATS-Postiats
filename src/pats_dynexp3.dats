@@ -150,9 +150,9 @@ p3at_ann (
 ) = p3at_make_node (loc, s2f, P3Tann (p3t, ann))
 
 implement
-p3at_err
-  (loc, s2f) = p3at_make_node (loc, s2f, P3Terr ())
-// end of [p3at_err]
+p3at_errpat
+  (loc, s2f) = p3at_make_node (loc, s2f, P3Terrpat ())
+// end of [p3at_errpat]
 
 (* ****** ****** *)
 
@@ -941,22 +941,24 @@ d3exp_ann_type
 (* ****** ****** *)
 
 implement
-d3exp_err (loc) = let
-  val s2f = s2exp_t0ype_err ()
+d3exp_errexp (loc) = let
+//
+val s2f = s2exp_t0ype_err ()
+//
 in '{
   d3exp_loc= loc
 , d3exp_type= s2f
-, d3exp_node= D3Eerr ()
-} end // end of [d3exp_err]
+, d3exp_node= D3Eerrexp ((*void*))
+} end // end of [d3exp_errexp]
 
 implement
-d3exp_void_err (loc) = let
+d3exp_errexp_void (loc) = let
   val s2f = s2exp_void_t0ype ()
 in '{
   d3exp_loc= loc
 , d3exp_type= s2f
-, d3exp_node= D3Eerr ()
-} end // end of [d3exp_void_err]
+, d3exp_node= D3Eerrexp ((*void*))
+} end // end of [d3exp_errexp_void]
 
 (* ****** ****** *)
 
@@ -1103,6 +1105,18 @@ d3ecl_saspdec (loc, d2c) =
 (* ****** ****** *)
 
 implement
+d3ecl_extype
+  (loc, name, s2e_def) =
+  d3ecl_make_node (loc, D3Cextype (name, s2e_def))
+// end of [d3ecl_extype]
+
+implement
+d3ecl_extval
+  (loc, name, d3e_def) =
+  d3ecl_make_node (loc, D3Cextval (name, d3e_def))
+// end of [d3ecl_extval]
+
+implement
 d3ecl_extcode
   (loc, knd, pos, code) =
   d3ecl_make_node (loc, D3Cextcode (knd, pos, code))
@@ -1128,8 +1142,8 @@ d3ecl_exndecs
 
 implement
 d3ecl_dcstdecs
-  (loc, knd, d2cs) =
-  d3ecl_make_node (loc, D3Cdcstdecs (knd, d2cs))
+  (loc, knd, dck, d2cs) =
+  d3ecl_make_node (loc, D3Cdcstdecs (knd, dck, d2cs))
 // end of [d3ecl_dcstdecs]
 
 (* ****** ****** *)

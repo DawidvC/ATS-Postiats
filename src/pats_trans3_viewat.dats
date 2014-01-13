@@ -35,7 +35,8 @@
 
 staload "./pats_errmsg.sats"
 staload _(*anon*) = "./pats_errmsg.dats"
-implement prerr_FILENAME<> () = prerr "pats_trans3_viewat"
+implement
+prerr_FILENAME<> () = prerr "pats_trans3_viewat"
 
 (* ****** ****** *)
 
@@ -47,8 +48,13 @@ overload = with $LAB.eq_label_label
 staload "./pats_staexp2.sats"
 staload "./pats_staexp2_util.sats"
 staload "./pats_stacst2.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp2.sats"
-staload "./pats_dynexp2_util.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp3.sats"
 
 (* ****** ****** *)
@@ -60,26 +66,30 @@ staload "./pats_trans3_env.sats"
 
 local
 
-fun auxerr_pfobj (
-  loc0: location, s2l: s2exp
+fun
+auxerr_pfobj
+(
+  loc0: loc_t, s2l: s2exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": [view@] operation cannot be performed"
   val () = prerr ": the proof search for view located at ["
   val () = prerr_s2exp (s2l)
   val () = prerr "] failed to turn up a result."
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_pfobj_search_none (loc0, s2l))
 end // end of [auxerr_pfobj]
 
-fun auxerr_context (
-  loc0: location, s2e: s2exp, d3ls: d3lablst
+fun
+auxerr_context
+(
+  loc0: loc_t, s2e: s2exp, d3ls: d3lablst
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": [view@] operation cannot be performed"
   val () = prerr ": context cannot be formed for the atview being taken."
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_s2addr_viewat_deref_context (loc0, s2e, d3ls))
 end // end of [auxerr_context]
@@ -97,8 +107,9 @@ fun auxlabs (
   | list_nil () => list_nil ()
 ) // end of [auxlabs]
 
-fun auxmain (
-  loc0: location
+fun auxmain
+(
+  loc0: loc_t
 , pfobj: pfobj, d3ls: d3lablst
 ) : s2exp(*atview*) = let
   val+~PFOBJ (
@@ -126,13 +137,15 @@ case+ ctxtopt of
   in
     s2exp_at (s2e_sel, s2rt)
   end // end of [Some]
-| None () => let
-    val () = auxerr_context (loc0, s2e_elt, d3ls) in s2exp_err (s2rt_view)
+| None ((*void*)) => let
+    val (
+    ) = auxerr_context
+      (loc0, s2e_elt, d3ls) in s2exp_err (s2rt_view)
   end // end of [None]
 //
 end // end of [auxmain]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 s2addr_viewat_deref
@@ -189,32 +202,37 @@ fun eq_dlablst_slablst (
 
 local
 
-fun auxerr_nonatview (
-  loc0: location, s2at_new: s2exp
+fun
+auxerr_nonatview
+(
+  loc0: loc_t, s2at_new: s2exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": viewat-restoration cannot be performed"  
   val () = prerr ": proof of some atview is needed but one of the following type is given: "
   val () = (prerr "["; prerr_s2exp (s2at_new); prerr "]")
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_s2exp_set_viewat_atview (loc0, s2at_new))
 end // end of [auxerr_nonatview]
 
-fun auxerr_nonwithout (
-  loc0: location, s2e_old: s2exp
+fun
+auxerr_nonwithout
+(
+  loc0: loc_t, s2e_old: s2exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": viewat-restoration cannot be performed"  
   val () = prerr ": the following type is expected to be a without-type but it is not: "
   val () = (prerr "["; prerr_s2exp (s2e_old); prerr "]")
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_s2exp_set_viewat_without (loc0, s2e_old))
 end // end of [auxerr_nonwithout]
 
-fun auxck_addreq (
-  loc0: location, s2e1, d3ls, s2e2
+fun auxck_addreq
+(
+  loc0: loc_t, s2e1, d3ls, s2e2
 ) : void = let
   val s2e2 = s2exp_hnfize (s2e2)
   var s2ls: s2lablst // uninitialized
@@ -230,16 +248,16 @@ if ~addreq then let
   val () = prerr ": viewat-restoration cannot be performed"  
   val () = prerr ": mismatch of bef/aft locations of atviews:\n"
   val () = (prerr "bef: ["; prerr_s2exp (s2e1); prerr "]")
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
   val () = (prerr "aft: ["; prerr_s2exp (s2e2); prerr "]")
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_s2addr_viewat_addreq (loc0, s2e1, d3ls, s2e2))
 end // end of [if]
 //
 end // end of [auxck_addreq]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 s2addr_set_viewat (
@@ -300,30 +318,34 @@ end // end of [local]
 
 local
 
-fun auxerr_nonptr (
-  loc0: location, d3e: d3exp
+fun
+auxerr_nonptr
+(
+  loc0: loc_t, d3e: d3exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": the dynamic expression is expected to be a pointer."
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_d3exp_nonderef (d3e))
 end // end of [auxerr_nonptr]
 
-fun auxerr1 (
-  loc0: location, d2v: d2var
+fun auxerr1
+(
+  loc0: loc_t, d2v: d2var
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": the dynamic variable ["
   val () = prerr_d2var (d2v)
   val () = prerr "] is not mutable and thus [view@] cannot be applied."
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_d2var_nonmut (loc0, d2v))
 end // end of [auxerr1]
 
-fun aux1 (
-  loc0: location
+fun aux1
+(
+  loc0: loc_t
 , s2f0: s2hnf
 , d3e_l: d3exp
 , d3ls: d3lablst
@@ -339,7 +361,7 @@ case+ opt of
   end // end of [None_vt]
 end // end of [aux1]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 d2exp_trup_viewat
@@ -378,19 +400,19 @@ case+ d2lv of
     val () = prerr_error3_loc (loc0)
     val () = prerr ": [view@] operation cannot be applied"
     val () = prerr ": the dynamic expression is addressless."
-    val () = prerr_newline ()
+    val () = prerr_newline ((*void*))
     val () = the_trans3errlst_add (T3E_d2exp_addrless (d2e0))
   in
-    d3exp_err (loc0)
+    d3exp_errexp (loc0)
   end // end of [D2LVALvar_lin]
 //
 | _ => let
     val () = prerr_error3_loc (loc0)
     val () = prerr ": [view@] operation cannot be applied: "
-    val () = prerr_newline ()
+    val () = prerr_newline ((*void*))
     val () = the_trans3errlst_add (T3E_d2exp_nonlval (d2e0))
   in
-    d3exp_err (loc0)
+    d3exp_errexp (loc0)
   end // end of [_]
 //
 end // end of [d2exp_trup_viewat]
@@ -401,24 +423,29 @@ end // end of [local]
 
 local
 
-fun auxerr_nonptr (
-  loc0: location, d3e: d3exp
+fun
+auxerr_nonptr
+(
+  loc0: loc_t, d3e: d3exp
 ) : void = let
   val () = prerr_error3_loc (loc0)
   val () = prerr ": the dynamic expression is expected to be a pointer."
-  val () = prerr_newline ()
+  val () = prerr_newline ((*void*))
 in
   the_trans3errlst_add (T3E_d3exp_nonderef (d3e))
 end // end of [auxerr_nonptr]
 
-fun aux1 (
-  loc0: location
+fun aux1
+(
+  loc0: loc_t
 , s2f0: s2hnf
 , d3e_l: d3exp
 , d3ls: d3lablst
 , d3e_r: d3exp
 ) : d3exp = let
-  val opt = un_s2exp_ptr_addr_type (s2f0)
+//
+val opt = un_s2exp_ptr_addr_type (s2f0)
+//
 in
 //
 case+ opt of
@@ -430,12 +457,13 @@ case+ opt of
   in
     d3exp_viewat_assgn (loc0, d3e_l, d3ls, d3e_r)
   end // end of [Some_vt]
-| ~None_vt () => let
-    val () = auxerr_nonptr (loc0, d3e_l) in d3exp_void_err (loc0)
+| ~None_vt ((*void*)) => let
+    val (
+    ) = auxerr_nonptr (loc0, d3e_l) in d3exp_errexp_void (loc0)
   end // end of [None_vt]
 end // end of [aux1]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 d2exp_trup_viewat_assgn
@@ -480,20 +508,20 @@ case+ d2lv_l of
     val () = prerr_error3_loc (loc)
     val () = prerr ": [view@] operation cannot be applied"
     val () = prerr ": the dynamic expression is addressless."
-    val () = prerr_newline ()
+    val () = prerr_newline ((*void*))
     val () = the_trans3errlst_add (T3E_d2exp_addrless (d2e0))
   in
-    d3exp_void_err (loc0)
+    d3exp_errexp_void (loc0)
   end // end of [D2LVALvar_lin]
 //
 | _ => let
     val loc = d2e_l.d2exp_loc
     val () = prerr_error3_loc (loc)
     val () = prerr ": [view@] operation cannot be applied: "
-    val () = prerr_newline ()
+    val () = prerr_newline ((*void*))
     val () = the_trans3errlst_add (T3E_d2exp_nonlval (d2e0))
   in
-    d3exp_void_err (loc0)
+    d3exp_errexp_void (loc0)
   end // end of [_]
 //
 end // end of [d2exp_trup_viewat_assgn]

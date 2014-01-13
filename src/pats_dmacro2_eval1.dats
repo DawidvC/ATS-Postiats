@@ -492,7 +492,7 @@ case+
       eval0_app_mac_short (loc0, d2m, ctx, env, d2as)
     ) else let
       val () =
-        auxerr (loc0, d2e0, d2m) in d2exp_err (loc0)
+        auxerr (loc0, d2e0, d2m) in d2exp_errexp (loc0)
       // end of [val]
     end // end of [if]
   end // end of [D2Emac]
@@ -531,7 +531,7 @@ case+ knd of
 *)
         val () = prerr_newline ()
       in
-        d2exp_err (loc0)
+        d2exp_errexp (loc0)
       end // end of [_]
   end // end of [MSKdecode]
 | $SYN.MSKxstage () => let
@@ -546,7 +546,7 @@ case+ knd of
     val () = prerr_d2exp (d2e0)
     val () = prerr_newline ()
   in
-    d2exp_err (loc0)
+    d2exp_errexp (loc0)
   end // end of [_]
 //
 end // end of [eval1_d2exp_macsyn]
@@ -754,6 +754,13 @@ case+ d2en0 of
     d2exp_exist (loc0, eval1sexparg (s2a), eval1dexp (d2e))
   // end of [D2Eexist]
 //
+| D2Elam_dyn
+    (lin, npf, p2ts, d2e) => let
+    val p2ts = eval1_p2atlst (loc0, ctx, env, p2ts)
+  in
+    d2exp_lam_dyn (loc0, lin, npf, p2ts, eval1dexp (d2e))
+  end // end of [D2Elam_dyn]
+//
 | D2Edelay (d2e) => d2exp_delay (loc0, eval1dexp (d2e))
 | D2Eldelay (d2e, opt) => // (eval, free)
     d2exp_ldelay (loc0, eval1dexp (d2e), eval1dexpopt (opt))
@@ -772,7 +779,7 @@ case+ d2en0 of
     d2exp_ann_funclo (loc0, eval1dexp (d2e), funclo)
   // end of [D2Eann_funclo]
 //
-| _ => d2exp_err (loc0)
+| _ => d2exp_errexp (loc0)
 //
 end // end of [eval1_d2exp]
 
@@ -781,8 +788,10 @@ end // end of [eval1_d2exp]
 implement
 eval1_gm2at
   (loc0, ctx, env, gm2t) = let
-  val d2e = eval1_d2exp (loc0, ctx, env, gm2t.gm2at_exp)
-  val opt = eval1_p2atopt (loc0, ctx, env, gm2t.gm2at_pat)
+//
+val d2e = eval1_d2exp (loc0, ctx, env, gm2t.gm2at_exp)
+val opt = eval1_p2atopt (loc0, ctx, env, gm2t.gm2at_pat)
+//
 in
   gm2at_make (loc0, d2e, opt)
 end // end of [eval1_gm2at]
@@ -798,9 +807,11 @@ eval1_gm2atlst
 implement
 eval1_c2lau
   (loc0, ctx, env, c2l) = let
-  val p2ts = eval1_p2atlst (loc0, ctx, env, c2l.c2lau_pat)
-  val gm2ts = eval1_gm2atlst (loc0, ctx, env, c2l.c2lau_gua)
-  val d2e_body = eval1_d2exp (loc0, ctx, env, c2l.c2lau_body)
+//
+val p2ts = eval1_p2atlst (loc0, ctx, env, c2l.c2lau_pat)
+val gm2ts = eval1_gm2atlst (loc0, ctx, env, c2l.c2lau_gua)
+val d2e_body = eval1_d2exp (loc0, ctx, env, c2l.c2lau_body)
+//
 in
   c2lau_make (loc0, p2ts, gm2ts, c2l.c2lau_seq, c2l.c2lau_neg, d2e_body)
 end // end of [eval1_c2lau]
@@ -824,9 +835,12 @@ eval1_d2ecl (
 ) = let
 in
 //
-case+ d2c0.d2ecl_node of
+case+
+d2c0.d2ecl_node of
 //
-| D2Cnone () => d2ecl_none (loc0)
+| D2Cnone (
+  ) => d2ecl_none (loc0)
+//
 | D2Clist (d2cs) => let
     val d2cs = eval1_d2eclist (loc0, ctx, env, d2cs)
   in
@@ -844,7 +858,7 @@ case+ d2c0.d2ecl_node of
     d2ecl_valdecs_rec (loc0, knd, d2cs)
   end // end of [D2Cvaldecs_rec]
 //
-| _ => d2ecl_errdec (loc0)
+| _(*not-handled*) => d2ecl_errdec (loc0)
 //
 end // end of [eval1_d2ecl]
 
@@ -859,11 +873,13 @@ eval1_d2eclist
 (* ****** ****** *)
 
 implement
-eval1_v2aldeclst (
+eval1_v2aldeclst
+(
   loc0, ctx, env, d2cs
 ) = let
 //
-fun auxlst1 (
+fun auxlst1
+(
   loc0: location
 , ctx: !evalctx, env: &alphenv
 , d2cs: v2aldeclst
@@ -871,7 +887,8 @@ fun auxlst1 (
   case+ d2cs of
   | list_cons
       (d2c, d2cs) => let
-      val d2e = eval1_d2exp (loc0, ctx, env, d2c.v2aldec_def)
+      val d2e =
+        eval1_d2exp (loc0, ctx, env, d2c.v2aldec_def)
       val d2es = auxlst1 (loc0, ctx, env, d2cs)
     in
       list_cons (d2e, d2es)
@@ -890,9 +907,11 @@ in
 case+ d2cs of
 | list_cons 
     (d2c, d2cs) => let
-    val p2t = eval1_p2at (loc0, ctx, env, d2c.v2aldec_pat)
+    val p2t =
+      eval1_p2at (loc0, ctx, env, d2c.v2aldec_pat)
     val-list_cons (d2e, d2es) = d2es
-    val ann = eval1_s2expopt (loc0, ctx, env, d2c.v2aldec_ann)
+    val ann =
+      eval1_s2expopt (loc0, ctx, env, d2c.v2aldec_ann)
     val d2c = v2aldec_make (loc0, p2t, d2e, ann)
     val d2cs = auxlst2 (loc0, ctx, env, d2cs, d2es)
   in

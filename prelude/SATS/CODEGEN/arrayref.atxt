@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -60,6 +60,12 @@ praxi
 lemma_arrayref_param
   {a:vt0p}{n:int} (A: arrayref (a, n)): [n >= 0] void
 // end of [lemma_arrayref_param]
+
+#atscode_separator()
+
+castfn
+arrayref2ptr{a:vt0p}{n:int} (A: arrayref(a, n)):<> Ptr0
+overload ptrcast with arrayref2ptr
 
 #atscode_separator()
 

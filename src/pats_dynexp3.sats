@@ -87,7 +87,7 @@ datatype p3at_node =
 //
   | P3Tann of (p3at, s2exp) // ascribed pattern
 //
-  | P3Terr of () // indication of error
+  | P3Terrpat of ((*void*)) // indication of error
 // end of [p3at_node]
 
 and labp3at = LABP3AT of (label, p3at)
@@ -187,7 +187,7 @@ fun p3at_ann (
   loc: location, s2f: s2exp, p3t: p3at, ann: s2exp
 ) : p3at // end of [p3at_ann]
 
-fun p3at_err (loc: location, s2f: s2exp): p3at
+fun p3at_errpat (loc: location, s2f: s2exp): p3at
 
 (* ****** ****** *)
 
@@ -227,11 +227,14 @@ d3ecl_node =
 //
   | D3Csaspdec of (s2aspdec)
 //
+  | D3Cextype of (string(*name*), s2exp(*def*))
+  | D3Cextval of (string(*name*), d3exp(*def*))
   | D3Cextcode of (int(*knd*), int(*pos*), string(*code*))  
 //
-  | D3Cdatdecs of (int(*knd*), s2cstlst)
   | D3Cexndecs of (d2conlst) // HX: exception decls
-  | D3Cdcstdecs of (dcstkind, d2cstlst)
+  | D3Cdatdecs of (int(*knd*), s2cstlst) // HX: DT decls
+//
+  | D3Cdcstdecs of (int(*0/1:sta/ext*), dcstkind, d2cstlst)
 //
   | D3Cimpdec of (
       int(*knd*), i3mpdec // knd=0/1 : implement/primplmnt
@@ -387,7 +390,7 @@ and d3exp_node =
 //
   | D3Eann_type of (d3exp, s2exp)
 //
-  | D3Eerr of () // indication of error
+  | D3Eerrexp of ((*void*)) // indication of error
 // end of [d3exp_node]
 
 and d3lab_node =
@@ -863,8 +866,8 @@ fun d3exp_ann_type
 
 (* ****** ****** *)
 
-fun d3exp_err (loc: location): d3exp
-fun d3exp_void_err (loc: location): d3exp
+fun d3exp_errexp (loc: location): d3exp
+fun d3exp_errexp_void (loc: location): d3exp
 
 (* ****** ****** *)
 
@@ -958,6 +961,14 @@ fun d3ecl_saspdec (loc: location, d2c: s2aspdec): d3ecl
 
 (* ****** ****** *)
 
+fun d3ecl_extype
+  (loc: location, name: string, s2e_def: s2exp): d3ecl
+// end of [d3ecl_extype]
+
+fun d3ecl_extval
+  (loc: location, name: string, d3e_def: d3exp): d3ecl
+// end of [d3ecl_extval]
+
 fun d3ecl_extcode
   (loc: location, knd: int, pos: int, code: string): d3ecl
 // end of [d3ecl_extcode]
@@ -975,8 +986,9 @@ fun d3ecl_exndecs (loc: location, d2cs: d2conlst): d3ecl
 (* ****** ****** *)
 
 fun d3ecl_dcstdecs
-  (loc: location, knd: dcstkind, d2cs: d2cstlst): d3ecl
-// end of [d3ecl_dcstdecs]
+(
+  loc: location, knd: int, dck: dcstkind, d2cs: d2cstlst
+) : d3ecl // end of [d3ecl_dcstdecs]
 
 (* ****** ****** *)
 

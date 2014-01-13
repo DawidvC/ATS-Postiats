@@ -45,6 +45,15 @@ staload "libats/ML/SATS/basis.sats"
 staload "libats/ML/SATS/list0.sats"
 
 (* ****** ****** *)
+//
+implement{a}
+list0_make_sing (x) =
+  list0_cons{a}(x, list0_nil)
+implement{a}
+list0_make_pair (x1, x2) =
+  list0_cons{a}(x1, list0_cons{a}(x2, list0_nil))
+//
+(* ****** ****** *)
 
 implement{a}
 list0_make_elt
@@ -771,7 +780,9 @@ implement
 list0_map (xs, f) = let
 //
 implement
-list_map$fopr<a><b> (x) = f (x)
+{a2}{b2}
+list_map$fopr (x) =
+  $UN.castvwtp0{b2}(f($UN.cast{a}(x)))
 //
 val ys = list_map<a><b> (g1ofg0_list(xs))
 //
@@ -831,7 +842,9 @@ implement
 list0_imap (xs, f) = let
 //
 implement
-list_imap$fopr<a><b> (i, x) = f (i, x)
+{a2}{b2}
+list_imap$fopr (i, x) =
+  $UN.castvwtp0{b2}(f (i, $UN.cast{a}(x)))
 val ys = list_imap<a><b> (g1ofg0_list(xs))
 //
 in
@@ -867,7 +880,9 @@ list0_map2
   (xs1, xs2, f) = let
 //
 implement
-list_map2$fopr<a1,a2><b> (x1, x2) = f (x1, x2)
+{a11,a12}{b2}
+list_map2$fopr (x1, x2) =
+  $UN.castvwtp0{b2}(f($UN.cast{a1}(x1), $UN.cast{a2}(x2)))
 val ys = list_map2<a1,a2><b> ((g1ofg0)xs1, (g1ofg0)xs2)
 //
 in
@@ -876,12 +891,14 @@ end // end of [list0_map2]
 
 (* ****** ****** *)
 
-implement{a}
+implement
+{a}(*tmp*)
 list0_filter
   (xs, p) = let
 //
-implement
-list_filter$pred<a> (x) = p (x)
+implement{a2}
+list_filter$pred
+  (x) = p ($UN.cast{a}(x))
 val ys = list_filter<a> ((g1ofg0)xs)
 //
 in
@@ -894,8 +911,9 @@ implement{a}
 list0_tabulate
   (n, f) = let
 //
-implement
-list_tabulate$fopr<a> (i) = f (i)
+implement{a2}
+list_tabulate$fopr
+  (i) = $UN.castvwtp0{a2}(f(i))
 //
 val n = g1ofg0_int (n)
 //

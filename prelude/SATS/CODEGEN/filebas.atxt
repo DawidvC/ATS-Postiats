@@ -8,7 +8,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 %}\
 \
 #atscode_banner()
-#atscode_copyright_LGPL()
+#atscode_copyright_GPL()
 
 #atscode_separator()
 
@@ -214,7 +214,7 @@ fun fileref_get_lines_charlstlst (inp: FILEref): List0_vt (charlst_vt)
 ** HX: for handling files of "tiny" size
 *)
 fun fileref_get_file_charlst (inp: FILEref): List0_vt (char)
-fun fileref_nget_file_charlst {n:nat} (inp: FILEref, n: int n): listLte_vt (char, n)
+fun fileref_get2_file_charlst (inp: FILEref, n: int): List0_vt (char)
 
 #atscode_separator()
 
@@ -242,6 +242,25 @@ fun{
 //
 fun{
 } fileref_get_file_string (inp: FILEref): Strptr1
+//
+#atscode_separator()
+//
+fun{
+} fileref_foreach$bufsize (): sizeGte(1)
+//
+fun{
+env:vt0p
+} fileref_foreach$fwork (c: char, env: &(env) >> _): void
+fun{
+env:vt0p
+} fileref_foreach$fworkv
+  {n:int} (arrayref(char, n), size_t(n), &(env) >> _): void
+//
+fun{
+} fileref_foreach (inp: FILEref): void
+fun{
+env:vt0p
+} fileref_foreach_env (inp: FILEref, env: &(env) >> _): void
 //
 #atscode_separator()
 

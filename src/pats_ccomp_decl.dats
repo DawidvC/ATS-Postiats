@@ -88,6 +88,16 @@ fun hisaspdec_ccomp
 // end of [hidsaspdec_ccomp]
 
 extern
+fun hiextval_ccomp
+  (env: !ccompenv, hid0: hidecl): primdec
+// end of [hidextval_ccomp]
+
+extern
+fun hiextype_ccomp
+  (env: !ccompenv, hid0: hidecl): primdec
+// end of [hidextype_ccomp]
+
+extern
 fun hiextcode_ccomp
   (env: !ccompenv, hid0: hidecl): primdec
 // end of [hidextcode_ccomp]
@@ -142,14 +152,14 @@ case+ hid0.hidecl_node of
 //
 | HIDsaspdec _ => hisaspdec_ccomp (env, hid0)
 //
+| HIDextype _ => hiextype_ccomp (env, hid0)
+| HIDextval _ => hiextval_ccomp (env, hid0)
 | HIDextcode _ => hiextcode_ccomp (env, hid0)
 //
 | HIDdatdecs _ => hidatdecs_ccomp (env, hid0)
 | HIDexndecs _ => hiexndecs_ccomp (env, hid0)
 //
-| HIDdcstdecs
-    (knd, d2cs) => primdec_none (loc0)
-  // end of [HIDdcstdecs]
+| HIDdcstdecs (dck, d2cs) => primdec_none (loc0)
 //
 | HIDimpdec
     (knd, imp) => let
@@ -322,6 +332,33 @@ end // end of [hisaspdec_ccomp]
 (* ****** ****** *)
 
 implement
+hiextype_ccomp
+  (env, hid0) = let
+//
+val loc0 = hid0.hidecl_loc
+val-HIDextype (name, hse_def) = hid0.hidecl_node
+val _(*hit*) = hisexp_typize (0(*flag*), hse_def)
+val () = the_extypelst_add (hid0)
+//
+in
+  primdec_none (loc0)
+end // end of [hiextype_ccomp]
+
+(* ****** ****** *)
+
+implement
+hiextval_ccomp
+  (env, hid0) = let
+//
+val loc0 = hid0.hidecl_loc
+//
+in
+  primdec_none (loc0)
+end // end of [hiextval_ccomp]
+
+(* ****** ****** *)
+
+implement
 hiextcode_ccomp
   (env, hid0) = let
 //
@@ -330,7 +367,7 @@ val () = the_extcodelst_add (hid0)
 //
 in
   primdec_none (loc0)
-end // end of [hiextcod_ccomp]
+end // end of [hiextcode_ccomp]
 
 (* ****** ****** *)
 
@@ -742,23 +779,32 @@ fun auxlam
 (
   env: !ccompenv
 , loc0: location
-, d2c: d2cst
-, imparg: s2varlst
-, tmparg: s2explstlst
-, hde0: hidexp
-) : funlab = flab where
-{
+, d2c: d2cst, imparg: s2varlst, tmparg: s2explstlst
+, hde_fun: hidexp
+) : funlab = let
 //
-val loc_fun = hde0.hidexp_loc
-val hse_fun = hde0.hidexp_type
+val hse_fun = hde_fun.hidexp_type
 val fcopt = d2cst_get2_funclo (d2c)
-//
-val-HDElam (knd, hips_arg, hde_body) = hde0.hidexp_node
 //
 val flab =
   funlab_make_dcst_type (d2c, hse_fun, fcopt)
 val () = the_funlablst_add (flab)
-val () = ccompenv_inc_tailcalenv (env, flab)
+//
+in
+  auxlam2 (env, loc0, flab, imparg, tmparg, hde_fun)
+end (* end of [auxlam2] *)
+
+and auxlam2
+(
+  env: !ccompenv
+, loc0: location
+, flab: funlab, imparg: s2varlst, tmparg: s2explstlst
+, hde_fun: hidexp
+) : funlab = flab where
+{
+//
+val (
+) = ccompenv_inc_tailcalenv (env, flab)
 //
 val tmplev = ccompenv_get_tmplevel (env)
 val () =
@@ -766,6 +812,11 @@ val () =
 // end of [val]
 //
 val pmv_lam = primval_make_funlab (loc0, flab)
+//
+val loc_fun = hde_fun.hidexp_loc
+//
+val-HDElam
+  (knd, hips_arg, hde_body) = hde_fun.hidexp_node
 //
 val fent = let
   val ins =
@@ -784,10 +835,44 @@ val () =
 val () = ccompenv_dec_tailcalenv (env)
 //
 (*
-val () = println! ("hiimpdec_ccomp: auxlam: fent = ", fent)
+val () = println! ("hiimpdec_ccomp: auxlam2: fent = ", fent)
 *)
 //
-} // end of [auxlam]
+} // end of [auxlam2]
+
+(* ****** ****** *)
+
+fun auxfix
+(
+  env: !ccompenv
+, loc0: location
+, d2c: d2cst
+, imparg: s2varlst
+, tmparg: s2explstlst
+, hde_fix: hidexp
+) : funlab = let
+//
+val-HDEfix (knd, f_d2v, hde_def) = hde_fix.hidexp_node
+//
+val hse_def = hde_def.hidexp_type
+val fcopt = d2cst_get2_funclo (d2c)
+//
+val flab =
+  funlab_make_dcst_type (d2c, hse_def, fcopt)
+val pmv0 = primval_make_funlab (loc0, flab)
+//
+val () = the_funlablst_add (flab)
+//
+// HX-2013-11-01:
+// this seems to be correct as [f_d2v] is a fix-var
+//
+val () = ccompenv_add_vbindmapenvall (env, f_d2v, pmv0)
+//
+in
+  auxlam2 (env, loc0, flab, imparg, tmparg, hde_def)
+end // end of [auxfix]
+
+(* ****** ****** *)
 
 fun auxmain
 (
@@ -796,42 +881,49 @@ fun auxmain
 , d2c: d2cst
 , imparg: s2varlst
 , tmparg: s2explstlst
-, hde0: hidexp
+, hde_def: hidexp
 ) : funlab = let
 //
-val hse0 = hde0.hidexp_type
+val hse_def =
+  hde_def.hidexp_type
 //
 in
 //
 case+
-  hde0.hidexp_node of
+  hde_def.hidexp_node of
 //
-| HDElam _ =>
-  (
-    auxlam (env, loc0, d2c, imparg, tmparg, hde0)
-  ) // end of [HDElam]
 | HDEcst (d2c) => let
     val () = the_dyncstlst_add (d2c)
     val fcopt = d2cst_get2_funclo (d2c)
   in
-    funlab_make_dcst_type (d2c, hse0, fcopt)
+    funlab_make_dcst_type (d2c, hse_def, fcopt)
   end // end of [HDEcst]
 | HDEvar (d2v) => let
     val fcopt = d2var_get2_funclo (d2v)
   in
-    funlab_make_dvar_type (d2v, hse0, fcopt)
+    funlab_make_dvar_type (d2v, hse_def, fcopt)
   end // end of [HDEvar]
 //
 | HDEtmpcst (d2c, t2mas) => let
     val fcopt = d2cst_get2_funclo (d2c)
   in
-    funlab_make_tmpcst_type (d2c, t2mas, hse0, fcopt)
+    funlab_make_tmpcst_type (d2c, t2mas, hse_def, fcopt)
   end // end of [HDEtmpcst]
+//
+| HDElam _ =>
+  (
+    auxlam (env, loc0, d2c, imparg, tmparg, hde_def)
+  ) // end of [HDElam]
+//
+| HDEfix _ =>
+  (
+    auxfix (env, loc0, d2c, imparg, tmparg, hde_def)
+  ) // end of [HDEfix]
 //
 | _ => let
     val (
     ) = (
-      println! ("hiimpdec_ccomp: auxmain: hde0 = ", hde0)
+      println! ("hiimpdec_ccomp: auxmain: hde_def = ", hde_def)
     ) // end of [val]
   in
     exitloc (1)

@@ -151,6 +151,57 @@ end // end of [emit_saspdec]
 (* ****** ****** *)
 
 implement
+emit_extype
+  (out, hid) = let
+//
+val loc0 = hid.hidecl_loc
+//
+val-HIDextype
+  (name, hse_def) = hid.hidecl_node
+//
+val () = emit_text (out, "/*\n")
+val () = emit_location (out, loc0)
+val () = emit_text (out, "\n*/\n")
+//
+in
+//
+case+
+hse_def.hisexp_node of
+//
+| HSEtysum _ => {
+//
+    val () =
+    emit_text (out, "typedef\n")
+    val () =
+    emit_hisexp_sel (out, hse_def)
+    val () = emit_text (out, "\n")
+    val () = emit_text (out, name)
+    val () = emit_text (out, "_")
+    val () = emit_text (out, " ;\n")
+//
+    val () =
+    emit_text (out, "typedef\n")
+    val () = emit_text (out, name)
+    val () = emit_text (out, "_ *")
+    val () = emit_text (out, name)
+    val () = emit_text (out, " ;\n")
+//
+  } (* end of [HSEtysum] *)
+//
+| _ (*non-tysum*) => {
+    val () =
+    emit_text (out, "typedef\n")
+    val () = emit_hisexp (out, hse_def)
+    val () = emit_text (out, "\n")
+    val () = emit_text (out, name)
+    val () = emit_text (out, " ;\n")
+  } (* end of [non-tysum] *)
+//
+end // end of [emit_extype]
+
+(* ****** ****** *)
+
+implement
 emit_extcode
   (out, hid) = let
 //
@@ -1644,7 +1695,7 @@ emit_d2cst_extdec
 macdef
 ismac = $D2E.d2cst_is_mac
 macdef
-isfun = $D2E.d2cst_is_fun
+isfundec = $D2E.d2cst_is_fundec
 //
 macdef
 iscastfn = $D2E.d2cst_is_castfn
@@ -1661,7 +1712,7 @@ case+ 0 of
     // nothing
   end // end of [ismac]
 | _ when
-    isfun (d2c) => let
+    isfundec (d2c) => let
     val issta = $D2E.d2cst_is_static (d2c)
     val () =
     (
@@ -1691,7 +1742,7 @@ case+ 0 of
 //
   in
     // nothing
-  end // end of [isfun]
+  end // end of [isfundec]
 //
 | _ when
     iscastfn (d2c) => let

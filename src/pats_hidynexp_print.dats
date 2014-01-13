@@ -670,7 +670,7 @@ case+
     val () = prstr ")"
   }
 //
-| HDEerr () => prstr "HDEerr()"
+| HDEerrexp ((*void*)) => prstr "HDEerrexp()"
 //
 (*
 | _ => {
@@ -777,9 +777,10 @@ case+ hid.hidecl_node of
   }
 //
 | HIDdcstdecs
-    (knd, d2cs) => {
+    (dck, d2cs) =>
+  {
     val () = prstr "HIDdcstdecs("
-    val () = fprint_dcstkind (out, knd)
+    val () = fprint_dcstkind (out, dck)
     val () = prstr "; "
     val () = fprint_d2cstlst (out, d2cs)
     val () = prstr ")"
