@@ -48,7 +48,11 @@ staload "pats_basics.sats"
 (* ****** ****** *)
 
 staload
-GLOB = "./pats_global.sats"
+FIL = "./pats_filename.sats"
+
+(* ****** ****** *)
+
+staload GLOB = "./pats_global.sats"
 
 (* ****** ****** *)
 //
@@ -89,10 +93,10 @@ emit_ats_ccomp_header (out) = let
   val () = emit_text (out, "#include \"pats_ccomp_instrset.h\"\n")
   val () = emit_text (out, "#include \"pats_ccomp_memalloc.h\"\n")
 //
-  val () = emit_text (out, "#ifndef _ATS_EXCEPTION_NONE\n")
+  val () = emit_text (out, "#ifndef _ATS_CCOMP_EXCEPTION_NONE\n")
   val () = emit_text (out, "#include \"pats_ccomp_memalloca.h\"\n")
   val () = emit_text (out, "#include \"pats_ccomp_exception.h\"\n")
-  val () = emit_text (out, "#endif // end of [_ATS_EXCEPTION_NONE]\n")
+  val () = emit_text (out, "#endif // end of [_ATS_CCOMP_EXCEPTION_NONE]\n")
 //
   val () = emit_text (out, "#endif /* _ATS_CCOMP_HEADER_NONE */\n")
   val () = emit_newline (out)
@@ -147,6 +151,15 @@ val () = emit_text (out, "#include \"prelude/CATS/matrixptr.cats\"\n")
 //
 val () = emit_text (out, "//\n")
 val () = emit_text (out, "#endif /* _ATS_CCOMP_PRELUDE_NONE */\n")
+//
+val () = emit_text (out, "/*\n")
+val () = emit_text (out, "** for user-supplied prelude\n")
+val () = emit_text (out, "*/\n")
+val () = emit_text (out, "#ifdef _ATS_CCOMP_PRELUDE_USER\n")
+val () = emit_text (out, "//\n")
+val () = emit_text (out, "#include _ATS_CCOMP_PRELUDE_USER\n")
+val () = emit_text (out, "//\n")
+val () = emit_text (out, "#endif /* _ATS_CCOMP_PRELUDE_USER */\n")
 //
 in
   emit_newline (out)
@@ -247,10 +260,10 @@ case+ fls of
     val isclo =
     (
       if istmp then false else let
-        val fc = funlab_get_funclo (fl) in funclo_is_cloptr (fc)
+        val fc = funlab_get_funclo (fl) in funclo_is_clo (fc)
       end // end of [let] // end of [if]
     ) : bool // end of [val]
-    val-Some (fent) = funlab_get_funent (fl)
+    val-Some(fent) = funlab_get_funent (fl)
     val () =
       if isclo then emit_funent_closure (out, fent)
     // end of [val]
@@ -839,7 +852,8 @@ val () = emit_text (out, "/*\n")
 val () = emit_text (out, "** for initialization(dynloading)")
 val () = emit_text (out, "\n*/\n")
 //
-val () = emit_text (out, "atsvoid_t0ype\n")
+val () =
+emit_text (out, "atsvoid_t0ype\n")
 val () = emit_dynload (out, infil)
 val () = emit_text (out, "()\n{\n")
 val () = if flag <= 0 then emit_text (out, "ATSdynload0(\n")
@@ -892,12 +906,12 @@ val () = emit_text (out, "\n*/\n")
 val () = emit_text (out, "#ifndef _ATS_CCOMP_RUNTIME_NONE\n")
 val () = emit_text (out, "#include \"pats_ccomp_runtime.c\"\n")
 val () = emit_text (out, "#include \"pats_ccomp_runtime_memalloc.c\"\n")
-val () = emit_text (out, "#ifndef _ATS_EXCEPTION_NONE\n")
+val () = emit_text (out, "#ifndef _ATS_CCOMP_EXCEPTION_NONE\n")
 val () = emit_text (out, "#include \"pats_ccomp_runtime2_dats.c\"\n")
 val () = emit_text (out, "#ifndef _ATS_CCOMP_RUNTIME_TRYWITH_NONE\n")
 val () = emit_text (out, "#include \"pats_ccomp_runtime_trywith.c\"\n")
 val () = emit_text (out, "#endif /* _ATS_CCOMP_RUNTIME_TRYWITH_NONE */\n")
-val () = emit_text (out, "#endif // end of [_ATS_EXCEPTION_NONE]\n")
+val () = emit_text (out, "#endif // end of [_ATS_CCOMP_EXCEPTION_NONE]\n")
 val () = emit_text (out, "#endif /* _ATS_CCOMP_RUNTIME_NONE */\n")
 //
 val () = emit_text (out, "\n/*\n")
@@ -1010,11 +1024,11 @@ val () = emit_text (out, "/*\n")
 val () = emit_text (out, "exnconlst-declaration(beg)\n")
 val () = emit_text (out, "*/\n")
 //
-val () = emit_text (out, "#ifndef _ATS_EXCEPTION_NONE\n")
+val () = emit_text (out, "#ifndef _ATS_CCOMP_EXCEPTION_NONE\n")
 val () = emit_text (out, "\
 extern void the_atsexncon_initize (atstype_exncon *d2c, char *exnmsg) ;\n\
 ") // end of [val]
-val () = emit_text (out, "#endif // end of [_ATS_EXCEPTION_NONE]\n")
+val () = emit_text (out, "#endif // end of [_ATS_CCOMP_EXCEPTION_NONE]\n")
 //
 val hids = the_exndeclst_get ()
 val ((*void*)) = loop (out, hids)
@@ -1105,9 +1119,15 @@ ccomp_main
 (
   out, flag, infil, hids
 ) = let
+//
 (*
-val () = println! ("ccomp_main: enter")
+val () =
+  print ("ccomp_main: infil = ")
+val () =
+  $FIL.print_filename_full (infil)
+val () = print_newline ((*void*))
 *)
+//
 val () = emit_time_stamp (out)
 val () = emit_ats_ccomp_header (out)
 val () = emit_ats_ccomp_prelude (out)

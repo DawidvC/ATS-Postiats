@@ -77,6 +77,13 @@ typedef dqi0de = $SYN.dqi0de
 typedef impqi0de = $SYN.impqi0de
 typedef dcstextdef = $SYN.dcstextdef
 
+(* ****** ****** *)
+
+overload print with $SYN.print_i0de
+overload print with $SYN.print_dqi0de
+
+(* ****** ****** *)
+
 macdef
 prerr_dqid (dq, id) =
   ($SYN.prerr_d0ynq ,(dq); $SYM.prerr_symbol ,(id))
@@ -117,11 +124,16 @@ fun aux
   (ids: i0delst): void = let
 in
   case+ ids of
-  | list_cons (id, ids) => aux ids where {
+  | list_cons
+      (id, ids) => let
       val sym = id.i0de_sym
-      val () = the_d2expenv_add (sym, D2ITMsymdef (sym, list_nil))
-    } // end of [list_cons]
-  | list_nil () => () // end of [list_nil]
+      val () =
+        the_d2expenv_add (sym, D2ITMsymdef (sym, list_nil))
+      // end of [val]
+    in
+      aux (ids)
+    end // end of [list_cons]
+  | list_nil ((*void*)) => () // end of [list_nil]
 end // end of [aux]
 //
 in
@@ -174,12 +186,8 @@ val loc0 = d1c0.d1ecl_loc
 (*
 val () =
 {
-  val () = print "overload_tr: id = "
-  val () = $SYN.print_i0de (id)
-  val () = print_newline ()
-  val () = print "overload_tr: dqid = "
-  val () = $SYN.print_dqi0de (dqid)
-  val () = print_newline ();
+  val () = println! ("overload_tr: id = ", id)
+  val () = println! ("overload_tr: dqid = ", dqid)
 } (* end of [val] *)
 *)
 //
@@ -260,16 +268,31 @@ val ans = ans where {
 } // end of [where] // end of [val]
 val d2pis = (
   case+ ans of
-  | ~Some_vt d2i => (
-    case+ d2i of
-    | D2ITMsymdef (sym, d2pis) => d2pis
-    | _ => let
-        val () = auxerr1 (loc0, id, err) in list_nil ()
-      end // end of [_]
+  | ~Some_vt (d2i) =>
+    (
+      case+ d2i of
+      | D2ITMsymdef (sym, d2pis) => d2pis
+      | _ => let
+          val () = auxerr1 (loc0, id, err) in list_nil
+        end // end of [_]
     ) // end of [Some_vt]
+(*
+//
+// HX-2014-01-30:
+// Is this design too cumbersome?
+//
   | ~None_vt () => let
       val () = auxerr2 (loc0, id, err) in list_nil ()
     end // end of [None_vt]
+*)
+  | ~None_vt () => let
+      val d2pis = list_nil ()
+      val () =
+        the_d2expenv_add (sym, D2ITMsymdef (sym, d2pis))
+      // end of [val]
+    in
+      d2pis
+    end // end of [_]
 ) : d2pitmlst // end of [val]
 (*
 val () = begin
@@ -398,7 +421,8 @@ end // end of [d1atsrtdeclst_tr]
 
 (* ****** ****** *)
 
-fn s1rtdef_tr
+fun
+s1rtdef_tr
   (d: s1rtdef): void = let
   val id = d.s1rtdef_sym
   val s2te = s1rtext_tr (d.s1rtdef_def)
@@ -406,10 +430,15 @@ in
   the_s2rtenv_add (id, s2te)
 end // end of [s1rtdef_tr]
 
+fun
+s1rtdeflst_tr
+  (ds: s1rtdeflst): void = list_app_fun (ds, s1rtdef_tr)
+// end of [s1rtdeflst_tr]
+
 (* ****** ****** *)
 
-fn s1tacst_tr
-  (d: s1tacst): void = let
+fun s1tacst_tr
+  (d: s1tacst): s2cst = let
 //
   fun aux (
     xs: a1msrtlst, res: s2rt
@@ -437,16 +466,21 @@ fn s1tacst_tr
   , list_nil () // argvarlst
   , None () // def
   ) // end of [s2cst_make]
+//
 in
-  the_s2expenv_add_scst (s2c)
+  the_s2expenv_add_scst (s2c); s2c
 end // end of [s1tacst_tr]
+
+fun s1tacstlst_tr
+  (ds: s1tacstlst): s2cstlst =
+  list_of_list_vt (list_map_fun (ds, s1tacst_tr))
 
 (* ****** ****** *)
 
-fn s1tacon_tr
+fun s1tacon_tr
 (
   s2t_res: s2rt, d: s1tacon
-) : void = let
+) : s2cst = let
   val id = d.s1tacon_sym
   val loc = d.s1tacon_loc
 //
@@ -527,7 +561,8 @@ fn s1tacon_tr
 //
   val () = the_s2expenv_pop_free (pfenv | (*none*))
 //
-  val s2c = s2cst_make (
+  val s2c =
+  s2cst_make (
     id // sym
   , loc // location
   , s2t_fun // srt
@@ -540,26 +575,32 @@ fn s1tacon_tr
   , None () // definition
   ) // end of [val]
 in
-  the_s2expenv_add_scst (s2c)
+  the_s2expenv_add_scst (s2c); s2c
 end // end of [s1tacon_tr]
 
 fn s1taconlst_tr
 (
   knd: int, ds: s1taconlst
-) : void = let
-  fun aux
-  (
-    s2t: s2rt, ds: s1taconlst
-  ): void =
-    case+ ds of
-    | list_cons (d, ds) => let
-        val () = s1tacon_tr (s2t, d) in aux (s2t, ds)
-      end // end of [list_cons]
-    | list_nil () => ()
-  // end of [aux]
-  val s2t_res = s2rt_impred (knd)
+) : s2cstlst = let
+//
+fun
+auxlst
+(
+  s2t: s2rt, ds: s1taconlst
+) : s2cstlst =
+  case+ ds of
+  | list_nil () => list_nil ()
+  | list_cons (d, ds) => let
+      val s2c = s1tacon_tr (s2t, d)
+    in
+      list_cons (s2c, auxlst (s2t, ds))
+    end // end of [list_cons]
+// end of [aux]
+//
+val s2t_res = s2rt_impred (knd)
+//
 in
-  aux (s2t_res, ds)
+  auxlst (s2t_res, ds)
 end // end of [s1taconlst_tr]
 
 (* ****** ****** *)
@@ -925,26 +966,31 @@ end // end of [s1aspdec_tr]
 local
 
 fun
-d1atconlst_tr (
+d1atconlst_tr
+(
   s2c: s2cst
 , islin: bool
 , isprf: bool
 , s2vss0: s2varlstlst
 , fil: filename
 , d1cs: d1atconlst
-) : d2conlst =
-  case+ d1cs of
-  | list_cons (d1c, d1cs) => let
-      val d2c = d1atcon_tr (s2c, islin, isprf, s2vss0, fil, d1c)
-    in
-      list_cons (d2c, d1atconlst_tr (s2c, islin, isprf, s2vss0, fil, d1cs))
-    end // end of [cons]
-  | list_nil () => list_nil ()
-(* end of [d1atconlst_tr] *)
+) : d2conlst = (
+//
+case+ d1cs of
+| list_nil () => list_nil ()
+| list_cons (d1c, d1cs) => let
+    val d2c = d1atcon_tr (s2c, islin, isprf, s2vss0, fil, d1c)
+    val d2cs = d1atconlst_tr (s2c, islin, isprf, s2vss0, fil, d1cs)
+  in
+    list_cons (d2c, d2cs)
+  end // end of [cons]
+//
+) (* end of [d1atconlst_tr] *)
 
 in (* in of [local] *)
 
-fn d1atdec_tr (
+fn d1atdec_tr
+(
   s2c: s2cst, s2vss0: s2varlstlst, d1c: d1atdec
 ) : void = let
 //
@@ -1003,12 +1049,19 @@ end // end of [d1atdec_tr]
 
 end // end of [local]
 
+(* ****** ****** *)
+
 extern
-fun d1atdeclst_tr (
-  datknd: int, d1cs_dat: d1atdeclst, d1cs_def: s1expdeflst
-) : s2cstlst // end of [d1atdeclst_tr]
+fun
+d1atdeclst_tr
+(
+  datknd: int
+, d1cs_dat: d1atdeclst
+, d1cs_def: s1expdeflst
+) : s2cstlst // end-of-fun
 implement
-d1atdeclst_tr (
+d1atdeclst_tr
+(
   datknd, d1cs_dat, d1cs_def
 ) = let
 //
@@ -1019,12 +1072,16 @@ val s2t_res = s2rt_impred (datknd)
 //
 val d1cs2cs2vsslst = let
 //
-  var res: List (T) = list_nil ()
+  var res
+    : List (T) = list_nil ()
+  // end of [var]
 //
-  fun aux .<>. (
+  fun aux .<>.
+  (
     d1c: d1atdec, res: &List (T)
   ) :<cloref1> void = let
-    val argvar = l2l (
+    val argvar =
+    list_of_list_vt (
       list_map_fun (d1c.d1atdec_arg, a1msrt_tr_symsrt)
     ) : List (syms2rtlst)
     val s2vss = let
@@ -1089,31 +1146,32 @@ in
   auxlst (d1cs_dat, res); res
 end : List (T) // end of [d1cs2cs2vsslst]
 //
-val () = aux (d1cs_def) where {
-  fun aux (
-    d1cs: s1expdeflst
-  ) : void = begin case+ d1cs of
-    | list_cons (d1c, d1cs) => let
-        val s2c = s1expdef_tr (None, d1c)
-        val () = the_s2expenv_add_scst (s2c)
-      in
-        aux (d1cs)
-      end // end of [cons]
-    | list_nil () => () // end of [list_nil]
-  end (* end of [aux] *)
-} // end of [val]
+fun aux2 (
+  d1cs: s1expdeflst
+) : void = (
+  case+ d1cs of
+  | list_nil () => ()
+  | list_cons (d1c, d1cs) => let
+      val s2c = s1expdef_tr (None, d1c)
+      val () = the_s2expenv_add_scst (s2c)
+    in
+      aux2 (d1cs)
+    end // end of [cons]
+) (* end of [aux2] *)
 //
-fun aux (
+val () = aux2 (d1cs_def)
+//
+fun auxlst2 (
   xs: List (T)
 ) : s2cstlst = case+ xs of
   | list_cons (x, xs) => let
-      val () = d1atdec_tr (x.1, x.2, x.0) in list_cons (x.1, aux xs)
+      val () = d1atdec_tr (x.1, x.2, x.0) in list_cons (x.1, auxlst2 xs)
     end // end of [list_cons]
   | list_nil () => list_nil ()
-// end of [aux]
+// end of [auxlst2]
 in
 //
-aux (d1cs2cs2vsslst)
+auxlst2 (d1cs2cs2vsslst)
 //
 end // end of [d1atdeclst_tr]
 
@@ -1267,12 +1325,15 @@ fun d1cstdec_tr
   val ((*void*)) = dckfun_check (d1c, dck, s2e_cst)
 //
   val arylst = s2exp_get_arylst (s2e_cst)
-  val extdef =
-  (
-    if knd = 0 // static dyncst
-      then $SYN.dcstextdef_sta (sym) else d1c.d1cstdec_extdef
-    // end of [if]
-  ) : dcstextdef // end of [val]
+//
+  var extdef
+    : dcstextdef = d1c.d1cstdec_extdef
+  val () = (
+    case+ extdef of
+    | $SYN.DCSTEXTDEFnone _ =>
+        if knd = 0 then (extdef := $SYN.DCSTEXTDEFnone (0))
+    | _(* DCSTEXTDEFsome... *) => ()
+  ) : void // end of [val]
 //
   val d2c =
     d2cst_make (sym, loc, fil, dck, s2qs, arylst, s2e_cst, extdef)
@@ -1769,16 +1830,23 @@ extern fun i1mpdec_tr (d1c: d1ecl): Option_vt (i2mpdec)
 *)
 
 (* ****** ****** *)
-
-fn s1taload_tr
+//
+extern
+fun
+s1taload_tr
 (
   loc0: location
 , idopt: symbolopt
-, fil: filename
-, loadflag: int
-, d1cs: d1eclist
+, fil: filename, ldflag: int, d1cs: d1eclist
 , loaded: &int? >> int
-) : filenv = let
+) : filenv // end-of-fun
+//
+implement
+s1taload_tr
+(
+  loc0, idopt
+, fil, ldflag, d1cs, loaded
+) = let
 (*
 val () = print "s1taload_tr: staid = "
 val () = (
@@ -1796,8 +1864,8 @@ val fsymb =
 val (pflev | ()) = the_staload_level_push ()
 val ans = the_filenvmap_find (fsymb)
 //
-val fenv =
-(
+val
+fenv = (
 case+
 :(
 loaded: int
@@ -1807,13 +1875,18 @@ loaded: int
   end // end of [Some_vt]
 | ~None_vt _ => let
     val () = loaded := 0
-    val (pfsave | ()) = the_trans2_env_save ()
+    val (
+      pfsave | ((*void*))
+    ) = the_trans2_env_save ()
+//
     val opt = $GLOB.the_PACKNAME_get ()
-    val d2cs = d1eclist_tr (d1cs)
-    val () = $GLOB.the_PACKNAME_set (opt)
-    val (m0, m1, m2) = the_trans2_env_restore (pfsave | (*none*))
+    val d2cs = d1eclist_tr (d1cs) // HX: may set PACKNAME
+    val ((*void*)) = $GLOB.the_PACKNAME_set (opt)
+//
+    val (m0, m1, m2) =
+      the_trans2_env_restore (pfsave | (*none*))
     val fenv = filenv_make (fil, m0, m1, m2, d2cs)
-    val () = the_filenvmap_add (fsymb, fenv)
+    val ((*void*)) = the_filenvmap_add (fsymb, fenv)
   in
     fenv
   end // end of [None_vt]
@@ -1821,10 +1894,10 @@ loaded: int
 //
 val () = (
 case+ idopt of
-| Some id =>
-    the_s2expenv_add (id, S2ITMfilenv fenv)
+| Some (id) =>
+    the_s2expenv_add (id, S2ITMfilenv(fenv))
 | None ((*void*)) =>
-    $NS.the_namespace_add (fenv) // opened file
+    $NS.the_namespace_add (fenv) // opening file
 ) : void // end of [val]
 //
 val () = the_staload_level_pop (pflev | (*none*))
@@ -1832,7 +1905,56 @@ val () = the_staload_level_pop (pflev | (*none*))
 in
   fenv
 end // end of [s1taload_tr]
-
+//
+(* ****** ****** *)
+//
+extern  
+fun
+s1taloadnm_tr
+(
+  d1c0: d1ecl
+) : void // end-of-fun
+//
+implement
+s1taloadnm_tr (d1c0) = let
+//
+fn auxerr
+(
+  d1c0: d1ecl, name: symbol
+) : void = let
+  val () =
+    prerr_error2_loc (d1c0.d1ecl_loc)
+  val () = filprerr_ifdebug "s1taloadnm_tr"
+  val () = prerr ": the name ["
+  val () = $SYM.prerr_symbol (name)
+  val () = prerr "] does not refer to a namespace."
+  val () = prerr_newline ((*void*))
+in
+  the_trans2errlst_add (T2E_d1ecl_tr_staloadnm (d1c0))
+end (* end of [auxerr] *)
+//
+val-D1Cstaloadnm
+  (idopt, nspace) = d1c0.d1ecl_node
+//
+val ans = the_s2expenv_find (nspace)
+//
+in
+//
+case+ ans of
+| ~Some_vt (s2i) => (
+    case+ s2i of
+    | S2ITMfilenv (fenv) =>
+      (
+        case+ idopt of
+        | Some (id) => the_s2expenv_add (id, s2i)
+        | None ((*void*)) => $NS.the_namespace_add (fenv)
+      ) (* end of [S2ITMfi1lenv] *)
+    | _(*non-S2ITMfilenv*) => auxerr (d1c0, nspace)
+  ) (* end of [Some_vt] *)
+| ~None_vt ((*void*)) => auxerr (d1c0, nspace)
+//
+end // end of [s1taloadnm_tr]
+  
 (* ****** ****** *)
 
 implement
@@ -1857,7 +1979,7 @@ case+ d2cs of
           | Some (d2i) => overload_tr_def (loc, id, pval, d2i) | None () => ()
         end (* end of [D2Coverload] *)
 //
-      | D2Cinclude (d2cs2) => overload_tr_d2eclist (d2cs2)
+      | D2Cinclude (knd, d2cs2) => overload_tr_d2eclist (d2cs2)
 //
       | _ (*ignored*) => ()
 //
@@ -1905,7 +2027,9 @@ end // end of [auxcheck_impdec]
 in
 //
 case+ d1c0.d1ecl_node of
+//
 | D1Cnone () => d2ecl_none (loc0)
+//
 | D1Clist (ds) => let
     val ds = l2l (list_map_fun (ds, d1ecl_tr))
   in
@@ -1913,10 +2037,9 @@ case+ d1c0.d1ecl_node of
   end // end of [D1Clist]
 //
 | D1Cpackname (opt) => let
-    val (
-    ) = $GLOB.the_PACKNAME_set (opt)
-  in
-    d2ecl_none (loc0)
+    val () =
+      $GLOB.the_PACKNAME_set (opt) in d2ecl_none (loc0)
+    // end of [D1Cpackname]
   end (* end of [D1Cpackname] *)
 //
 | D1Csymintr (ids) => let
@@ -1925,6 +2048,7 @@ case+ d1c0.d1ecl_node of
 | D1Csymelim (ids) => let
     val () = symelim_tr (ids) in d2ecl_symelim (loc0, ids)
   end // end of [D1Csymelim]
+//
 | D1Coverload
     (id, dqid, pval) => let
     val d2iopt =
@@ -1948,22 +2072,31 @@ case+ d1c0.d1ecl_node of
   end // end of [D0Ce0xpundef]
 //
 | D1Cdatsrts (ds) => let
-    val () = d1atsrtdeclst_tr (ds) in d2ecl_none (loc0)
+    val () =
+      d1atsrtdeclst_tr (ds) in d2ecl_none (loc0)
+    // end of [val]
   end // end of [D1Cdatsrts]
+//
 | D1Csrtdefs (ds) => let
-    val () = list_app_fun (ds, s1rtdef_tr) in d2ecl_none (loc0)
+    val () = s1rtdeflst_tr (ds) in d2ecl_none (loc0)
   end // end of [D1Csrtdefs]
+//
 | D1Cstacsts (ds) => let
-    val () = list_app_fun (ds, s1tacst_tr) in d2ecl_none (loc0)
+    val s2cs =
+      s1tacstlst_tr (ds) in d2ecl_stacsts (loc0, s2cs)
+    // end of [val]
   end // end of [D1Cstacsts]
 | D1Cstacons (knd, ds) => let
-    val () = s1taconlst_tr (knd, ds) in d2ecl_none (loc0)
+    val s2cs =
+      s1taconlst_tr (knd, ds) in d2ecl_stacons (loc0, knd, s2cs)
+    // end of [val]
   end // end of [D1Cstacons]
 (*
 | D1Cstavars (d1s) => let
-    val d2s = s1tavarlst_tr (d1s) in d2ecl_stavars (loc0, d2s)
+    val s2vs = s1tavarlst_tr (d1s) in d2ecl_stavars (loc0, s2vs)
   end // end of [D1Cstavars]
 *)
+//
 | D1Ctkindef (d) => let
     val () = t1kindef_tr (d) in d2ecl_none (loc0)
   end // end of [D1Ckindef]
@@ -1996,9 +2129,10 @@ case+ d1c0.d1ecl_node of
 | D1Cclassdec (id, sup) => let
     val () = c1lassdec_tr (id, sup) in d2ecl_none (loc0)
   end // end of [D1Cclassdec]
+//
 | D1Cextype
   (
-    name, s1e_def
+    name, s1e_def // arity=2
   ) => let
     val s2e_def = s1exp_trdn_impred (s1e_def)
   in
@@ -2006,7 +2140,7 @@ case+ d1c0.d1ecl_node of
   end // end of [D1Cextype]
 | D1Cextype
   (
-    knd, name, s1e_def
+    knd, name, s1e_def // arity=3
   ) => let
     val s2t_def = s2rt_impred (knd)
     val s2e_def = s1exp_trdn (s1e_def, s2t_def)
@@ -2095,10 +2229,9 @@ case+ d1c0.d1ecl_node of
   ) => let
     val v2ds = v1aldeclst_tr (isrec, v1ds)
   in
-    if not(isrec) then
-      d2ecl_valdecs (loc0, knd, v2ds)
-    else
-      d2ecl_valdecs_rec (loc0, knd, v2ds)
+    if not(isrec)
+      then d2ecl_valdecs (loc0, knd, v2ds)
+      else d2ecl_valdecs_rec (loc0, knd, v2ds)
     // end of [if]
   end // end of [D1Cvaldecs]
 //
@@ -2111,22 +2244,24 @@ case+ d1c0.d1ecl_node of
     end // end of [if]
   ) // end of [D1Cvardecs]
 //
-| D1Cinclude (d1cs) => let
-    val d2cs = d1eclist_tr (d1cs) in d2ecl_include (loc0, d2cs)
+| D1Cinclude (knd, d1cs) => let
+    val d2cs = d1eclist_tr (d1cs) in d2ecl_include (loc0, knd, d2cs)
   end // end of [D1Cinclude]
 //
 | D1Cstaload
   (
-    idopt, fil, loadflag, d1cs
+    idopt, fil, ldflag, d1cs
   ) => let
     var loaded: int
 //
     val fenv =
     s1taload_tr
-      (loc0, idopt, fil, loadflag, d1cs, loaded)
+      (loc0, idopt, fil, ldflag, d1cs, loaded)
+    // end of [val]
 //
 // HX-2013-10-30:
-// Overloading declarations cannot permeate a NAMED namespace!!!
+// Overloading declarations
+// is not allowed to permeate a NAMED namespace!!!
 //
     val () = (
     case+ idopt of
@@ -2134,12 +2269,34 @@ case+ d1c0.d1ecl_node of
         val d2cs = filenv_get_d2eclist (fenv)
         val ((*void*)) = overload_tr_d2eclist (d2cs)
       } (* end of [None] *)
-    | Some id => ()
+    | Some (id) => ((*void*))
     ) (* end of [val] *)
 //
   in
-    d2ecl_staload (loc0, idopt, fil, loadflag, fenv, loaded)
+    d2ecl_staload (loc0, idopt, fil, ldflag, fenv, loaded)
   end // end of [D1Cstaload]
+//
+| D1Cstaloadnm _ => let
+    val () = s1taloadnm_tr (d1c0) in d2ecl_none (loc0)
+  end // end of [D1Cstaloadnm]
+//
+| D1Cstaloadloc
+  (
+    pfil, nspace, d1cs_loc
+  ) => let
+//
+    val (pfsave | ((*void*))) = the_trans2_env_save ()
+//
+    val opt = $GLOB.the_PACKNAME_get ()
+    val d2cs_loc = d1eclist_tr (d1cs_loc) // local declarations
+    val ((*void*)) = $GLOB.the_PACKNAME_set (opt)
+//
+    val (m0, m1, m2) = the_trans2_env_restore (pfsave | (*void*))
+    val fenv = filenv_make (pfil, m0, m1, m2, d2cs_loc)
+    val ((*void*)) = the_s2expenv_add (nspace, S2ITMfilenv(fenv))
+  in
+    d2ecl_staloadloc (loc0, pfil, nspace, fenv)
+  end // end of [D1Cstaloadloc]
 //
 | D1Cdynload (fil) => d2ecl_dynload (loc0, fil)
 //

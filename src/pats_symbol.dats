@@ -324,10 +324,18 @@ symbol_PATSHOMERELOC = symbol_make_string "PATSHOMERELOC"
 (* ****** ****** *)
 
 implement
-symbol_ATS_PACKNAME = symbol_make_string "ATS_PACKNAME"
+symbol_ATSPKGRELOCROOT = symbol_make_string "ATSPKGRELOCROOT"
+
+(* ****** ****** *)
 
 implement
+symbol_ATS_PACKNAME = symbol_make_string "ATS_PACKNAME"
+
+(*
+// HX-2014-06-06: this one is no longer in use:
+implement
 symbol_ATS_STALOADFLAG = symbol_make_string "ATS_STALOADFLAG"
+*)
 implement
 symbol_ATS_DYNLOADFLAG = symbol_make_string "ATS_DYNLOADFLAG"
 
@@ -352,15 +360,32 @@ compare_symbol_symbol (x1, x2) = compare (x1.stamp, x2.stamp)
 (* ****** ****** *)
 
 implement
-fprint_symbol
-  (out, x) = fprint_string (out, x.name)
-// end of [fprint_symbol]
-
-implement
 print_symbol (x) = fprint_symbol (stdout_ref, x)
 implement
 prerr_symbol (x) = fprint_symbol (stderr_ref, x)
 
+(* ****** ****** *)
+//
+implement
+fprint_symbol
+  (out, x) = fprint_string (out, x.name)
+//
+implement
+fprint_symbolopt
+  (out, opt) = let
+in
+//
+case+ opt of
+| Some (x) => {
+    val () =
+      fprint_string (out, "Some(")
+    val () = fprint_symbol (out, x)
+    val () = fprint_string (out, ")")
+  } (* end of [Some] *)
+| None () => fprint_string (out, "None()")
+//
+end (* end of [fprint_symbolopt] *)
+//
 (* ****** ****** *)
 
 (* end of [pats_symbol.dats] *)

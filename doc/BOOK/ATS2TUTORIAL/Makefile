@@ -22,11 +22,15 @@ cleanall::
 
 ######
 
-pdf: main.db
-	jw -b pdf --output PDF/ main.db
+JADE=/usr/bin/openjade
 
-html: main.db
-	jw -b html --output HTML/ main.db
+######
+
+pdf: main.db ; jw -b pdf --dsl default --parser $(JADE) --output PDF/ main.db
+
+######
+
+html: main.db ; jw -b html --dsl default --parser $(JADE) --output HTML/ main.db
 
 ######
 
@@ -45,53 +49,101 @@ preface.db:: ; $(RMF) preface.exe preface_atxt_dats.c preface_atxt.dats preface_
 ######
 
 allchap:: CHAP_SYNCLR
+CHAP_SYNCLR:: ; \
+  make -C CHAP_SYNCLR -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_SYNCLR -f ../Makefile_chap clean
+
 allchap:: CHAP_FILENAME
+CHAP_FILENAME:: ; \
+  make -C CHAP_FILENAME -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_FILENAME -f ../Makefile_chap clean
+
 allchap:: CHAP_FILEINCL
+CHAP_FILEINCL:: ; \
+  make -C CHAP_FILEINCL -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_FILEINCL -f ../Makefile_chap clean
+
 allchap:: CHAP_FIXITY
-allchap:: CHAP_HORDFUN
+CHAP_FIXITY:: ; \
+  make -C CHAP_FIXITY -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_FIXITY -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_EXCEPTION
+CHAP_EXCEPTION:: ; \
+  make -C CHAP_EXCEPTION -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_EXCEPTION -f ../Makefile_chap clean
+
+######
+
 allchap:: CHAP_REFERENCE
+CHAP_REFERENCE:: ; \
+  make -C CHAP_REFERENCE -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_REFERENCE -f ../Makefile_chap clean
+
+######
+
 allchap:: CHAP_ARRAYREF
-
-######
-
-CHAP_SYNCLR:: ; \
-  make -C CHAP_SYNCLR -f ../Makefile.chap main.db
-CHAP_SYNCLR:: ; \
-  make -C CHAP_SYNCLR -f ../Makefile.chap clean
-
-CHAP_FILENAME:: ; \
-  make -C CHAP_FILENAME -f ../Makefile.chap main.db
-CHAP_FILENAME:: ; \
-  make -C CHAP_FILENAME -f ../Makefile.chap clean
-
-CHAP_FILEINCL:: ; \
-  make -C CHAP_FILEINCL -f ../Makefile.chap main.db
-CHAP_FILEINCL:: ; \
-  make -C CHAP_FILEINCL -f ../Makefile.chap clean
-
-CHAP_FIXITY:: ; \
-  make -C CHAP_FIXITY -f ../Makefile.chap main.db
-CHAP_FIXITY:: ; \
-  make -C CHAP_FIXITY -f ../Makefile.chap clean
-
-######
-
-CHAP_HORDFUN:: ; \
-  make -C CHAP_HORDFUN -f ../Makefile.chap main.db
-CHAP_HORDFUN:: ; \
-  make -C CHAP_HORDFUN -f ../Makefile.chap clean
-
-######
-
-CHAP_REFERENCE:: ; \
-  make -C CHAP_REFERENCE -f ../Makefile.chap main.db
-CHAP_REFERENCE:: ; \
-  make -C CHAP_REFERENCE -f ../Makefile.chap clean
-
 CHAP_ARRAYREF:: ; \
-  make -C CHAP_ARRAYREF -f ../Makefile.chap main.db
-CHAP_ARRAYREF:: ; \
-  make -C CHAP_ARRAYREF -f ../Makefile.chap clean
+  make -C CHAP_ARRAYREF -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_ARRAYREF -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_ARRSZREF
+CHAP_ARRSZREF:: ; \
+  make -C CHAP_ARRSZREF -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_ARRSZREF -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_MATRIXREF
+CHAP_MATRIXREF:: ; \
+  make -C CHAP_MATRIXREF -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_MATRIXREF -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_MTRXSZREF
+CHAP_MTRXSZREF:: ; \
+  make -C CHAP_MTRXSZREF -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_MTRXSZREF -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_TAILREC
+CHAP_TAILREC:: ; \
+  make -C CHAP_TAILREC -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_TAILREC -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_HORDFUN
+CHAP_HORDFUN:: ; \
+  make -C CHAP_HORDFUN -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_HORDFUN -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_CLOPTR
+CHAP_CLOPTR:: ; \
+  make -C CHAP_CLOPTR -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_CLOPTR -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_STREAM
+CHAP_STREAM:: ; \
+  make -C CHAP_STREAM -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_STREAM -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_STREAM_VT
+CHAP_STREAM_VT:: ; \
+  make -C CHAP_STREAM_VT -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_STREAM_VT -f ../Makefile_chap clean
 
 ######
 
@@ -101,21 +153,29 @@ CHMOD=chmod
 
 ######
 
-upload_html:: ; \
-  scp -r HTML ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL
-uploadloc_html:: ; \
-  $(SCPR) HTML hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/ATS2TUTORIAL
+regress:: ; \
+  $(MAKE) -C CODE regress
 
 ######
+
+upload:: upload_html
 
 upload_pdf:: ; \
   scp -r PDF ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL/
+upload_html:: ; \
+  scp -r HTML ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL/
 
 ######
 
+uploadloc:: ; $(SCPR) HTML hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/ATS2TUTORIAL
+
+######
+#
+upload_code:: ; \
+  make -C CODE cleanall
 upload_code:: ; \
   scp -r CODE ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL
-
+#
 ######
 
 RMF=rm -f
@@ -131,6 +191,6 @@ cleanall:: clean
 cleanall:: ; $(RMF) preface.db
 cleanall:: ; $(RMF) HTML/*.html
 cleanall:: ; $(RMF) PDF/main.pdf
-cleanall:: ; $(RMF) CODE/chap_*.dats
+cleanall:: ; $(RMF) TEMP/chap_*.dats
 
 ###### end of [Makefile] ######

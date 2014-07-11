@@ -193,7 +193,7 @@ print_filename_full
   (fil) = fprint_filename_full (stdout_ref, fil)
 implement
 prerr_filename_full
-  (fil) = fprint_filename_full (stdout_ref, fil)
+  (fil) = fprint_filename_full (stderr_ref, fil)
 implement
 fprint_filename_full
   (out, fil) = let
@@ -294,6 +294,18 @@ filename_stdin = '{
   filename_givename= "__STDIN__"
 , filename_partname= "__STDIN__", filename_fullname= $SYM.symbol_empty
 } // end of [filename_stdin]
+
+(* ****** ****** *)
+
+implement
+filename_is_dummy (fil) =
+  if fil.filename_fullname = $SYM.symbol_empty then true else false
+// end of [filename_is_empty]
+
+implement
+filename_isnot_dummy (fil) =
+  if fil.filename_fullname = $SYM.symbol_empty then false else true
+// end of [filename_isnot_empty]
 
 (* ****** ****** *)
 
@@ -447,7 +459,8 @@ viewtypedef filenamelst = List_vt filename
 val the_filename = ref_make_elt<filename> (filename_dummy)
 val the_filenamelst = ref_make_elt<filenamelst> (list_vt_nil ())
 
-fun filename_occurs
+fun
+filename_occurs
   (f0: filename): bool = let
   fun loop {n:nat} .<n>. (
     fs: !list_vt (filename, n), f0: filename
@@ -469,7 +482,8 @@ end // end of [filename_occurs]
 
 in (* in of [local] *)
 
-implement filename_get_current () = !the_filename
+implement
+filename_get_current () = !the_filename
 
 implement
 the_filenamelst_pop
@@ -512,7 +526,10 @@ the_filenamelst_push_check
   val () = print ("the_filenamelst_push_check: the_filenamelst(aft) =\n")
   val () = fprint_the_filenamelst (stdout_ref)
 *)
-  val isexi = filename_occurs (f0) // HX: is [f0] already in the list?
+  val isexi =
+  (
+    if filename_isnot_dummy (f0) then filename_occurs (f0) else false
+  ) : bool // end of [val]
 in
   (pf | isexi)
 end // end of [the_filenamelst_push_check]
@@ -635,6 +652,8 @@ local
 
 extern castfn s2s (x: string):<> String
 extern castfn p2s {l:agz} (x: !strptr l):<> String
+
+(* ****** ****** *)
 
 fun
 aux_local
@@ -767,6 +786,8 @@ in
 end else None_vt () // end of [if]
 //
 end // end of [filenameopt_make_local]
+
+(* ****** ****** *)
 
 implement
 filenameopt_make_relative

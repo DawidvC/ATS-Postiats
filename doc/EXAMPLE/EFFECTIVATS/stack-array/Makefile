@@ -17,8 +17,11 @@ include $(PATSHOME)/share/atsmake-post.mk
 
 ######
 
-all:: postfix_eval
-postfix_eval: postfix_eval.dats; $(PATSCC) -DATS_MEMALLOC_LIBC -o $@ $<
+all:: \
+postfix_eval
+postfix_eval: \
+  postfix_eval.dats; $(PATSCC2) -DATS_MEMALLOC_LIBC -o $@ $<
+regress:: postfix_eval ; ./$<
 cleanall:: ; $(RMF) postfix_eval
 
 ######
@@ -49,6 +52,7 @@ upload_main: \
 
 ######
 
+cleanats:: ; $(RMF) *_?ats.c
 cleanats:: ; $(RMF) main_atxt.txt
 cleanats:: ; $(RMF) main_atxt.dats
 

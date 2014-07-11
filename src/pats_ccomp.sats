@@ -204,6 +204,10 @@ fun tmpvar_get_tailcal (tmp: tmpvar): int // if >= 2
 fun tmpvar_inc_tailcal (tmp: tmpvar): void // incby 1
 
 (* ****** ****** *)
+
+fun tmpvar_set_tyclo (tmp: tmpvar, fl: funlab): void
+
+(* ****** ****** *)
 //
 fun print_tmpvar (x: tmpvar): void
 fun prerr_tmpvar (x: tmpvar): void
@@ -243,11 +247,17 @@ fun tmpvarmap_vt_remove
   {a:type} (map: &tmpvarmap_vt(a), tmp: tmpvar): bool(*found*)
 
 (* ****** ****** *)
-
+//
 abstype d2env_type
+//
 typedef d2env = d2env_type
+//
 typedef d2envlst = List (d2env)
 vtypedef d2envlst_vt = List_vt (d2env)
+//
+typedef d2envlstopt = Option (d2envlst)
+//
+(* ****** ****** *)
 
 fun d2var2env (d2v: d2var): d2env
 
@@ -259,6 +269,9 @@ fun fprint_d2env : fprint_type (d2env)
 overload fprint with fprint_d2env
 fun fprint_d2envlst : fprint_type (d2envlst)
 overload fprint with fprint_d2envlst
+
+fun fprint_d2envlstopt : fprint_type (d2envlstopt)
+overload fprint with fprint_d2envlstopt
 
 (* ****** ****** *)
 
@@ -285,6 +298,8 @@ vtypedef funlablst_vt = List_vt (funlab)
 typedef funlabopt = Option (funlab)
 vtypedef funlabopt_vt = Option_vt (funlab)
 //
+typedef funlablstopt = Option (funlablst)
+//
 fun print_funlab (x: funlab): void
 fun prerr_funlab (x: funlab): void
 overload print with print_funlab
@@ -294,6 +309,9 @@ fun fprint_funlab : fprint_type (funlab)
 overload fprint with fprint_funlab
 fun fprint_funlablst : fprint_type (funlablst)
 overload fprint with fprint_funlablst
+//
+fun fprint_funlablstopt : fprint_type (funlablstopt)
+overload fprint with fprint_funlablstopt
 //
 (* ****** ****** *)
 //
@@ -544,9 +562,12 @@ primdec_node =
 //
   | PMDimpdec of (hiimpdec)
 //
-  | PMDinclude of (primdeclst)
+  | PMDinclude of (int(*knd*), primdeclst)
 //
   | PMDstaload of (hidecl) // HX: staloading
+//
+  | PMDstaloadloc of (filename, symbol, primdeclst)
+//
   | PMDdynload of (hidecl) // HX: dynloading
 //
   | PMDlocal of (primdeclst, primdeclst)
@@ -653,8 +674,6 @@ and primlab =
 
 and primlablst = List (primlab)
 
-and d2vbindmap = d2varmap (primval)
-
 (* ****** ****** *)
 
 fun print_primdec (pmd: primdec): void
@@ -717,13 +736,20 @@ fun primdec_impdec
 
 (* ****** ****** *)
 
-fun primdec_include (loc: location, pmds: primdeclst): primdec
+fun primdec_include
+  (loc: location, knd: int, pmds: primdeclst): primdec
 
 (* ****** ****** *)
-
+//
 fun primdec_staload (loc: location, hid: hidecl): primdec
+//
+fun primdec_staloadloc
+(
+  loc: location, pfil: filename, nspace: symbol, pmds: primdeclst
+) : primdec // end of [primdec_staloadloc]
+//
 fun primdec_dynload (loc: location, hid: hidecl): primdec
-
+//
 (* ****** ****** *)
 
 fun primdec_local
@@ -856,7 +882,8 @@ fun primval_extval
 
 (* ****** ****** *)
 
-fun primval_castfn (
+fun primval_castfn
+(
   loc: location, hse: hisexp, d2c: d2cst, arg: primval
 ) : primval // end of [primval_castfn]
 
@@ -864,22 +891,26 @@ fun primval_castfn (
 
 fun primval_selcon
 (
-  loc: location, hse: hisexp, pmv: primval, hse_sum: hisexp, lab: label
+  loc: location
+, hse: hisexp, pmv: primval, hse_sum: hisexp, lab: label
 ) : primval // end of [primval_selcon]
 fun primval_select
 (
-  loc: location, hse: hisexp, pmv: primval, hse_rt: hisexp, pml: primlab
+  loc: location
+, hse: hisexp, pmv: primval, hse_rt: hisexp, pml: primlab
 ) : primval // end of [primval_select]
 fun primval_select2
 (
-  loc: location, hse: hisexp, pmv: primval, hse_rt: hisexp, pmls: primlablst
+  loc: location
+, hse: hisexp, pmv: primval, hse_rt: hisexp, pmls: primlablst
 ) : primval // end of [primval_select2]
 
 (* ****** ****** *)
 
 fun primval_selptr
 (
-  loc: location, hse: hisexp, pmv: primval, hse_rt: hisexp, pmls: primlablst
+  loc: location
+, hse: hisexp, pmv: primval, hse_rt: hisexp, pmls: primlablst
 ) : primval // end of [primval_selptr]
 
 (* ****** ****** *)
@@ -897,20 +928,17 @@ fun primval_ptrofsel (
 
 fun primval_refarg
 (
-  loc: location, hse: hisexp, knd: int, freeknd: int, pmv: primval
+  loc: location
+, hse: hisexp, knd: int, freeknd: int, pmv: primval
 ) : primval // end of [primval_refarg]
 
 (* ****** ****** *)
-
+//
 fun primval_funlab
   (loc: location, hse: hisexp, flab: funlab): primval
-// end of [primval_funlab]
-
 fun primval_cfunlab
-(
-  loc: location, hse: hisexp, knd: int, flab: funlab
-) : primval // end of [primval_cfunlab]
-
+  (loc: location, hse: hisexp, knd: int, flab: funlab): primval
+//
 (* ****** ****** *)
 
 fun primval_d2vfunlab
@@ -1162,6 +1190,8 @@ instr_node =
 //
   | INSupdate_ptrinc of (tmpvar, hisexp(*elt*))
   | INSupdate_ptrdec of (tmpvar, hisexp(*elt*))
+//
+  | INSclosure_initize of (tmpvar, funlab)
 //
   | INStmpdec of (tmpvar) // HX-2013-01: this is a no-op
 //
@@ -1436,6 +1466,11 @@ fun instr_update_ptrdec
 // end of [instr_update_ptrdec]
 
 (* ****** ****** *)
+//
+fun instr_closure_initize
+  (loc: location, tmpret: tmpvar, flab: funlab): instr
+//
+(* ****** ****** *)
 
 fun instr_tmpdec (loc: location, tmp: tmpvar): instr
 
@@ -1513,6 +1548,8 @@ fun hiimpdec_set_instrlstopt
 
 typedef
 vbindmap = d2varmap (primval)
+
+(* ****** ****** *)
 
 fun fprint_vbindmap (out: FILEref, vbmap: vbindmap): void
 
@@ -1750,12 +1787,15 @@ fun hifunarg_ccomp
 typedef
 hidexp_ccomp_funtype =
   (!ccompenv, !instrseq, hidexp) -> primval
+//
 fun hidexp_ccomp : hidexp_ccomp_funtype
 fun hidexp_ccomp_lam : hidexp_ccomp_funtype
 fun hidexp_ccomp_fix : hidexp_ccomp_funtype
 fun hidexp_ccomp_loop : hidexp_ccomp_funtype
 fun hidexp_ccomp_loopexn : hidexp_ccomp_funtype
-
+//
+fun hidexp_ccompv : hidexp_ccomp_funtype  
+//
 (* ****** ****** *)
 
 typedef
@@ -1779,10 +1819,6 @@ fun hidexp_ccomp_ret_trywith : hidexp_ccomp_ret_funtype
 fun hidexplst_ccomp
   (env: !ccompenv, res: !instrseq, hdes: hidexplst): primvalist
 // end of [hidexplst_ccomp]
-
-fun labhidexplst_ccomp
-  (env: !ccompenv, res: !instrseq, lhdes: labhidexplst): labprimvalist
-// end of [labhidexplst_ccomp]
 
 (* ****** ****** *)
 
@@ -1894,7 +1930,8 @@ fun emit_ATSPMVf0loat (out: FILEref, tok: $SYN.f0loat): void
 
 (* ****** ****** *)
 
-fun emit_symbol (out: FILEref, sym: symbol): void
+fun emit_stamp (out: FILEref, x: stamp): void
+fun emit_symbol (out: FILEref, x: symbol): void
 
 (* ****** ****** *)
 
@@ -1931,7 +1968,7 @@ fun emit2_d2cst (out: FILEref, d2c: d2cst): void // HX: local
 
 fun emit_d2env (out: FILEref, d2e: d2env): void
 fun emit_d2var_env (out: FILEref, d2v: d2var): void
-fun emit_d2envlst (out: FILEref, d2es: d2envlst): int(*nenv*)
+fun emit_d2envlst (out: FILEref, d2es: d2envlst, i: int): int(*nenv*)
 
 (* ****** ****** *)
 
@@ -2001,6 +2038,8 @@ fun prerr_hitype (hit: hitype): void
 overload prerr with prerr_hitype
 fun fprint_hitype : fprint_type (hitype)
 fun fprint_hitypelst : fprint_type (hitypelst)
+overload fprint with fprint_hitype
+overload fprint with fprint_hitypelst
 
 (* ****** ****** *)
 //

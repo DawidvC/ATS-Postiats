@@ -38,6 +38,10 @@ ATSPRE = "./pats_atspre.dats"
 //
 (* ****** ****** *)
 
+staload UN = "prelude/SATS/unsafe.sats"
+
+(* ****** ****** *)
+
 staload "pats_basics.sats"
 
 (* ****** ****** *)
@@ -76,6 +80,8 @@ D2E = "./pats_dynexp2.sats"
 typedef d2cst = $D2E.d2cst
 typedef d2ecl = $D2E.d2ecl
 typedef d2eclist = $D2E.d2eclist
+overload = with $D2E.eq_d2cst_d2cst
+overload != with $D2E.neq_d2cst_d2cst
 
 (* ****** ****** *)
 
@@ -265,7 +271,7 @@ case+ d2cs of
       in
         if issta then auxsta (out, d2cs) else ()
       end // end of [D2Cstaload]
-    | _ => ()
+    | _ (*skipped*) => ((*void*))
     ) : void // end of [val]
   in
     auxsta (out, d2cs)
@@ -325,8 +331,8 @@ emit_staload
 //
 val-HIDstaload
 (
-  fil, flag, fenv, loaded
-) = hid.hidecl_node
+  idopt, fil, flag, fenv, loaded
+) = hid.hidecl_node // end-of-val
 (*
 val () = 
   println! ("emit_staload: flag = ", flag)
@@ -783,6 +789,7 @@ val issta = not (isext)
 //
 val () = if istmp then emit_text (out, "#if(0)\n")
 val () = if isqua then emit_text (out, "#if(0)\n")
+//
 val () = if isext then emit_text (out, "ATSglobaldec()\n")
 val () = if issta then emit_text (out, "ATSstaticdec()\n")
 //
@@ -997,7 +1004,7 @@ val () = emit_text (out, "atstype_funptr cfun ;\n")
 val () = aux1_envlst (out, d2es, 0)
 val () = emit_text (out, "} ")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closure_t0ype ;\n")
+val () = emit_text (out, "__closure_t0ype ;\n")
 //
 in
   // nothing
@@ -1011,22 +1018,26 @@ fun auxclo_cfun
 val hse_res = funlab_get_type_res (flab)
 val hses_arg = funlab_get_type_arg (flab)
 //
+val isvoid = hisexp_is_void (hse_res)
+//
 val () = emit_text (out, "ATSstaticdec()\n")
 val () = emit_hisexp (out, hse_res)
 val () = emit_text (out, "\n")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$cfun")
+val () = emit_text (out, "__cfun")
 val () = emit_text (out, "\n(\n")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closure_t0ype *p_cenv")
+val () = emit_text (out, "__closure_t0ype *p_cenv")
 val () = aux1_arglst (out, hses_arg, 1, 0)
 val () = emit_text (out, "\n)\n{\n")
-val () = emit_text (out, "return ")
+val () = emit_text (out, "ATSFCreturn")
+val () = if isvoid then emit_text (out, "_void")
+val () = emit_text (out, "(")
 val () = emit_funlab (out, flab)
 val () = emit_text (out, "(")
 val n0 = aux4_envlst (out, d2es, 0, 0)
 val () = aux2_arglst (out, hses_arg, n0, 0)
-val () = emit_text (out, ") ;\n")
+val () = emit_text (out, ")) ;\n")
 val () = emit_text (out, "} /* end of [cfun] */\n")
 //
 in
@@ -1042,18 +1053,18 @@ val () = emit_text (out, "ATSstaticdec()\n")
 val () = emit_text (out, "atstype_cloptr\n")
 //
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closureinit")
+val () = emit_text (out, "__closureinit")
 val () = emit_text (out, "\n(\n")
 //
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closure_t0ype *p_cenv")
+val () = emit_text (out, "__closure_t0ype *p_cenv")
 val n0 = aux2_envlst (out, d2es, 1, 0)
 //
 val () = emit_text (out, "\n)\n{\n")
 val () = aux5_envlst (out, d2es, 0)
 val () = emit_text (out, "p_cenv->cfun = ")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$cfun ;\n")
+val () = emit_text (out, "__cfun ;\n")
 val () = emit_text (out, "return p_cenv ;\n")
 val () = emit_text (out, "} /* end of [closureinit] */\n")
 //
@@ -1070,7 +1081,7 @@ val () = emit_text (out, "ATSstaticdec()\n")
 val () = emit_text (out, "atstype_cloptr\n")
 //
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closurerize")
+val () = emit_text (out, "__closurerize")
 val () = emit_text (out, "\n(\n")
 //
 val n0 = aux2_envlst (out, d2es, 0, 0)
@@ -1079,10 +1090,10 @@ val () = if n0 = 0 then emit_text (out, "// argumentless")
 val () = emit_text (out, "\n)\n{\n")
 val () = emit_text (out, "return ")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closureinit(")
+val () = emit_text (out, "__closureinit(")
 val () = emit_text (out, "ATS_MALLOC(sizeof(")
 val () = emit_funlab (out, flab)
-val () = emit_text (out, "$closure_t0ype))")
+val () = emit_text (out, "__closure_t0ype))")
 val n0 = aux3_envlst (out, d2es, 1, 0)
 val () = emit_text (out, ") ;\n")
 val () = emit_text (out, "} /* end of [closurerize] */\n")
@@ -1103,7 +1114,11 @@ val d2es = funent_eval_d2envlst (fent)
 val () = auxclo_type (out, flab, d2es)
 val () = auxclo_cfun (out, flab, d2es)
 val () = auxclo_init (out, flab, d2es)
-val () = auxclo_create (out, flab, d2es)
+//
+val fc =
+funlab_get_funclo (flab)
+val () =
+if funclo_is_ptr(fc) then auxclo_create (out, flab, d2es)
 //
 val () = emit_newline (out)
 //
@@ -1573,10 +1588,15 @@ case+ pmd.primdec_node of
 | PMDvardecs (hvds, inss) =>
     emit_instrlst_ln (out, $UN.cast{instrlst}(inss))
 //
-| PMDinclude (pmds) => emit_primdeclst (out, pmds)
+| PMDinclude
+    (pfil, pmds) => emit_primdeclst (out, pmds)
 //
 | PMDstaload _ => ()
-| PMDdynload (fil) => emit_dynload (out, fil)
+//
+| PMDstaloadloc
+    (pfil, nspace, pmds) => emit_primdeclst (out, pmds)
+//
+| PMDdynload (cfil) => emit_dynload (out, cfil)
 //
 | PMDlocal
   (
@@ -1688,12 +1708,41 @@ end // end of [emit_d2conlst_initize]
 
 (* ****** ****** *)
 
+(*
+//
+// HX-2014-03-14: should it be tried?
+//
+fun
+d2cst_is_lamless
+  (d2c: d2cst): bool = let
+//
+val opt = $D2E.d2cst_get_funlab (d2c)
+//
+in
+//
+case+ opt of
+| None () => false
+| Some (flab) => let
+    val flab = $UN.cast{funlab}(flab)
+    val opt2 = funlab_get_d2copt (flab)
+  in
+    case+ opt2 of
+    | None () => false
+    | Some (d2c2) => if d2c != d2c2 then true else false
+  end // end of [Some]
+//
+end // end of [d2cst_is_lamless]
+*)
+
+(* ****** ****** *)
+
 implement
 emit_d2cst_extdec
   (out, d2c) = let
 //
 macdef
 ismac = $D2E.d2cst_is_mac
+//
 macdef
 isfundec = $D2E.d2cst_is_fundec
 //
@@ -1707,12 +1756,12 @@ case+ 0 of
     ismac (d2c) => let
     val () = emit_text (out, "ATSdyncst_mac(")
     val () = emit_d2cst (out, d2c)
-    val () = emit_text (out, ") ;\n")
+    val () = emit_text (out, ")\n")
   in
     // nothing
   end // end of [ismac]
 | _ when
-    isfundec (d2c) => let
+    isfundec(d2c) => let
     val issta = $D2E.d2cst_is_static (d2c)
     val () =
     (
@@ -1745,14 +1794,14 @@ case+ 0 of
   end // end of [isfundec]
 //
 | _ when
-    iscastfn (d2c) => let
+    iscastfn(d2c) => let
     val () = emit_text (out, "ATSdyncst_castfn(")
     val () = emit_d2cst (out, d2c)
-    val () = emit_text (out, ") ;\n")
+    val () = emit_text (out, ")\n")
   in
     // nothing
   end // end of [castfn]
-| _ => let
+| _ (*non-fun*) => let
     val-Some(hse) = d2cst_get2_hisexp (d2c)
     val () = emit_text (out, "ATSdyncst_valdec(")
     val () = emit_d2cst (out, d2c)

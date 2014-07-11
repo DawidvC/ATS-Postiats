@@ -21,7 +21,7 @@ val () = theAtextMap_insert_str ("thisfilename", _thisfilename)
 #atscode_separator()
 
 #atscode_author("Hongwei Xi")
-#atscode_authoremail("hwxi AT cs DOT bu DOT edu")
+#atscode_authoremail("gmhwxiATgmailDOTcom")
 #atscode_start_time("Feburary, 2012")
 
 #atscode_separator()
@@ -31,14 +31,17 @@ staload _(*anon*) = "prelude/DATS/unsafe.dats"
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_make_sing (x) = list_vt_cons{x}(x, list_vt_nil)
-implement{x}
+implement
+{x}(*tmp*)
 list_make_pair (x1, x2) = list_vt_cons{x}(x1, list_vt_cons{x}(x2, list_vt_nil))
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_make_elt
   {n} (n, x) = let
   fun loop
@@ -56,7 +59,8 @@ end // end of [list_make_elt]
 
 #atscode_separator()
 
-implement{}
+implement
+{}(*tmp*)
 list_make_intrange
   {l0,r} (l0, r) = let
 //
@@ -86,7 +90,8 @@ end // end of [list_make_intrange]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_make_array
   {n} (A, n) = let
 //
@@ -129,12 +134,14 @@ end // end of [list_make_array]
 
 #atscode_separator()
 
-implement{a}
-list_make_arrpsz {n} (A0) = let
+implement
+{a}(*tmp*)
+list_make_arrpsz
+  {n} (A0) = let
 //
 var asz: size_t
 val A = arrpsz_get_ptrsize (A0, asz)
-val p = ptrcast (A)
+val p = arrayptr2ptr (A)
 prval pfarr = arrayptr_takeout (A)
 val res = list_make_array (!p, asz)
 prval () = arrayptr_addback (pfarr | A)
@@ -146,19 +153,23 @@ end // end of [list_make_arrpsz]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 print_list (xs) = fprint_list<a> (stdout_ref, xs)
-implement{a}
+implement
+{a}(*tmp*)
 prerr_list (xs) = fprint_list<a> (stderr_ref, xs)
 
 #atscode_separator()
 
-implement{}
+implement
+{}(*tmp*)
 fprint_list$sep
   (out) = fprint_string (out, ", ")
 // end of [fprint_list$sep]
 
-implement{a}
+implement
+{a}(*tmp*)
 fprint_list (out, xs) = let
 //
 implement(env)
@@ -171,13 +182,14 @@ in
   fprint_val<a> (out, x)
 end // end of [list_iforeach$fwork]
 //
-val _(*n*) = list_iforeach<a> (xs)
+val _(*len*) = list_iforeach<a> (xs)
 //
 in
   // nothing
 end // end of [fprint_list]
 
-implement{a}
+implement
+{a}(*tmp*)
 fprint_list_sep
   (out, xs, sep) = let
 //
@@ -195,7 +207,8 @@ end // end of [fprint_list_sep]
 // Compiling this can be a great challenge!
 //
 *)
-implement{a}
+implement
+{a}(*tmp*)
 fprint_listlist_sep
   (out, xss, sep1, sep2) = let
 //
@@ -208,37 +221,44 @@ end // end of [fprint_listlist_sep]
 
 #atscode_separator()
 
-implement{}
+implement
+{}(*tmp*)
 list_is_nil (xs) =
   case+ xs of list_nil () => true | _ =>> false
 // end of [list_is_nil]
 
-implement{}
+implement
+{}(*tmp*)
 list_is_cons (xs) =
   case+ xs of list_cons _ => true | _ =>> false
 // end of [list_is_cons]
 
-implement{x}
+implement
+{x}(*tmp*)
 list_is_sing (xs) =
   case+ xs of list_sing (x) => true | _ =>> false
 // end of [list_is_sing]
 
-implement{x}
+implement
+{x}(*tmp*)
 list_is_pair (xs) =
   case+ xs of list_pair (x1, x2) => true | _ =>> false
 // end of [list_is_pair]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_head (xs) =
   let val+list_cons (x, _) = xs in x end
 // end of [list_head]
-implement{x}
+implement
+{x}(*tmp*)
 list_tail (xs) =
   let val+list_cons (_, xs) = xs in xs end
 // end of [list_tail]
-implement{x}
+implement
+{x}(*tmp*)
 list_last (xs) = let
 //
 fun loop
@@ -255,21 +275,24 @@ end // end of [list_last]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_head_exn (xs) =
 (
 case+ xs of
 | list_cons (x, _) => x | _ => $raise ListSubscriptExn()
 ) (* end of [list_head_exn] *)
 
-implement{x}
+implement
+{x}(*tmp*)
 list_tail_exn (xs) =
 (
 case+ xs of
 | list_cons (_, xs) => xs | _ => $raise ListSubscriptExn()
 ) (* end of [list_tail_exn] *)
 
-implement{x}
+implement
+{x}(*tmp*)
 list_last_exn (xs) =
 (
 case+ xs of
@@ -278,7 +301,8 @@ case+ xs of
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_nth (xs, i) = let
 //
 fun loop
@@ -293,14 +317,70 @@ in
   loop (xs, i)
 end // end of [list_nth]
 
+implement
+{a}(*tmp*)
+list_nth_opt (xs, i) = let
+//
+fun loop
+  {n:nat} .<n>.
+(
+  xs: list (a, n), i: intGte(0)
+) :<> Option_vt (a) =
+(
+case+ xs of
+| list_nil () => None_vt ()
+| list_cons (x, xs) =>
+    if i = 0 then Some_vt(x) else loop (xs, pred(i))
+  // end of [list_vt_cons]
+) (* end of [loop] *)
+//
+prval () = lemma_list_param (xs)
+//
+in
+  loop (xs, i)
+end // end of [list_nth_opt]
+
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_get_at (xs, i) = list_nth<a> (xs, i)
+implement
+{a}(*tmp*)
+list_get_at_opt (xs, i) = list_nth_opt<a> (xs, i)
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
+list_set_at
+  (xs, i, x_new) = let
+  val (xs1, xs2) =
+    $effmask_wrt (list_split_at<a> (xs, i))
+  val+list_cons (x_old, xs2) = xs2
+  val xs2 = list_cons{a}(x_new, xs2)
+in
+  $effmask_wrt (list_append1_vt<a> (xs1, xs2))
+end // ed of [list_set_at]
+
+#atscode_separator()
+
+implement
+{a}(*tmp*)
+list_exch_at
+  (xs, i, x_new) = let
+  val (xs1, xs2) =
+    $effmask_wrt (list_split_at<a> (xs, i))
+  val+list_cons (x_old, xs2) = xs2
+  val xs2 = list_cons{a}(x_new, xs2)
+in
+  ($effmask_wrt (list_append1_vt<a> (xs1, xs2)), x_old)
+end // ed of [list_exch_at]
+
+#atscode_separator()
+
+implement
+{a}(*tmp*)
 list_insert_at
   (xs, i, x) = let
 //
@@ -332,7 +412,8 @@ end // end of [list_insert_at]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_takeout_at
   (xs, i, x0) = let
 //
@@ -374,7 +455,8 @@ end // end of [list_takeout_at]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_length (xs) = let
 //
 prval () = lemma_list_param (xs)
@@ -445,7 +527,8 @@ $effmask_wrt
 ) // end of [$effmask_wrt]
 end // end of [list_append]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_append1_vt
   {m,n} (xs, ys) = let
   val ys = __cast (ys) where {
@@ -455,7 +538,8 @@ in
   list_of_list_vt (list_vt_append (xs, ys))
 end // end of [list_append1_vt]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_append2_vt
   {m,n} (xs, ys) = let
 //
@@ -491,7 +575,8 @@ end // end of [list_append2_vt]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_extend (xs, y) =
 (
   list_append2_vt<a> (xs, list_vt_sing (y))
@@ -499,14 +584,16 @@ list_extend (xs, y) =
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_reverse (xs) = (
   list_reverse_append2_vt<x> (xs, list_vt_nil)
 ) // end of [list_reverse]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_reverse_append
   {m,n} (xs, ys) = let
 //
@@ -524,7 +611,8 @@ $effmask_wrt
 //
 end // end of [list_reverse_append]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_reverse_append1_vt
   {m,n} (xs, ys) = let
 //
@@ -558,7 +646,8 @@ in
   loop (xs, ys)
 end // end of [list_reverse_append1_vt]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_reverse_append2_vt
   (xs, ys) = let
 //
@@ -617,7 +706,8 @@ end // end of [list_concat]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_take (xs, i) = let
 //
 fun loop
@@ -646,7 +736,8 @@ in
   res
 end // end of [list_take]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_take_exn
   {n}{i} (xs, i) = let
 //
@@ -660,37 +751,43 @@ fun loop
 ) :<!wrt> #[
   j:nat | (i <= n && i == j) || (i > n && n == j)
 ] bool (i <= n) = let
+//
 in
-  if i > 0 then (
-    case+ xs of
-    | list_cons
-        (x, xs1) => let
-        val () = res :=
-          list_vt_cons{a}{0}(x, _(*?*))
-        val+list_vt_cons
-          (_, res1) = res // res1 = res.1
-        val ans = loop (xs1, i-1, res1)
-        prval () = fold@ (res)
-      in
-        ans
-      end // end of [list_cons]
-    | list_nil () => let
-        val () = res := list_vt_nil ()
-      in
-        false(*fail*)
-      end // end of [list_nil]
-  ) else let
-    val () = res := list_vt_nil () in true(*succ*)
-  end (* end of [if] *)
+//
+if i > 0
+then let
+in
+//
+case+ xs of
+| list_cons
+    (x, xs1) => let
+    val ((*void*)) =
+    res := list_vt_cons{a}{0}(x, _)
+    val+list_vt_cons (_, res1) = res
+    val ans = loop (xs1, i-1, res1)
+  in
+    fold@ (res); ans
+  end // end of [list_cons]
+| list_nil () => let
+    val ((*void*)) =
+    res := list_vt_nil () in false(*fail*)
+  end // end of [list_nil]
+//
+end // end of [then]
+else let
+  val () = res := list_vt_nil () in true(*succ*)
+end // end of [else]
+// end of [if]
+//
 end // end of [loop] 
 //   
 var res: ptr
-val ans = loop {n}{i} (xs, i, res)
+val ans = loop{n}{i}(xs, i, res)
 //
 in
 //
-if ans then
-  res // i <= n && length (res) == i
+if ans
+then res // i <= n && length (res) == i
 else let
   val () = list_vt_free<a> (res) in $raise ListSubscriptExn()
 end // end of [if]
@@ -699,9 +796,9 @@ end (* end of [list_take_exn] *)
 
 #atscode_separator()
 
-implement{a}
-list_drop
-  (xs, i) = let
+implement
+{a}(*tmp*)
+list_drop (xs, i) = let
 //
 fun loop
   {n:int}
@@ -715,7 +812,8 @@ in
   loop (xs, i)
 end // end of [list_drop]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_drop_exn
   (xs, i) = let
 //
@@ -729,7 +827,7 @@ fun loop
     case+ xs of
     | list_cons (_, xs) => loop (xs, i-1)
     | list_nil () => $raise ListSubscriptExn()
-  ) else xs // end of [if]
+  ) else (xs) // end of [if]
 //
 in
   loop (xs, i)
@@ -737,7 +835,8 @@ end // end of [list_drop_exn]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_split_at
   (xs, i) = let
 //
@@ -776,7 +875,8 @@ end // end of [list_split_at]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_exists (xs) = let
 in
 //
@@ -787,7 +887,8 @@ case+ xs of
 //
 end // end of [list_exists]
 
-implement{x}
+implement
+{x}(*tmp*)
 list_forall (xs) = let
 in
 //
@@ -800,7 +901,8 @@ end // end of [list_forall]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_equal$eqfn = gequal_val<a>
 
 implement
@@ -830,7 +932,8 @@ end // end of [list_equal]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_find_exn (xs) = let
 in
 //
@@ -841,7 +944,8 @@ case+ xs of
 //
 end // end of [list_find_exn]
 
-implement{x}
+implement
+{x}(*tmp*)
 list_find_opt (xs) = let
 in
 //
@@ -854,7 +958,8 @@ end // end of [list_find_opt]
 
 #atscode_separator()
 
-implement{key}
+implement
+{key}(*tmp*)
 list_assoc$eqfn = gequal_val<key>
 
 implement
@@ -934,7 +1039,8 @@ end // end of [list_assoc_opt]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_filter {n} (xs) = let
 //
 prval () = lemma_list_param (xs)
@@ -973,7 +1079,8 @@ end // end of [list_filter]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}(*tmp*)
 list_labelize
   (xs) = res where {
 //
@@ -1006,8 +1113,9 @@ var res: ptr ; val () = loop (xs, 0, res)
 
 #atscode_separator()
 
-implement{x}{y}
-list_map {n} (xs) = let
+implement
+{x}{y}(*tmp*)
+list_map{n}(xs) = let
 //
 prval () = lemma_list_param (xs)
 //
@@ -1041,8 +1149,52 @@ end // end of [list_map]
 
 #atscode_separator()
 
+implement
+{x}{y}(*tmp*)
+list_map_fun
+  (xs, f) = let
+//
+implement
+{x2}{y2}
+list_map$fopr (x2) = $UN.castvwtp0{y2}(f($UN.cast{x}(x2)))
+//
+in
+  list_map<x><y> (xs)
+end // end of [list_map_fun]
+
+implement
+{x}{y}(*tmp*)
+list_map_cloref
+  (xs, f) = let
+//
+implement
+{x2}{y2}
+list_map$fopr (x2) = $UN.castvwtp0{y2}(f($UN.cast{x}(x2)))
+//
+in
+  list_map<x><y> (xs)
+end // end of [list_map_cloref]
+
+implement
+{x}{y}(*tmp*)
+list_map_clo
+  (xs, f) = let
+//
+val f = $UN.cast{(x) -<cloref1> y}(addr@f)
+//
+implement
+{x2}{y2}
+list_map$fopr (x2) = $UN.castvwtp0{y2}(f($UN.cast{x}(x2)))
+//
+in
+  list_map<x><y> (xs)
+end // end of [list_map_clo]
+
+#atscode_separator()
+
 (*
-implement{x}{y}
+implement
+{x}{y}(*tmp*)
 list_map_funenv
   {v}{vt}{n}{fe}
   (pfv | xs, f, env) = let
@@ -1089,18 +1241,21 @@ end // end of [list_map_funenv]
 
 #atscode_separator()
 
-implement{x}{y}
-list_imap {n} (xs) = let
+implement
+{x}{y}
+list_imap{n}(xs) = let
 //
 prval () = lemma_list_param (xs)
 //
 fun loop
-  {n:nat} .<n>. (
-  xs: list (x, n), i: int
+  {n:nat}{i:nat} .<n>.
+(
+  xs: list (x, n), i: int(i)
 , res: &ptr? >> list_vt (y, n)
 ) : void = (
   case+ xs of
-  | list_cons (x, xs) => let
+  | list_cons
+      (x, xs) => let
       val y =
         list_imap$fopr<x><y> (i, x)
       val () = res :=
@@ -1108,7 +1263,7 @@ fun loop
       val+list_vt_cons
         (_, res1) = res // res1 = res.1
       val () = loop (xs, i+1, res1)
-      prval () = fold@ (res)
+      prval ((*void*)) = fold@ (res)
     in
       // nothing
     end // end of [list_cons]
@@ -1124,8 +1279,9 @@ end // end of [list_imap]
 
 #atscode_separator()
 
-implement{x}{y}
-list_mapopt {n} (xs) = let
+implement
+{x}{y}
+list_mapopt{n}(xs) = let
 //
 prval () = lemma_list_param (xs)
 //
@@ -1169,7 +1325,8 @@ end // end of [list_mapopt]
 #atscode_separator()
 
 (*
-implement{x}{y}
+implement
+{x}{y}(*tmp*)
 list_mapopt_funenv
   {v}{vt}{n}{fe}
   (pfv | xs, f, env) = let
@@ -1219,7 +1376,48 @@ end // end of [list_mapopt_funenv]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x1,x2}{y}(*tmp*)
+list_map2{n1,n2}(xs1, xs2) = let
+//
+prval () = lemma_list_param (xs1)
+prval () = lemma_list_param (xs2)
+//
+fun
+loop{n1,n2:nat}
+(
+  xs1: list (x1, n1)
+, xs2: list (x2, n2)
+, res: &ptr? >> list_vt (y, min(n1,n2))
+) : void = let
+in
+//
+case+ (xs1, xs2) of
+| (list_cons (x1, xs1),
+   list_cons (x2, xs2)) =>
+  {
+    val y = list_map2$fopr (x1, x2)
+    val () =
+      res := list_vt_cons{y}{0}(y, _)
+    val+list_vt_cons (_, res1) = res
+    val ((*void*)) = loop (xs1, xs2, res1)
+    prval ((*folded*)) = fold@ (res)
+  } (* end of [cons, cons] *)
+| (_, _) =>> (res := list_vt_nil((*void*)))
+//
+end // end of [loop]
+//
+var res: ptr
+val ((*void*)) = loop (xs1, xs2, res)
+//
+in
+  res
+end // end of [list_map2]
+
+#atscode_separator()
+
+implement
+{x}(*tmp*)
 list_tabulate
   (n) = res where {
 //
@@ -1247,6 +1445,47 @@ var res: ptr
 val () = loop (n, 0, res)
 //
 } // end of [list_tabulate]
+
+#atscode_separator()
+
+implement
+{a}(*tmp*)
+list_tabulate_fun (n, f) = let
+//
+val f = $UN.cast{int -> a}(f)
+//
+implement(a2)
+list_tabulate$fopr<a2> (n) = $UN.castvwtp0{a2}(f(n))
+//
+in
+  list_tabulate<a> (n)
+end // end of [list_tabulate_fun]
+
+implement
+{a}(*tmp*)
+list_tabulate_cloref (n, f) = let
+//
+val f = $UN.cast{int -<cloref1> a}(f)
+//
+implement(a2)
+list_tabulate$fopr<a2> (n) = $UN.castvwtp0{a2}(f(n))
+//
+in
+  list_tabulate<a> (n)
+end // end of [list_tabulate_cloref]
+
+implement
+{a}(*tmp*)
+list_tabulate_clo (n, f) = let
+//
+val f = $UN.cast{int -<cloref1> a}(addr@f)
+//
+implement(a2)
+list_tabulate$fopr<a2> (n) = $UN.castvwtp0{a2}(f(n))
+//
+in
+  list_tabulate<a> (n)
+end // end of [list_tabulate_clo]
 
 #atscode_separator()
 
@@ -1380,10 +1619,7 @@ end // end of [list_crosswith]
 #atscode_separator()
 
 implement
-{x}{env}
-list_foreach$cont (x, env) = true
-
-implement{x}
+{x}(*tmp*)
 list_foreach (xs) = let
   var env: void = () in list_foreach_env<x><void> (xs, env)
 end // end of [list_foreach]
@@ -1413,7 +1649,7 @@ case+ xs of
       loop (xs, env)
     end else () // end of [if]
   end // end of [list_cons]
-| list_nil () => ()
+| list_nil ((*void*)) => ()
 //
 end // end of [loop]
 //
@@ -1421,7 +1657,48 @@ in
   loop (xs, env)
 end // end of [list_foreach_env]
 
-implement{x}
+#atscode_separator()
+
+implement
+{x}{env}
+list_foreach$cont (x, env) = true
+
+#atscode_separator()
+
+implement
+{x}(*tmp*)
+list_foreach_fun
+  (xs, f) = let
+//
+fun loop (xs: List(x)): void =
+//
+case+ xs of
+| list_nil () => ()
+| list_cons (x, xs) => (f (x); loop (xs))
+//
+in
+  $effmask_all (loop (xs))
+end // end of [list_foreach_fun]
+
+implement
+{x}(*tmp*)
+list_foreach_cloref
+  (xs, f) = let
+//
+fun loop (xs: List(x)): void =
+//
+case+ xs of
+| list_nil () => ()
+| list_cons (x, xs) => (f (x); loop (xs))
+//
+in
+  $effmask_all (loop (xs))
+end // end of [list_foreach_cloref]
+
+#atscode_separator()
+
+implement
+{x}(*tmp*)
 list_foreach_funenv
   {v}{vt}{fe}
   (pfv | xs, f, env) = let
@@ -1438,7 +1715,7 @@ fun loop {n:nat} .<n>. (
   | list_cons (x, xs) => let
       val () = f (pfv | x, env) in loop (pfv | xs, f, env)
     end // end of [list_cons]
-  | list_nil () => ()
+  | list_nil ((*void*)) => ()
 // end of [loop]
 in
   loop (pfv | xs, f, env)
@@ -1447,10 +1724,7 @@ end // end of [list_foreach_funenv]
 #atscode_separator()
 
 implement
-{x,y}{env}
-list_foreach2$cont (x, y, env) = true
-
-implement{x,y}
+{x,y}(*tmp*)
 list_foreach2 (xs, ys) = let
   var env: void = () in list_foreach2_env<x,y><void> (xs, ys, env)
 end // end of [list_foreach2]
@@ -1497,10 +1771,13 @@ end // end of [list_foreach2_env]
 #atscode_separator()
 
 implement
-{x}{env}
-list_iforeach$cont (i, x, env) = true
+{x,y}{env}
+list_foreach2$cont (x, y, env) = true
 
-implement{x}
+#atscode_separator()
+
+implement
+{x}(*tmp*)
 list_iforeach (xs) = let
   var env: void = () in list_iforeach_env<x><void> (xs, env)
 end // end of [list_iforeach]
@@ -1514,7 +1791,8 @@ prval () = lemma_list_param (xs)
 //
 fun loop
   {n:nat}
-  {i:int} .<n>. (
+  {i:nat} .<n>.
+(
   i: int i, xs: list (x, n), env: &env
 ) : intBtwe(i,n+i) =
   case+ xs of
@@ -1539,7 +1817,14 @@ end // end of [list_iforeach_env]
 
 #atscode_separator()
 
-implement{x}
+implement
+{x}{env}(*tmp*)
+list_iforeach$cont (i, x, env) = true
+
+#atscode_separator()
+
+implement
+{x}(*tmp*)
 list_iforeach_funenv
   {v}{vt}{n}{fe}
   (pfv | xs, f, env) = let
@@ -1567,12 +1852,12 @@ end // end of [list_iforeach_funenv]
 #atscode_separator()
 
 implement
-{x,y}{env}
-list_iforeach2$cont (i, x, y, env) = true
-
-implement{x,y}
-list_iforeach2 (xs, ys) = let
-  var env: void = () in list_iforeach2_env<x,y><void> (xs, ys, env)
+{x,y}(*tmp*)
+list_iforeach2
+  (xs, ys) = let
+  var env: void = ()
+in
+  list_iforeach2_env<x,y><void> (xs, ys, env)
 end // end of [list_iforeach2]
 
 implement
@@ -1584,7 +1869,8 @@ prval () = lemma_list_param (xs)
 prval () = lemma_list_param (ys)
 //
 fun loop
-  {m,n:nat}{i:int} .<m>. (
+  {m,n:nat}{i:nat} .<m>.
+(
   i: int i, xs: list (x, m), ys: list (y, n), env: &env
 ) : intBtwe(i, min(m,n)+i) = let
 in
@@ -1616,6 +1902,12 @@ end // end of [list_iforeach2_env]
 #atscode_separator()
 
 implement
+{x,y}{env}
+list_iforeach2$cont (i, x, y, env) = true
+
+#atscode_separator()
+
+implement
 {res}{x}
 list_foldleft (xs, ini) = let
 //
@@ -1641,12 +1933,14 @@ end // end of [list_foldleft]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_mergesort$cmp
   (x1, x2) = gcompare_val<a> (x1, x2)
 // end of [list_mergesort$cmp]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_mergesort
   (xs) = let
 //
@@ -1662,15 +1956,19 @@ end // end of [list_mergesort]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_mergesort_fun
   (xs, cmp) = let
 //
-implement{a2}
+implement
+{a2}(*tmp*)
 list_mergesort$cmp
   (x1, x2) = let
 //
-val cmp = $UN.cast{cmpval(a2)}(cmp) in cmp (x1, x2)
+typedef cmp2 = cmpval(a2)
+//
+val cmp2 = $UN.cast{cmp2}(cmp) in cmp2 (x1, x2)
 //
 end // end of [list_mergesort$cmp]
 //
@@ -1678,14 +1976,36 @@ in
   list_mergesort<a> (xs)
 end // end of [list_mergesort_fun]
 
+implement
+{a}(*tmp*)
+list_mergesort_cloref
+  (xs, cmp) = let
+//
+implement
+{a2}(*tmp*)
+list_mergesort$cmp
+  (x1, x2) = let
+//
+typedef cmp2 = (a2, a2) -<cloref> int
+//
+val cmp2 = $UN.cast{cmp2}(cmp) in cmp2 (x1, x2)
+//
+end // end of [list_mergesort$cmp]
+//
+in
+  list_mergesort<a> (xs)
+end // end of [list_mergesort_cloref]
+
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_quicksort$cmp
   (x1, x2) = gcompare_val<a> (x1, x2)
 // end of [list_quicksort$cmp]
 
-implement{a}
+implement
+{a}(*tmp*)
 list_quicksort
   (xs) = let
 //
@@ -1701,11 +2021,13 @@ end // end of [list_quicksort]
 
 #atscode_separator()
 
-implement{a}
+implement
+{a}(*tmp*)
 list_quicksort_fun
   (xs, cmp) = let
 //
-implement{a2}
+implement
+{a2}(*tmp*)
 list_quicksort$cmp
   (x1, x2) = let
 //

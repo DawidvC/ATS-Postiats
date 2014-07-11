@@ -120,7 +120,9 @@ libc:: ; $(PATSOPT) -tc -d $(PATSHOME)/libc/DATS/unistd.dats
 ######
 
 libc_sys:: ; $(PATSOPT) -tc -s $(PATSHOME)/libc/sys/SATS/stat.sats
+libc_sys:: ; $(PATSOPT) -tc -d $(PATSHOME)/libc/sys/DATS/stat.dats
 libc_sys:: ; $(PATSOPT) -tc -s $(PATSHOME)/libc/sys/SATS/types.sats
+libc_sys:: ; $(PATSOPT) -tc -d $(PATSHOME)/libc/sys/DATS/types.dats
 
 ######
 
@@ -136,6 +138,9 @@ libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/stkarray.dats
 
 libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/deqarray.sats
 libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/deqarray.dats
+
+libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/dynarray.sats
+libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/dynarray.dats
 
 libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/ilist_prf.sats
 libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/ilist_prf.dats
@@ -157,6 +162,8 @@ libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/gmatrix_row.dats
 
 libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/hashtbl_chain.sats
 libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/hashtbl_chain.dats
+libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/hashtbl_linprb.sats
+libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/hashtbl_linprb.dats
 
 libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/funset_avltree.sats
 libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/funset_avltree.dats
@@ -201,6 +208,12 @@ libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/linralist_nested.dats
 
 ######
 
+libats:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/SATS/athread.sats
+libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/athread.dats
+libats:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/DATS/athread_posix.dats
+
+######
+
 libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/basis.sats
 libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/list0.sats
 libats_ML:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/ML/DATS/list0.dats
@@ -208,6 +221,8 @@ libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/option0.sats
 libats_ML:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/ML/DATS/option0.dats
 libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/array0.sats
 libats_ML:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/ML/DATS/array0.dats
+libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/matrix0.sats
+libats_ML:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/ML/DATS/matrix0.dats
 libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/string.sats
 libats_ML:: ; $(PATSOPT) -tc -d $(PATSHOME)/libats/ML/DATS/string.dats
 libats_ML:: ; $(PATSOPT) -tc -s $(PATSHOME)/libats/ML/SATS/strarr.sats

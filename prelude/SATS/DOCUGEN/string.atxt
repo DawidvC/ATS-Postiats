@@ -40,6 +40,10 @@ If str[i] equals the null character, then i equals n.\
 
 (* ****** ****** *)
 
+#declnamesynop("StringSubscriptExn")
+
+(* ****** ****** *)
+
 #declnamesynop("lemma_string_param")
 
 (* ****** ****** *)
@@ -61,85 +65,6 @@ This function constructs a singleton string consisting of its char argument.
 
 (* ****** ****** *)
 
-#declnamesynop("string_make_list")
-#decldescrpt('\
-
-This function returns a linear string consisting of the same sequence of
-non-null chars in its argument.  ')
-
-#declfunretval("A linear string is returned.")
-
-#declexample('\
-
-The following code implements a function that returns a linear string
-consisting of the reverse of the sequence of chars in its argument:
-
-#pats2xhtmld_tryit('\
-staload UN = "prelude/SATS/unsafe.sats"
-//
-fun
-string_reverse
-  {n:int} .<>.
-(
-  str: string(n)
-) : strnptr(n) = let
-//
-prval () = lemma_string_param (str)
-//
-val cs = string_explode (str)
-val cs = list_vt_reverse (cs)
-val res = string_make_list ($UN.list_vt2t(cs))
-val ((*void*)) = list_vt_free (cs)
-//
-in
-  res
-end // end of [string_reverse]
-')
-')
-
-(* ****** ****** *)
-
-#declnamesynop("string_make_listlen")
-#decldescrpt('\
-
-This function does the same as #dyncode("string_make_list") except for
-taking the length of the given string as its second argument.  ')
-
-(* ****** ****** *)
-
-#declnamesynop("string_make_rlist")
-#decldescrpt('\
-
-This function returns a linear string consisting of the reverse of the
-sequence of non-null chars in its argument.  ')
-
-#declfunretval("A linear string is returned.")
-
-(* ****** ****** *)
-
-#declnamesynop("string_make_rlistlen")
-#decldescrpt('\
-
-This function does the same as #dyncode("string_make_rlist") except for
-taking the length of the given string as its second argument.  ')
-
-#declfunretval("A linear string is returned.")
-
-(* ****** ****** *)
-
-#declnamesynop("string_make_substring")
-
-#decldescrpt("\
-
-Given a string str of length n and integers st and ln, this function
-returns a string that equals the substring in str that starts at char st
-and is of length ln.\
-
-")
-#declfunretval("A linear string is returned.")
-
-(* ****** ****** *)
-
 #declnamesynop("string_is_empty")
 #decldescrpt('\
 This funtion returns true if and only if its string argument is empty.
@@ -153,6 +78,8 @@ This funtion returns true if and only if its string argument is non-empty.
 #declfunretval("A boolean value is returned.")
 
 (* ****** ****** *)
+
+#declnamesynop("string_is_atend")
 
 #declnamesynop("string_is_atend_gint")
 #decldescrpt('\
@@ -169,6 +96,11 @@ This function does the same as #dyncode("string_is_atend_gint") except for
 taking an unsigned integer as the string index.  ')
 
 #declfunretval("A boolean value is returned.")
+
+(* ****** ****** *)
+
+#declnamesynop("string_head")
+#declnamesynop("string_tail")
 
 (* ****** ****** *)
 
@@ -300,21 +232,26 @@ signed characters. ')
 #declnamesynop("neq_string_string")
 #decldescrpt('\
 
-This function returns true if and only if its first argument is unequal to
-its second argument according to the lexicographic ordering on
-signed characters. ')
+This function returns true if and only if its first argument is unequal
+to its second argument according to the lexicographic ordering on signed
+characters.\
+
+')
 
 (* ****** ****** *)
 
 #declnamesynop("compare_string_string")
 #decldescrpt('\
 
-This function returns ~1, 0 and 1 if and only if its first argument is less
-than, equal to and greater than its second argument according to the
-lexicographic ordering on signed characters. ')
+This function returns ~1, 0 and 1 if and only if its first argument is
+less than, equal to and greater than its second argument according to the
+lexicographic ordering on signed characters.\
 
 ')
-#declfunretval("An integer between ~1 (negative 1) and 1 is returned.")
+
+#declfunretval("\
+An integer between ~1 (negative 1) and 1, inclusive, is returned.\
+")
 
 (* ****** ****** *)
 
@@ -347,6 +284,85 @@ second string argument, respectively.\
 ')
 //
 #declfunretval("An integer between ~1 (negative 1) and 1 is returned.")
+
+(* ****** ****** *)
+
+#declnamesynop("string_make_list")
+#decldescrpt('\
+
+This function returns a linear string consisting of the same sequence of
+non-null chars in its argument.  ')
+
+#declfunretval("A linear string is returned.")
+
+#declexample('\
+
+The following code implements a function that returns a linear string
+consisting of the reverse of the sequence of chars in its argument:
+
+#pats2xhtmld_tryit('\
+staload UN = "prelude/SATS/unsafe.sats"
+//
+fun
+string_reverse
+  {n:int} .<>.
+(
+  str: string(n)
+) : strnptr(n) = let
+//
+prval () = lemma_string_param (str)
+//
+val cs = string_explode (str)
+val cs = list_vt_reverse (cs)
+val res = string_make_list ($UN.list_vt2t(cs))
+val ((*void*)) = list_vt_free (cs)
+//
+in
+  res
+end // end of [string_reverse]
+')
+')
+
+(* ****** ****** *)
+
+#declnamesynop("string_make_listlen")
+#decldescrpt('\
+
+This function does the same as #dyncode("string_make_list") except for
+taking the length of the given string as its second argument.  ')
+
+(* ****** ****** *)
+
+#declnamesynop("string_make_rlist")
+#decldescrpt('\
+
+This function returns a linear string consisting of the reverse of the
+sequence of non-null chars in its argument.  ')
+
+#declfunretval("A linear string is returned.")
+
+(* ****** ****** *)
+
+#declnamesynop("string_make_rlistlen")
+#decldescrpt('\
+
+This function does the same as #dyncode("string_make_rlist") except for
+taking the length of the given string as its second argument.  ')
+
+#declfunretval("A linear string is returned.")
+
+(* ****** ****** *)
+
+#declnamesynop("string_make_substring")
+
+#decldescrpt("\
+
+Given a string str of length n and integers st and ln, this function
+returns a string that equals the substring in str that starts at char st
+and is of length ln.\
+
+")
+#declfunretval("A linear string is returned.")
 
 (* ****** ****** *)
 
@@ -411,6 +427,8 @@ function in ATSLIB calls the libc-function of the same name (declared in
 
 (* ****** ****** *)
 
+#declnamesynop("string_length")
+
 #declnamesynop("string0_length")
 #decldescrpt('\
 
@@ -426,8 +444,26 @@ same as #dyncode("string0_length") but is assigned a more informative type.
 
 (* ****** ****** *)
 
+%{
+(*
+#declnamesynop("string_copy")
+*)
+%}
+
 #declnamesynop("string0_copy")
+#decldescrpt('\
+This function returns a linear string that is the copy of its argument.
+')
+
 #declnamesynop("string1_copy")
+#decldescrpt('\
+This function does the same as #dyncode("string0_copy") but is assigned
+a more accurate type.
+')
+
+(* ****** ****** *)
+
+#declnamesynop("string_append")
 
 #declnamesynop("string0_append")
 #decldescrpt('\
@@ -442,6 +478,17 @@ arguments. ')
 This function, which overloads the symbol #dyncode("string_append"), does
 the same as #dyncode("string0_append") but is assigned a more informative
 type.  ')
+
+(* ****** ****** *)
+
+#declnamesynop("string_append3")
+
+#declnamesynop("string0_append3")
+#decldescrpt('\
+
+This function, which overloads the symbol #dyncode("string_append"),
+returns a linear string equal to the concatenation of its three string
+arguments. ')
 
 (* ****** ****** *)
 
@@ -724,9 +771,9 @@ treated as a string. Otherwise, it is treated as the null pointer. ')
 //
 #declparamadd("#dyncode("out")", "the channel for receiving the output.")
 //
-#declparamadd("#dyncode("x")", "\
+#declparamadd("#dyncode("opt")", "\
 the optional string to be printed. Note that an optional string is either a
-string or null pointer.")
+string or a null pointer.")
 //
 #declparamlist()
 //
@@ -747,30 +794,38 @@ string or null pointer.")
 
 (* ****** ****** *)
 
+#declnamesynop("[]")
+
+(* ****** ****** *)
+
 #declnamesynop("<")
 #declnamesynop("<=")
 #declnamesynop(">")
 #declnamesynop(">=")
 #declnamesynop("=")
 #declnamesynop("!=")
+
+(* ****** ****** *)
+
 #declnamesynop("compare")
 
 (* ****** ****** *)
 
-#declnamesynop("string_is_atend")
+#declnamesynop(".head")
+#declnamesynop(".tail")
+
+(* ****** ****** *)
+
+#declnamesynop("iseqz")
+#declnamesynop("isneqz")
 
 (* ****** ****** *)
 
 #declnamesynop("length")
-#declnamesynop("string_length")
 
 (* ****** ****** *)
 
-#declnamesynop("[]")
-
-(* ****** ****** *)
-
-#declnamesynop("string_append")
+#declnamesynop("copy")
 
 (* ****** ****** *)
 

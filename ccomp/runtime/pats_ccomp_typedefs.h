@@ -119,7 +119,7 @@ typedef void* atstype_datcontyp ;
 
 /* ****** ****** */
 
-#ifndef _ATS_EXCEPTION_NONE
+#ifndef _ATS_CCOMP_EXCEPTION_NONE
 //
 typedef
 struct
@@ -128,7 +128,7 @@ struct
 } atstype_exncon ;
 typedef atstype_exncon *atstype_exnconptr ;
 //
-#endif // end of [_ATS_EXCEPTION_NONE]
+#endif // end of [_ATS_CCOMP_EXCEPTION_NONE]
 
 /* ****** ****** */
 /*
@@ -154,13 +154,33 @@ typedef void* atstype_cloptr ;
 #define atstkind_t0ype(tk) tk
 
 /* ****** ****** */
+//
+// HX-2014-05:
+// making it not usable!!!
+//
+#ifndef _ATSTYPE_VAR_SIZE
+#define _ATSTYPE_VAR_SIZE 0X10000
+#endif // end of [#ifndef]
+//
+// HX-2014-05:
+// for 8-bit or 16-bit march,
+// _ATSTYPE_VAR_SIZE can be set to 0x100
+//
+typedef
+struct{char _[_ATSTYPE_VAR_SIZE];} atstype_var[0] ;
+//
+/* ****** ****** */
 
-typedef struct{} atstype_var ;
 #define atstyvar_type(a) atstype_var
 
 /* ****** ****** */
 
 #define atstybox_type(hit) atstype_boxed
+
+/* ****** ****** */
+
+#define atstyclo_top struct{ void *cfun; }
+#define atstyclo_type(flab) flab##__closure_t0ype
 
 /* ****** ****** */
 

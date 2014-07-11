@@ -51,10 +51,13 @@ staload LOC = "./pats_location.sats"
 overload print with $LOC.print_location
 
 (* ****** ****** *)
-
+//
 staload "./pats_staexp2.sats"
-staload "./pats_dynexp2.sats"
-
+//
+staload D2E = "./pats_dynexp2.sats"
+typedef d2cst = $D2E.d2cst
+typedef dynexp2_funlabopt = $D2E.funlabopt
+//
 (* ****** ****** *)
 
 staload "./pats_trans2_env.sats"
@@ -202,19 +205,19 @@ case+ hid0.hidecl_node of
   end // end of [HIDvardecs]
 //
 | HIDinclude
-    (hids) => let
+    (knd, hids) => let
 (*
     val () = println! ("hidecl_ccomp: HIDinclude: loc0 = ", loc0)
     val () = println! ("hidecl_ccomp: HIDinclude: hid0 = ", hid0)
 *)
     val pmds = hideclist_ccomp (env, hids)
   in
-    primdec_include (loc0, pmds)
+    primdec_include (loc0, knd, pmds)
   end // end of [HIDinclude]
 //
 | HIDstaload
   (
-    fil, flag, fenv, loaded
+    idopt, cfil, flag, fenv, loaded
   ) => let
 (*
     val () = println! ("hidecl_ccomp: HIDstaload: loc0 = ", loc0)
@@ -225,6 +228,15 @@ case+ hid0.hidecl_node of
   in
     primdec_staload (loc0, hid0)
   end // end of [HIDstaload]
+//
+| HIDstaloadloc
+    (pfil, nspace, hids) => let
+    val (pf | ()) = ccompenv_push (env)
+    val pmds = hideclist_ccomp (env, hids)    
+    val ((*void*)) = ccompenv_pop (pf | env)
+  in
+    primdec_staloadloc (loc0, pfil, nspace, pmds)
+  end // end of [HIDtsaloadloc]
 //
 | HIDdynload _ => let
 (*
@@ -244,7 +256,7 @@ case+ hid0.hidecl_node of
     val pmds_head = hideclist_ccomp (env, hids_head)
     val (pf2 | ()) = ccompenv_push (env)
     val pmds_body = hideclist_ccomp (env, hids_body)
-    val () = ccompenv_localjoin (pf, pf2 | env)
+    val ((*void*)) = ccompenv_localjoin (pf, pf2 | env)
   in
     primdec_local (loc0, pmds_head, pmds_body)
   end // end of [HIDlocal]
@@ -420,7 +432,8 @@ case+ hfds of
     val loc = hfd.hifundec_loc
     val d2v = hfd.hifundec_var
 //
-    val () = d2var_set_level (d2v, lvl0)
+    val () =
+      $D2E.d2var_set_level (d2v, lvl0)
     val-Some(hse) = d2var_get2_hisexp (d2v)
     val fcopt = None_vt() // HX: by [hse]
 //
@@ -574,7 +587,8 @@ fun aux
 ) : void = let
   val loc = hvd.hivaldec_loc
   val hde_def = hvd.hivaldec_def
-  val pmv_def = hidexp_ccomp (env, res, hde_def)
+  val pmv_def =
+    hidexp_ccompv (env, res, hde_def) // non-lvalue
   val hip = hvd.hivaldec_pat
   val fail = (
     case+ knd of
@@ -711,9 +725,11 @@ fun aux
 val loc = hvd.hivardec_loc
 val d2v = hvd.hivardec_dvar_ptr
 val d2vw = hvd.hivardec_dvar_view
-val loc_d2v = d2var_get_loc (d2v)
-val () = d2var_set_level (d2v, lvl0)
-val-Some (s2at) = d2var_get_mastype (d2vw)
+val loc_d2v =
+  $D2E.d2var_get_loc (d2v)
+val ((*void*)) =
+  $D2E.d2var_set_level (d2v, lvl0)
+val-Some (s2at) = $D2E.d2var_get_mastype (d2vw)
 val-S2Eat (s2e_elt, _) = s2at.s2exp_node
 val hse_elt = s2exp_tyer_shallow (loc_d2v, s2e_elt)
 val tmp = tmpvar_make_ref (loc_d2v, hse_elt)
@@ -940,7 +956,7 @@ hiimpdec_ccomp
 ) = let
 //
 val d2c = imp.hiimpdec_cst
-val knd = d2cst_get_kind (d2c)
+val knd = $D2E.d2cst_get_kind (d2c)
 //
 (*
 val () = println! ("hiimpdec_ccomp: d2c = ", d2c)
@@ -970,7 +986,13 @@ case+ 0 of
     val flab = auxmain (env, loc0, d2c, imparg, tmparg, hde_def)
     val () = if istmp then ccompenv_dec_tmplevel (env)
 //
-    val p = hiimpdec_set_funlabopt (imp, Some (flab))
+    val opt = Some (flab)
+    val ((*void*)) = hiimpdec_set_funlabopt (imp, opt)
+    val ((*void*)) =
+    if not(istmp) then
+      $D2E.d2cst_set_funlab (d2c, $UN.cast{dynexp2_funlabopt}(opt))
+    // end of [if]
+//
   in
     // nothing
   end // end of [if]

@@ -98,7 +98,8 @@ staload "./pats_e1xpval.sats"
 
 (* ****** ****** *)
 
-fn prerr_error1_loc
+fun
+prerr_error1_loc
   (loc: location): void = (
   $LOC.prerr_location loc; prerr ": error(1)"
 ) // end of [prerr_error1_loc]
@@ -107,42 +108,49 @@ fn prerr_error1_loc
 
 implement
 v1al_is_err (v) =
- case+ v of | V1ALerr () => true | _ => false
-// end of [v1al_is_err]
+(
+  case+ v of | V1ALerr () => true | _ => false
+) (* end of [v1al_is_err] *)
 
 implement
-v1al_is_true (v) = begin
-  case+ v of
-  | V1ALint i => i <> 0 // most common
-  | V1ALchar c => c <> '\000'
-  | V1ALstring s => string_isnot_empty s // 2nd most common
-  | V1ALfloat f => f <> 0.0
-  | V1ALerr () => false
+v1al_is_true (v) = let
+in
+//
+case+ v of
+| V1ALint i => i <> 0 // most common
+| V1ALchar c => c <> '\000'
+| V1ALstring s => string_isnot_empty s // 2nd most common
+| V1ALfloat f => f <> 0.0
+| V1ALerr ((*void*)) => false
+//
 end // end of [v1al_is_true]
 
 implement v1al_is_false (v) = ~v1al_is_true(v)
 
 (* ****** ****** *)
-
+//
 extern
 fun e1xplev_valize (lev: int, e0: e1xp) : v1al
+//
 extern fun e1xp_valize_defined (e0: e1xp) : v1al
 extern fun e1xp_valize_undefined (e0: e1xp) : v1al
-
+//
 (* ****** ****** *)
 
 implement
 e1xp_valize
   (e) = res where {
   val res = e1xplev_valize (0(*lev*), e)
-  val () = (case+ res of
+  val ((*void*)) =
+  (
+    case+ res of
     | V1ALerr () => {
         val () = fprint_the_valerrlst (stderr_ref)
         val () = $ERR.abort ()
       } // end of [V1ALerr]
-    | _ => ()
+    | _ (*non-err*) => ((*void*))
   ) : void // end of [val]
-} // end of [e1xp_valize]
+} (* end of [e1xp_valize] *)
 
 implement
 e1xp_valize_if (knd, e) =
@@ -305,7 +313,9 @@ fun e1xplevenv_valize_main (lev: int, env: !vlenv, e0: e1xp): v1al
 
 (* ****** ****** *)
 
-fun e1xplstlevenv_valize (
+fun
+e1xplstlevenv_valize
+(
   lev: int, env: !vlenv, es: e1xplst
 ) : List_vt (v1al) =
   case+ es of
@@ -320,7 +330,9 @@ fun e1xplstlevenv_valize (
 
 (* ****** ****** *)
 
-fn e1xplevenv_valize_list (
+fun
+e1xplevenv_valize_list
+(
   lev: int, env: !vlenv, e0: e1xp, es: e1xplst
 ) : v1al = case+ es of
   | list_cons (e, es) => (
@@ -336,13 +348,17 @@ fn e1xplevenv_valize_list (
 (* ****** ****** *)
 
 extern
-fun e1xplevenv_valize_delta (
+fun
+e1xplevenv_valize_delta
+(
   lev: int, env: !vlenv, e0: e1xp, id: symbol, es: e1xplst
 ) : v1al // end of [e1xplevenv_valize_delta]
 
 (* ****** ****** *)
 
-fun e1xplevenv_valize_appid (
+fun
+e1xplevenv_valize_appid
+(
   lev: int, env: !vlenv, e0: e1xp, id: symbol, es: e1xplst
 ) : v1al = let
   val opt = the_e1xpenv_find (id)
@@ -451,7 +467,8 @@ case+ e0.e1xp_node of
     val () = the_valerrlst_add (VE_E1XPundef (e0))
   }
 //
-| E1XPapp (
+| E1XPapp
+  (
     e_fun, _(*loc_arg*), es_arg
   ) => (
   case+ e_fun.e1xp_node of
@@ -995,7 +1012,8 @@ e1xplevenv_normalize_main
       e1xp_list (lorg, es)
     end
   | E1XPeval (e) => let
-      val v = e1xp_valize (
+      val v =
+      e1xp_valize (
         e1xplevenv_normalize (lorg, lev, env, e)
       ) // end of [val]
     in
@@ -1012,20 +1030,22 @@ e1xplevenv_normalize_main
       | E1XPfun (xs, body) => res where {
           val env1 = lenvmake_e1xplst (lorg, xs, es_arg)
           val res = e1xplevenv_normalize (lorg, lev+1, env1, body)
-          val () = lenvfree (env1)
+          val ((*void*)) = lenvfree (env1)
         } (* end of [E1XPfun] *)
       | _ => e1xp_app (lorg, e_fun, lorg, es_arg)
     end // end of [E1XPapp]
   | E1XPfun _ => e1xp_make (lorg, node)
 //
   | E1XPif (
-      _cond, _then, _else // HX: [E1XPif] is treated specially
+      _cond, _then, _else // HX: specially treated
     ) => let
-      val v = e1xp_valize (
+      val v =
+      e1xp_valize (
         e1xplevenv_normalize (lorg, lev, env, _cond)
       ) // end of [val]
+      val istt = v1al_is_true (v)
     in
-      if v1al_is_true (v) then
+      if istt then
         e1xplevenv_normalize (lorg, lev, env, _then)
       else
         e1xplevenv_normalize (lorg, lev, env, _else)

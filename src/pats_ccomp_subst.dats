@@ -112,11 +112,13 @@ case+ xs of
 //
     val s2es = x.t2mpmarg_arg
     val s2es2 = s2explst_subst (sub, s2es)
+//
 (*
     val out = stdout_ref
     val () = fprintln! (out, "auxlst: s2es = ", s2es)
     val () = fprintln! (out, "auxlst: s2es2 = ", s2es2)
 *)
+//
     val x2 = t2mpmarg_make (loc0, s2es2)
 //
   in
@@ -171,6 +173,9 @@ fun tmpvarlst_subst
 local
 
 extern
+fun tmpvar_set_ref
+  (tmp: tmpvar, ref: int): void  = "patsopt_tmpvar_set_ref"
+extern
 fun tmpvar_set_ret
   (tmp: tmpvar, ret: int): void  = "patsopt_tmpvar_set_ret"
 extern
@@ -190,6 +195,9 @@ tmpvar_subst
   val hse = tmpvar_get_type (tmp)
   val hse = hisexp_subst (sub, hse)
   val tmp2 = tmpvar_make (loc, hse)
+  val () =
+    if tmpvar_isref (tmp) then tmpvar_set_ref (tmp2, 1)
+  // end of [val]
   val () =
     if tmpvar_isret (tmp) then tmpvar_set_ret (tmp2, 1)
   // end of [val]
@@ -456,7 +464,8 @@ end // end of [tmpmap_make]
 (* ****** ****** *)
 
 extern
-fun tmpvar2var
+fun
+tmpvar2var
   (map: !tmpmap, tmp: tmpvar): tmpvar
 implement
 tmpvar2var (map, tmp) = let
@@ -469,8 +478,8 @@ case+ opt of
 //
     val loc = tmpvar_get_loc (tmp)
     val () = prerr_warnccomp_loc (loc)
-    val () = prerr ": toplevel non-global code shoulld not be used in template."
-    val () = prerr_newline ()
+    val () = prerr ": toplevel non-global code in template may be problematic."
+    val () = prerr_newline ((*void*))
 //
 (*
     val () = prerr_interror ()
@@ -669,21 +678,22 @@ val vbmap2 = vbindmap_subst (env, tmpmap2, sub, vbmap, sfx)
 //
 val () = tmpvarmap_vt_free (tmpmap2)
 //
+(*
+val out = stdout_ref
+typedef flab = funlab
+val () = fprintln! (out, "funent_subst: flab2 = ", flab2)
+val () = fprintln! (out, "funent_subst: flvl2 = ", flvl2)
+val () = fprintln! (out, "funent_subst: fls02 = ", $UN.linlst2lst{flab}(fls02))
+val () = fprintln! (out, "funent_subst: d2es2 = ", $UN.linlst2lst{d2env}(d2es2))
+val () = fprintln! (out, "funent_subst: vbmap2 = ", vbmap2)
+*)
+//
 val fent2 =
 funent_make (
   loc, flab2
 , imparg, tmparg, None(*tmpsub*), tmpret2
 , (l2l)fls02, (l2l)d2es2, vbmap2, inss2_body, tmplst2
 ) (* end of [val] *)
-//
-(*
-val out = stdout_ref
-val () = fprintln! (out, "funent_subst: flab2 = ", flab2)
-val () = fprintln! (out, "funent_subst: flvl2 = ", flvl2)
-val () = fprintln! (out, "funent_subst: fls02 = ", fls02)
-val () = fprintln! (out, "funent_subst: d2es2 = ", d2es2)
-val () = fprintln! (out, "funent_subst: vbmap2 = ", vbmap2)
-*)
 //
 in
   fent2
@@ -717,7 +727,7 @@ macdef fpmlist (x) = primlablst_subst (env, map, sub, ,(x), sfx)
 in
 //
 case+
-  pmv0.primval_node of
+pmv0.primval_node of
 //
 | PMVtmp (tmp) => let
     val tmp = ftmp (tmp) in primval_tmp (loc0, hse0, tmp)
@@ -1109,17 +1119,23 @@ case+
     primdec_vardecs (loc0, hvds, inss)
   end // end of [PMDvardecs]
 //
-| PMDinclude (pmds) => let
+| PMDinclude
+    (stadyn, pmds) => let
     val pmds = primdeclst_subst (env, map, sub, pmds, sfx)
   in
-    primdec_include (loc0, pmds)
+    primdec_include (loc0, stadyn, pmds)
   end // end of [PMDinclude]
 //
-| PMDstaload (hid) => let
+| PMDstaload
+    (hid) => pmd0 where
+  {
     val-HIDstaload
-      (fil, flag, fenv, loaded) = hid.hidecl_node
-    val () = ccompenv_add_staload (env, fenv) in pmd0
-  end // end of [PMDstaload]
+      (_, _, _, fenv, loaded) = hid.hidecl_node
+    val ((*void*)) = ccompenv_add_staload (env, fenv)
+  } (* end of [PMDstaload] *)
+//
+| PMDstaloadloc
+    (pfil, nspace, pmds) => pmd0
 //
 | PMDdynload (hid) => pmd0
 //
@@ -1458,7 +1474,7 @@ case+
   ) => let
     val tmp = ftmp (tmp)
     val hse = hisexp_subst (sub, hse)
-    val pmv_thunk = fpmv (pmv_lazyval)
+    val pmv_lazyval = fpmv (pmv_lazyval)
   in
     instr_move_lazyeval (loc0, tmp, lin, hse, pmv_lazyval)
   end // end of [INSmove_lazyeval]
@@ -1532,7 +1548,29 @@ case+
     instr_update_ptrdec (loc0, tmp, hse_elt)
   end // end of [INSupdate_ptrdec]
 //
-| _ => ins0
+| INSclosure_initize
+    (tmpret, flab) => let
+//
+    val sfx = funlab_incget_ncopy (flab)
+    val flab2 = funlab_subst (sub, flab)
+    val () = funlab_set_suffix (flab2, sfx)
+//
+    val () = the_funlablst_add (flab2)
+    val () = ccompenv_add_flabsetenv (env, flab2)
+//
+    val-Some(fent) = funlab_get_funent (flab)
+    val fent2 = funent_subst (env, sub, flab2, fent, sfx)
+    val ((*void*)) = funlab_set_funent (flab2, Some (fent2))
+//
+    val tmpret2 = ftmp (tmpret)
+    typedef funlab = hisexp_funlab_type
+    val ((*void*)) = tmpvar_set_tyclo (tmpret2, $UN.cast{funlab}(flab2))
+//
+  in
+    instr_closure_initize (loc0, tmpret2, flab2)
+  end // end of [INSclosure_initize]
+//
+| _ (* cases-that-do-not-need-substitution *) => ins0
 //
 end // end of [instr_subst]
 
@@ -1627,20 +1665,18 @@ case- pmv.primval_node of
 | PMVfunlab (fl) => fl | PMVcfunlab (knd, fl) => fl
 ) : funlab // end of [val]
 //
-val-Some
-  (fent) = funlab_get_funent (fl)
-//
 val sfx = funlab_incget_ncopy (fl)
+val flab2 = funlab_subst (sub, fl)
+val () = funlab_set_suffix (flab2, sfx)
 //
-val fl2 = funlab_subst (sub, fl)
-val () = funlab_set_suffix (fl2, sfx)
-val () = the_funlablst_add (fl2)
-val () = ccompenv_add_flabsetenv (env, fl2)
+val () = the_funlablst_add (flab2)
+val () = ccompenv_add_flabsetenv (env, flab2)
 //
-val fent2 = funent_subst (env, sub, fl2, fent, sfx)
+val-Some (fent) = funlab_get_funent (fl)
+val fent2 = funent_subst (env, sub, flab2, fent, sfx)
+val ((*void*)) = funlab_set_funent (flab2, Some (fent2))
 //
-val () = funlab_set_funent (fl2, Some (fent2))
-val pmv_funval = primval_make_funlab (loc, fl2)
+val pmv_funval = primval_make_funlab (loc, flab2)
 //
 in
   primval_lamfix (knd, pmv_funval)
@@ -1665,30 +1701,26 @@ case+ hfds of
     val-Some (fl) =
       hifundec_get_funlabopt (hfd)
     val sfx = funlab_incget_ncopy (fl)
-    val fl2 = funlab_subst (sub, fl)
-//
-    val () = funlab_set_suffix (fl2, sfx)
+    val flab2 = funlab_subst (sub, fl)
+    val () = funlab_set_suffix (flab2, sfx)
 //
 // HX: only the first fnx-decl is added!
 //
     val () = (
-      if i <= 1 then the_funlablst_add (fl2)
-    ) // end of [val]
+      if i <= 1 then the_funlablst_add (flab2)
+    ) (* end of [val] *)
 //
-    val () = ccompenv_add_flabsetenv (env, fl2)
+    val () = ccompenv_add_flabsetenv (env, flab2)
 //
     val loc = hfd.hifundec_loc
     val d2v = hfd.hifundec_var
-    val pmv = primval_make_funlab (loc, fl2)
+    val pmv = primval_make_funlab (loc, flab2)
 //
     val () = ccompenv_add_vbindmapenvall (env, d2v, pmv)
 //
-    val i2 = (
-      if i >= 1 then i+1 else i
-    ) : int // end of [val]
-    val fls2 = auxinit (env, sub, hfds, i2)
+    val i2 = (if i >= 1 then i+1 else i): int
   in
-    list_cons (fl2, fls2)
+    list_cons (flab2, auxinit (env, sub, hfds, i2))
   end (* end of [list_cons] *)
 | list_nil ((*void*)) => list_nil ()
 //
@@ -1726,8 +1758,7 @@ fun auxfnxset
 ) : void = let
 //
   val-list_cons (fl0, _) = fls
-  val opt = funlab_get_funent (fl0)
-  val-Some(fent) = opt
+  val-Some (fent) = funlab_get_funent (fl0)
   val () = funent_set_fnxlablst (fent, fls)
 in
   // nothing

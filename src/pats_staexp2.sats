@@ -76,11 +76,12 @@ EFF = "./pats_effect.sats"
 typedef effset = $EFF.effset
 
 (* ****** ****** *)
-
+//
 staload
 JSON = "./pats_jsonize.sats"
+//
 typedef jsonval = $JSON.jsonval
-
+//
 (* ****** ****** *)
 
 staload "./pats_staexp1.sats"
@@ -386,6 +387,10 @@ overload != with eq_tyreckind_tyreckind
 
 (* ****** ****** *)
 
+fun jsonize_tyreckind : tyreckind -> jsonval
+
+(* ****** ****** *)
+
 (*
 ** HX: s2hnf for s2exp in head normal form (HNF)
 *)
@@ -475,7 +480,7 @@ s2exp_node =
 //
   | S2Evararg of (s2exp) // variadic argument type
 //
-  | S2Ewth of (s2exp, wths2explst) // the result part of a fun type
+  | S2Ewthtype of (s2exp, wths2explst) // the result part of a fun type
 //
   | S2Eerr of () // HX: placeholder for indicating error or something else
 //
@@ -1041,7 +1046,8 @@ fun s2exp_lam (s2vs: s2varlst, s2e: s2exp): s2exp
 fun s2exp_lam_srt (s2t: s2rt, s2vs: s2varlst, s2e: s2exp): s2exp
 fun s2exp_lamlst (s2vss: s2varlstlst, s2e: s2exp): s2exp
 
-fun s2exp_fun_srt (
+fun
+s2exp_fun_srt (
   s2t: s2rt
 , fc: funclo
 , lin: int
@@ -1134,7 +1140,7 @@ fun s2exp_unis (s2qs: s2qualst, s2f: s2exp): s2exp
 
 (* ****** ****** *)
 
-fun s2exp_wth (_res: s2exp, _with: wths2explst): s2exp
+fun s2exp_wthtype (_res: s2exp, _with: wths2explst): s2exp
 
 (* ****** ****** *)
 
@@ -1426,16 +1432,30 @@ fun jsonize_s2cst (s2c: s2cst): jsonval
 fun jsonize_s2var (s2v: s2var): jsonval
 fun jsonize_s2Var (s2V: s2Var): jsonval
 //
+fun jsonize_s2varlst (s2vs: s2varlst): jsonval
+//
 fun jsonize_d2con (d2c: d2con): jsonval
+fun jsonize_d2con_long (d2c: d2con): jsonval
+//
+fun jsonize_s2exp (flag: int, s2e: s2exp): jsonval
+fun jsonize_s2explst (flag: int, s2es: s2explst): jsonval
+fun jsonize_s2expopt (flag: int, s2eopt: s2expopt): jsonval
+//
+fun jsonize_labs2explst (flag: int, ls2es: labs2explst): jsonval  
+//
+fun jsonize_s2eff (s2fe: s2eff): jsonval
+//
+(* ****** ****** *)
 //
 fun jsonize0_s2exp (s2e: s2exp): jsonval // w/o hnfizing
 fun jsonize1_s2exp (s2e: s2exp): jsonval // with hnfizing
 //
-fun jsonize_s2exp (flag: int, s2e: s2exp): jsonval
-fun jsonize_s2explst (flag: int, s2es: s2explst): jsonval
+fun jsonize0_s2explst (s2es: s2explst): jsonval // w/o hnfizing
+fun jsonize1_s2explst (s2es: s2explst): jsonval // with hnfizing
 //
-fun jsonize_s2eff (s2fe: s2eff): jsonval
-//
+fun jsonize0_s2expopt (opt: s2expopt): jsonval // w/o hnfizing
+fun jsonize1_s2expopt (opt: s2expopt): jsonval // with hnfizing
+//  
 (* ****** ****** *)
 
 (* end of [pats_staexp2.sats] *)

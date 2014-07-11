@@ -41,7 +41,7 @@ abstype filename_type
 
 typedef
 filename = filename_type
-viewtypedef
+vtypedef
 filenameopt_vt = Option_vt (filename)
 
 (* ****** ****** *)
@@ -117,6 +117,11 @@ overload compare with compare_filename_filename
 
 val filename_dummy : filename (* dummy *)
 val filename_stdin : filename (* STDIN *)
+
+(* ****** ****** *)
+
+fun filename_is_dummy : filename -> bool
+fun filename_isnot_dummy : filename -> bool
 
 (* ****** ****** *)
 

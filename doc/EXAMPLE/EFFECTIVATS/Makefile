@@ -16,7 +16,7 @@ all::queue-sllist2
 queue-sllist2:: ; make -C queue-sllist2 all
 
 all::loop-as-tailrec
-loop-as-tailrec:: ; make -C loop-as-tailrec ll
+loop-as-tailrec:: ; make -C loop-as-tailrec all
 
 all::file-copying
 file-copying:: ; make -C file-copying all
@@ -48,6 +48,8 @@ cleanall:: ; make -C word-counting cleanall
 cleanall:: ; make -C DiningPhil cleanall
 cleanall:: ; make -C DiningPhil2 cleanall
 cleanall:: ; make -C Producer-Consumer cleanall
+cleanall:: ; make -C IPC-redis cleanall
+cleanall:: ; make -C sorting-linear-lists
 
 ######
 
@@ -61,6 +63,8 @@ uploadall::upload_word-counting
 uploadall::upload_DiningPhil
 uploadall::upload_DiningPhil2
 uploadall::upload_Producer-Consumer
+uploadall::upload_IPC-redis
+uploadall::upload_sorting-linear-lists
 
 ######
 
@@ -130,7 +134,7 @@ upload_DiningPhil2:: ; \
   DiningPhil2/DiningPhil2.sats \
   DiningPhil2/DiningPhil2.dats \
   DiningPhil2/DiningPhil2_fork.dats \
-  DiningPhil2/DiningPhil2_thread.dats \
+  DiningPhil2/DiningPhil2_mylib.dats \
   ats-hwxi,ats-lang@web.sourceforge.net:htdocs/EXAMPLE/EFFECTIVATS/DiningPhil2/
 
 ######
@@ -145,6 +149,15 @@ upload_Producer-Consumer:: ; \
 
 ######
 
+upload_Readers-and-Writers:: ; \
+  scp \
+  Readers-and-Writers/Makefile \
+  Readers-and-Writers/DB_read_write.sats \
+  Readers-and-Writers/DB_read_write.dats \
+  ats-hwxi,ats-lang@web.sourceforge.net:htdocs/EXAMPLE/EFFECTIVATS/Readers-and-Writers/
+
+######
+
 upload_IPC-redis:: ; \
   scp \
   IPC-redis/Makefile \
@@ -156,6 +169,20 @@ upload_IPC-redis:: ; \
   IPC-redis/test_up.dats \
   IPC-redis/test_dn.dats \
   ats-hwxi,ats-lang@web.sourceforge.net:htdocs/EXAMPLE/EFFECTIVATS/IPC-redis/
+
+######
+
+upload_sorting-linear-lists:: ; \
+  scp \
+  sorting-linear-lists/Makefile \
+  sorting-linear-lists/mylist.dats \
+  sorting-linear-lists/mylist_mergesort.dats \
+  sorting-linear-lists/mergesort_sllist.dats \
+  sorting-linear-lists/mergesort_list_vt.dats \
+  sorting-linear-lists/mylist_quicksort.dats \
+  sorting-linear-lists/quicksort_sllist.dats \
+  sorting-linear-lists/quicksort_list_vt.dats \
+  ats-hwxi,ats-lang@web.sourceforge.net:htdocs/EXAMPLE/EFFECTIVATS/sorting-linear-lists
 
 ######
 

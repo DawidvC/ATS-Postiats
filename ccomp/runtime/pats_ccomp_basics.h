@@ -67,13 +67,14 @@
 
 /* ****** ****** */
 
-#ifndef _ATS_EXCEPTION_NONE
+#ifndef _ATS_CCOMP_EXCEPTION_NONE
 //
-#define ATSdynexn_dec(d2c) atstype_exncon d2c = { 0, "ats-exncon-name" }
+#define \
+ATSdynexn_dec(d2c) atstype_exncon d2c = { 0, "ats-exncon-name" }
 #define ATSdynexn_initize(d2c, exnmsg) the_atsexncon_initize(&(d2c), exnmsg)
 #define ATSdynexn_extdec(d2c) ATSglobaldec() atstype_exncon d2c
 //
-#endif // end of [_ATS_EXCEPTION_NONE]
+#endif // end of [_ATS_CCOMP_EXCEPTION_NONE]
 
 /* ****** ****** */
 
@@ -93,24 +94,32 @@
 #define ATSdyncst_valbind(d2c, pmv) d2c = (pmv)
 
 /* ****** ****** */
-
-#define ATSmainats_void_0(err) mainats_void_0()
-#define ATSmainats_argc_argv_0(argc, argv, err) mainats_argc_argv_0(argc, argv)
-#define ATSmainats_argc_argv_envp_0(argc, argv, envp, err) mainats_argc_argv_envp_0(argc, argv, envp)
-
-#define ATSmainats_void_int(err) err = mainats_void_int()
-#define ATSmainats_argc_argv_int(argc, argv, err) err = mainats_argc_argv_int(argc, argv)
-#define ATSmainats_argc_argv_envp_int(argc, argv, envp, err) err = mainats_argc_argv_envp_int(argc, argv, envp)
-
+//
+#define \
+ATSmainats_void_0(err) mainats_void_0()
+#define \
+ATSmainats_argc_argv_0(argc, argv, err) mainats_argc_argv_0(argc, argv)
+#define \
+ATSmainats_argc_argv_envp_0(argc, argv, envp, err) mainats_argc_argv_envp_0(argc, argv, envp)
+//
+#define \
+ATSmainats_void_int(err) err = mainats_void_int()
+#define \
+ATSmainats_argc_argv_int(argc, argv, err) err = mainats_argc_argv_int(argc, argv)
+#define \
+ATSmainats_argc_argv_envp_int(argc, argv, envp, err) err = mainats_argc_argv_envp_int(argc, argv, envp)
+//
 /* ****** ****** */
-
+//
 extern
 void atsruntime_raise (void *exn) ;
 extern
 void atsruntime_handle_uncaughtexn (void *exn0) ;
 extern
 void atsruntime_handle_unmatchedval (char *msg0) ;
-
+extern
+void atsruntime_handle_unmatchedarg (char *msg0) ;
+//
 /* ****** ****** */
 
 #endif /* PATS_CCOMP_BASICS_H */

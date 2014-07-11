@@ -1043,13 +1043,22 @@ case+ x.d2ecl_node of
     val () = prstr ")"
   } // end of [D2Coverload]
 //
+| D2Cstacsts
+    (s2cs) => {
+    val () = fprint! (out, "D2Cstacsts(", s2cs, ")")
+  } (* end of [D2Cstacsts] *)
+| D2Cstacons
+    (knd, s2cs) => {
+    val () = fprint! (out, "D2Cstacons(", knd, "; ", s2cs, ")")
+  } (* end of [D2Cstacons] *)
+//
 | D2Cextype
     (name, s2e) => {
-    val () = fprint! (out, "D2Cextype(", name, " = ", s2e)
+    val () = fprint! (out, "D2Cextype(", name, " = ", s2e, ")")
   } (* end of [D2Cextype] *)
 | D2Cextval 
     (name, d2e) => {
-    val () = fprint! (out, "D2Cextval(", name, " = ", d2e)
+    val () = fprint! (out, "D2Cextval(", name, " = ", d2e, ")")
   } (* end of [D2Cextval] *)
 | D2Cextcode _ => prstr "D2Cextcode(...)"
 //
@@ -1100,16 +1109,26 @@ case+ x.d2ecl_node of
     val () = prstr "\n)"
   } // end of [D2Cprvardecs]
 //
-| D2Cinclude (d2cs) => {
-    val () = prstr "D2Cinclude(\n"
+| D2Cinclude
+    (knd, d2cs) => {
+    val () = prstr "D2Cinclude("
+    val () = fprint_int (out, knd)
+    val () = prstr "\n"
     val () = prstr "..."
     val () = prstr "\n)"
   } // end of [D2Cinclude]    
+//
 | D2Cstaload _ => {
     val () = prstr "D2Cstaload(\n"
     val () = prstr "..."
     val () = prstr "\n)"
   } // end of [D2Cstaload]    
+| D2Cstaloadloc _ => {
+    val () = prstr "D2Cstaloadloc(\n"
+    val () = prstr "..."
+    val () = prstr "\n)"
+  } // end of [D2Cstaload]    
+//
 | D2Cdynload _ => {
     val () = prstr "D2Cdynload(\n"
     val () = prstr "..."

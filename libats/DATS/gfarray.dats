@@ -39,13 +39,13 @@
 // HX-2012-11-30: ported to ATS/Postiats from ATS/Anairiats
 //
 (* ****** ****** *)
-
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
-
-(* ****** ****** *)
-
-staload "libats/SATS/ilist_prf.sats" // for handling integer sequences
-
+//
+// HX:
+// for integer sequences
+//
+staload
+"libats/SATS/ilist_prf.sats"
+//
 (* ****** ****** *)
 
 staload "libats/SATS/gfarray.sats"
@@ -107,7 +107,7 @@ sif i > 0 then let
 in
   (LENGTHcons (pfres_len), APPENDcons (pfres_app), gfarray_v_cons (pf1at, pfres1), pfres2)
 end else let
-  prval INTEQ () = inteq_make {i,0} ()
+  prval EQINT () = eqint_make {i,0} ()
 in
   (LENGTHnil (), APPENDnil (), gfarray_v_nil (), pfarr)
 end // end of [sif]

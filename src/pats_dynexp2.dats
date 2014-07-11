@@ -1093,12 +1093,24 @@ d2ecl_stavars
 *)
 
 (* ****** ****** *)
-
+//
 implement
-d2ecl_saspdec (loc, d) = d2ecl_make_node (loc, D2Csaspdec (d))
-
+d2ecl_stacsts
+  (loc, s2cs) =
+  d2ecl_make_node (loc, D2Cstacsts (s2cs))
+implement
+d2ecl_stacons
+  (loc, knd, s2cs) =
+  d2ecl_make_node (loc, D2Cstacons (knd, s2cs))
+//
 (* ****** ****** *)
-
+//
+implement
+d2ecl_saspdec
+  (loc, d) = d2ecl_make_node (loc, D2Csaspdec (d))
+//
+(* ****** ****** *)
+//
 implement
 d2ecl_extype (loc, name, def) =
   d2ecl_make_node (loc, D2Cextype (name, def))
@@ -1108,17 +1120,17 @@ d2ecl_extval (loc, name, def) =
 implement
 d2ecl_extcode (loc, knd, pos, code) =
   d2ecl_make_node (loc, D2Cextcode (knd, pos, code))
-
+//
 (* ****** ****** *)
-
+//
 implement
 d2ecl_datdecs (loc, knd, s2cs) =
   d2ecl_make_node (loc, D2Cdatdecs (knd, s2cs))
-
+//
 implement
 d2ecl_exndecs (loc, d2cs) =
  d2ecl_make_node (loc, D2Cexndecs (d2cs))
-
+//
 (* ****** ****** *)
 
 implement
@@ -1160,18 +1172,29 @@ d2ecl_impdec (loc, knd, d2c) =
 (* ****** ****** *)
 
 implement
-d2ecl_include (loc, d2cs) =
-  d2ecl_make_node (loc, D2Cinclude (d2cs))
+d2ecl_include (loc, knd, d2cs) =
+  d2ecl_make_node (loc, D2Cinclude (knd, d2cs))
+
+(* ****** ****** *)
 
 implement
 d2ecl_staload (
-  loc, idopt, fil, flag, fenv, loaded
-) =
-  d2ecl_make_node (loc, D2Cstaload (idopt, fil, flag, fenv, loaded))
+  loc, idopt, cfil, flag, fenv, loaded
+) = d2ecl_make_node
+  (loc, D2Cstaload (idopt, cfil, flag, fenv, loaded))
 // endof [d2ecl_staload]
 
 implement
+d2ecl_staloadloc (
+  loc, pfil, nspace, fenv
+) = d2ecl_make_node (loc, D2Cstaloadloc (pfil, nspace, fenv))
+
+(* ****** ****** *)
+
+implement
 d2ecl_dynload (loc, fil) = d2ecl_make_node (loc, D2Cdynload (fil))
+
+(* ****** ****** *)
 
 implement d2ecl_local
   (loc, head, body) = d2ecl_make_node (loc, D2Clocal (head, body))

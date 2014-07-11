@@ -248,12 +248,17 @@ hidecl_node =
 //
   | HIDvardecs of (hivardeclst) // variable declarations
 //
-  | HIDinclude of (hideclist)
+  | HIDinclude of (int(*sta/dyn*), hideclist)
 //
   | HIDstaload of
     (
-      filename, int(*flag*), filenv, int(*loaded*)
-    ) // end of [HIDstaload]
+      symbolopt
+    , filename, int(*ldflag*), filenv, int(*loaded*)
+    ) (* end of [HIDstaload] *)
+  | HIDstaloadloc of
+      (filename(*pfil*), symbol(*nspace*), hideclist)
+    // end of [HIDstaloadloc]
+//
   | HIDdynload of (filename)
 //
   | HIDlocal of (hideclist (*head*), hideclist (*body*))
@@ -373,9 +378,10 @@ and hilab_node =
   | HILind of (hidexplst (*index*)) // array subscription
 // end of [hilab_node]
 
-where hidecl = '{
+where
+hidecl = '{
   hidecl_loc= location, hidecl_node= hidecl_node
-}
+} (* end of [hidecl] *)
 
 and hideclist = List (hidecl)
 and hideclopt = Option (hidecl)
@@ -514,6 +520,7 @@ fun labhidexplst_get_type (lhdes: labhidexplst): labhisexplst
 (* ****** ****** *)
 
 fun hidexp_is_value (hde: hidexp): bool
+fun hidexp_is_lvalue (hde: hidexp): bool
 
 (* ****** ****** *)
 
@@ -920,17 +927,27 @@ fun hidecl_vardecs (loc: location, hvds: hivardeclst): hidecl
 
 (* ****** ****** *)
 
-fun hidecl_include (loc: location, hids: hideclist): hidecl
+fun hidecl_include
+  (loc: location, stadyn: int, hids: hideclist): hidecl
+// end of [hidecl_include]
 
 (* ****** ****** *)
 
 fun hidecl_staload
 (
   loc: location
+, idopt: symbolopt
 , fname: filename, flag: int, fenv: filenv, loaded: int
 ) : hidecl // end of [hidecl_staload]
 
-fun hidecl_dynload (loc: location, fil: filename): hidecl
+fun hidecl_staloadloc
+(
+  loc: location, pfil: filename, nspace: symbol, hids: hideclist
+) : hidecl // end of [hidecl_staloadloc]
+
+(* ****** ****** *)
+
+fun hidecl_dynload (loc: location, cfil: filename): hidecl
 
 (* ****** ****** *)
       

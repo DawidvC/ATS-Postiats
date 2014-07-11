@@ -103,7 +103,13 @@ staload "./pats_staexp2.sats"
 abstype dynexp2_hisexp_type
 typedef hisexp = dynexp2_hisexp_type
 typedef hisexpopt = Option (hisexp)
-
+//
+// A place holder for [funlab]
+//
+abstype dynexp2_funlab_type
+typedef funlab = dynexp2_funlab_type
+typedef funlabopt = Option (funlab)
+//
 (* ****** ****** *)
 //
 // HX: assumed in [pats_dynexp2_dcst.dats]
@@ -143,6 +149,10 @@ typedef d2varmap (a:type) = d2varmap_type (a)
 absvtype
 d2varmap_vtype (a:type) // assumed in [pats_dynexp2_dvar.dats]
 vtypedef d2varmap_vt (a:type) = d2varmap_vtype (a)
+//
+absvtype
+d2varmaplst_vtype (a:type) // assumed in [pats_dynexp2_dvar.dats]
+vtypedef d2varmaplst_vt (a:type) = d2varmaplst_vtype (a)
 //
 (* ****** ****** *)
 
@@ -225,8 +235,12 @@ fun d2cst_set_decarg (x: d2cst, s2qs: s2qualst): void
 fun d2cst_get_artylst (x: d2cst): List (int)
 //
 fun d2cst_get_type (x: d2cst): s2exp
+//
 fun d2cst_get_hisexp (x: d2cst): hisexpopt
 fun d2cst_set_hisexp (x: d2cst, opt: hisexpopt): void
+//
+fun d2cst_get_funlab (x: d2cst): funlabopt
+fun d2cst_set_funlab (x: d2cst, opt: funlabopt): void
 //
 fun d2cst_get_pack (x: d2cst): Stropt
 fun d2cst_get_extdef (x: d2cst): dcstextdef
@@ -353,13 +367,13 @@ fun d2var_set_mastype (x: d2var, opt: s2expopt): void
 //
 fun d2var_get_hisexp (x: d2var):<> hisexpopt
 fun d2var_set_hisexp (x: d2var, opt: hisexpopt): void
-
+//
 fun d2var_exch_type (x: d2var, opt: s2expopt): s2expopt 
-
+//
 fun d2var_get_utimes (x: d2var):<> int
 fun d2var_set_utimes (x: d2var, nused: int):<> void
 fun d2var_inc_utimes (x: d2var):<> void
-
+//
 fun d2var_get_stamp (x: d2var):<> stamp
 
 (* ****** ****** *)
@@ -415,20 +429,32 @@ fun d2varmap_listize
   {a:type} (map: d2varmap(a)):<> List_vt @(d2var, a)
 
 (* ****** ****** *)
-
+//
 fun d2varmap_vt_nil {a:type} ():<> d2varmap_vt (a)
 fun d2varmap_vt_free {a:type} (map: d2varmap_vt(a)):<> void
-
+//
 fun d2varmap_vt_search
-  {a:type} (map: !d2varmap_vt(a), d2v: d2var):<> Option_vt a
+  {a:type} (map: !d2varmap_vt(a), d2v: d2var):<> Option_vt(a)
 fun d2varmap_vt_insert
   {a:type} (map: &d2varmap_vt(a), d2v: d2var, x: a):<> bool(*found*)
 fun d2varmap_vt_remove
   {a:type} (map: &d2varmap_vt(a), d2v: d2var):<> bool(*found*)
-
+//
 fun d2varmap_vt_listize
   {a:type} (map: !d2varmap_vt(a)):<> List_vt @(d2var, a)
-
+//
+(* ****** ****** *)
+//
+fun d2varmaplst_vt_nil {a:type} ():<> d2varmaplst_vt (a)
+fun d2varmaplst_vt_free {a:type} (map: d2varmaplst_vt(a)):<> void
+//
+fun d2varmaplst_vt_search
+  {a:type} (map: !d2varmaplst_vt(a), d2v: d2var):<> Option_vt(a)
+fun d2varmaplst_vt_insert
+  {a:type} (map: &d2varmaplst_vt(a), d2v: d2var, x: a):<> bool(*found*)
+fun d2varmaplst_vt_remove
+  {a:type} (map: &d2varmaplst_vt(a), d2v: d2var):<> bool(*found*)
+//
 (* ****** ****** *)
 
 datatype m2acarg =
@@ -673,6 +699,11 @@ d2ecl_node =
       ($SYN.i0de, int(*pval*), d2itmopt) // [None] indicates error
     // end of [D2Coverload]
 //
+  | D2Cstacsts of s2cstlst // for [stacst] declarations
+  | D2Cstacons of
+      (int(*knd*), s2cstlst) // for [stacon] declarations
+    // end of [D2Cstacons]
+//
 (*
   | D2Cstavars of s2tavarlst // for [stavar] declarations
 *)
@@ -701,12 +732,16 @@ d2ecl_node =
   | D2Cvardecs of (v2ardeclst) // variable declarations
   | D2Cprvardecs of (prv2ardeclst) // proof variable declarations
 //
-  | D2Cinclude of d2eclist (* file inclusion *)
+  | D2Cinclude of (int(*knd*), d2eclist) (* file inclusion *)
 //
-  | D2Cstaload of (
-      symbolopt(*id*), filename, int(*loadflag*), filenv, int(*loaded*)
-    ) // end of [D2staload]
-  | D2Cdynload of (filename) (* dynamic load *)
+  | D2Cstaload of
+    (
+      symbolopt, filename, int(*loadflag*), filenv, int(*loaded*)
+    ) (* end of [D2staload] *)
+//
+  | D2Cstaloadloc of (filename(*pfil*), symbol(*nspace*), filenv)
+//
+  | D2Cdynload of (filename) (* dynamic load for initialization *)
 //
   | D2Clocal of (d2eclist(*head*), d2eclist(*body*)) // local declaration
 //
@@ -877,7 +912,8 @@ and d2exparglst = List (d2exparg)
 
 (* ****** ****** *)
 
-and d2lab = '{
+and
+d2lab = '{
   d2lab_loc= location
 , d2lab_node= d2lab_node
 , d2lab_overld= d2symopt
@@ -887,20 +923,24 @@ and d2lablst = List d2lab
 
 (* ****** ****** *)
 
-and i2nvarg = '{
-  i2nvarg_var= d2var, i2nvarg_type= s2expopt
+and
+i2nvarg = '{
+  i2nvarg_var= d2var
+, i2nvarg_type= s2expopt
 } // end of [i2nvarg]
 
 and i2nvarglst = List i2nvarg
 
-and i2nvresstate = '{
+and
+i2nvresstate = '{
   i2nvresstate_svs= s2varlst
 , i2nvresstate_gua= s2explst
 , i2nvresstate_arg= i2nvarglst
 , i2nvresstate_met= s2explstopt
 } // end of [i2nvresstate]
 
-and loopi2nv = '{
+and
+loopi2nv = '{
   loopi2nv_loc= location
 , loopi2nv_svs= s2varlst
 , loopi2nv_gua= s2explst
@@ -911,15 +951,19 @@ and loopi2nv = '{
 
 (* ****** ****** *)
 
-and gm2at = '{
-  gm2at_loc= location, gm2at_exp= d2exp, gm2at_pat= p2atopt
+and
+gm2at = '{
+  gm2at_loc= location
+, gm2at_exp= d2exp
+, gm2at_pat= p2atopt
 } // end of [gm2at]
 
 and gm2atlst = List (gm2at)
 
 (* ****** ****** *)
 
-and c2lau = '{
+and
+c2lau = '{
   c2lau_loc= location
 , c2lau_pat= p2atlst
 , c2lau_gua= gm2atlst
@@ -1551,6 +1595,8 @@ fun d2ecl_overload
   (loc: location, id: $SYN.i0de, pval: int, opt: d2itmopt): d2ecl
 // end of [d2ecl_overload]
 
+fun d2ecl_stacsts (loc: location, s2cs: s2cstlst): d2ecl
+fun d2ecl_stacons (loc: location, knd: int, s2cs: s2cstlst): d2ecl
 (*
 fun d2ecl_stavars (loc: location, xs: s2tavarlst): d2ecl
 *)
@@ -1608,16 +1654,30 @@ fun d2ecl_impdec
 
 (* ****** ****** *)
 
-fun d2ecl_include (loc: location, d2cs: d2eclist): d2ecl
+fun d2ecl_include
+  (loc: location, knd: int, d2cs: d2eclist): d2ecl
+// end of [d2ecl_include]
+
+(* ****** ****** *)
 
 fun d2ecl_staload
 (
   loc: location
-, idopt: symbolopt
-, fil: filename, loadflag: int, fenv: filenv, loaded: int
-) : d2ecl // end of [d2ecl_staload]
+, idopt: symbolopt, cfil: filename
+, ldflag: int, fenv: filenv, loaded: int
+) : d2ecl // end-of-fun
+
+fun d2ecl_staloadloc
+(
+  loc: location
+, pfil: filename, nspace: symbol, fenv: filenv
+) : d2ecl // end-of-fun
+
+(* ****** ****** *)
 
 fun d2ecl_dynload (loc: location, fil: filename): d2ecl
+
+(* ****** ****** *)
 
 fun d2ecl_local (loc: location, ds1: d2eclist, ds2: d2eclist): d2ecl
 
@@ -1658,7 +1718,12 @@ fun d2exp_lvalize
 (* ****** ****** *)
 
 fun jsonize_d2cst (d2c: d2cst): jsonval
+fun jsonize_d2cst_long (d2c: d2cst): jsonval
+
+(* ****** ****** *)
+
 fun jsonize_d2var (d2v: d2var): jsonval
+fun jsonize_d2var_long (d2v: d2var): jsonval
 
 (* ****** ****** *)
 

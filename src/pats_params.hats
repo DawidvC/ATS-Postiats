@@ -31,14 +31,25 @@
 // Start Time: March, 2012
 //
 (* ****** ****** *)
+
+(*
+#define FUNCLO_DEFAULT 1 // FUNCLOptr
+*)
+#define FUNCLO_DEFAULT ~1 // FUNCLOref
+
+(* ****** ****** *)
 //
 // HX: this is used in [pats_constraint3_solve.dats]
 //
-(*
-#define C3NSTRINTKIND "intknd"
-*)
+(* ****** ****** *)
 //
-#define C3NSTRINTKIND "intinfknd"
+#ifndef
+C3NSTRINTKND
+(*
+#define C3NSTRINTKND "intknd"
+*)
+#define C3NSTRINTKND "gmpknd"
+#endif // end of [ifndef]
 //
 (* ****** ****** *)
 

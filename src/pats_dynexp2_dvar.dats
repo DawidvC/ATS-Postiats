@@ -108,11 +108,13 @@ assume d2var_type = ref (d2var_struct)
 in (* in of [local] *)
 
 implement
-d2var_make (loc, id) = let
+d2var_make
+  (loc, id) = let
 //
 val stamp = $STMP.d2var_stamp_make ()
+//
 val (pfgc, pfat | p) = ptr_alloc<d2var_struct> ()
-prval () = free_gc_elim {d2var_struct?} (pfgc)
+prval ((*freed*)) = free_gc_elim {d2var_struct?} (pfgc)
 //
 val () = p->d2var_sym := id
 val () = p->d2var_loc := loc
@@ -135,6 +137,8 @@ in
 ref_make_view_ptr (pfat | p)
 //
 end // end of [d2var_make]
+
+(* ****** ****** *)
 
 implement
 d2var_make_any
@@ -514,6 +518,19 @@ end // end of [local]
 
 (* ****** ****** *)
 
+implement
+fprint_d2varset
+  (out, d2vset) = {
+//
+val xs =
+  d2varset_listize (d2vset)
+val () = $UT.fprintlst (out, $UN.linlst2lst(xs), ", ", fprint_d2var)
+val () = list_vt_free (xs)
+//
+} // end of [fprint_d2varset]
+
+(* ****** ****** *)
+
 local
 
 staload
@@ -534,6 +551,8 @@ assume
 d2varmap_type (a:type) = $FM.map (d2var, a)
 assume
 d2varmap_vtype (a:type) = $LM.map (d2var, a)
+assume
+d2varmaplst_vtype (a:type) = $LM.map (d2var, List_vt(a))
 
 in (* in of [local] *)
 
@@ -592,20 +611,132 @@ d2varmap_vt_listize
   {a} (map) = $LM.linmap_listize (map)
 // end of [d2varmap_vt_listize]
 
-end // end of [local]
-
 (* ****** ****** *)
 
 implement
-fprint_d2varset
-  (out, d2vset) = {
+d2varmaplst_vt_nil () = $LM.linmap_make_nil ()
+
+implement
+d2varmaplst_vt_free
+  {a} (map) = let
 //
-val xs =
-  d2varset_listize (d2vset)
-val () = $UT.fprintlst (out, $UN.linlst2lst(xs), ", ", fprint_d2var)
-val () = list_vt_free (xs)
+typedef key = d2var
+vtypedef itm = List_vt (a)
 //
-} // end of [fprint_d2varset]
+fn f
+(
+  pfv: !unit_v | k: key, x: &itm >> itm?, env: !ptr
+) :<> void = list_vt_free (x)
+//
+val env = null
+prval pfv = unit_v ()
+val ((*void*)) =
+$effmask_all($LM.linmap_clear_funenv<key,itm> {unit_v}{ptr} (pfv | map, f, env))
+prval unit_v () = pfv
+//
+in
+  $LM.linmap_free<key,itm?> (map)
+end // end of [d2varmaplst_vt_free]
+
+implement
+d2varmaplst_vt_search
+  {a} (map, d2v) = let
+//
+typedef key = d2var
+vtypedef itm = List_vt (a)
+//
+val p =
+$LM.linmap_search_ref<key,itm> (map, d2v, cmp)
+//
+in
+//
+if (p > null)
+  then let
+    val xs = $UN.ptrget<List(a)> (p)
+  in
+    case+ xs of
+      list_cons (x, _) => Some_vt (x) | _ => None_vt ()
+    // end of [case]
+  end // end of [then]
+  else None_vt((*void*))
+// end of [if]
+//
+end // end of [d2varmaplst_vt_search]
+
+implement
+d2varmaplst_vt_insert
+  {a} (map, d2v, x0) = let
+//
+typedef key = d2var
+vtypedef itm = List_vt (a)
+//
+val p =
+$LM.linmap_search_ref<key,itm> (map, d2v, cmp)
+//
+in
+//
+if (p > null)
+  then let
+    val xs = $UN.ptrget<itm> (p)
+    val () = $UN.ptrset<itm> (p, list_vt_cons{a}(x0, xs))
+  in
+    true
+  end // end of [then]
+  else let
+    var res: itm
+    val _(*false*) =
+      $LM.linmap_insert<key,itm> (map, d2v, list_vt_sing(x0), cmp, res)
+    val () = $UN.castvwtp0{void}(res)
+  in
+    false
+  end // end of [else]
+// end of [if]
+//
+end // end of [d2varmaplst_vt_search]
+
+implement
+d2varmaplst_vt_remove
+  {a} (map, d2v) = let
+//
+typedef key = d2var
+vtypedef itm = List_vt (a)
+//
+val p =
+$LM.linmap_search_ref<key,itm> (map, d2v, cmp)
+//
+in
+//
+if (p > null)
+  then let
+    val xs = $UN.ptrget<itm> (p)
+  in
+    case+ xs of
+    | ~list_vt_cons
+        (_, xs) => let
+        val () = (
+          case+ xs of
+          | list_vt_cons _ => let
+              prval () = fold@(xs) in $UN.ptrset<itm> (p, xs)
+            end // end of [list_vt_cons]
+          | ~list_vt_nil () => let
+              var res: itm
+              val _(*true*) =
+                $LM.linmap_takeout<key,itm> (map, d2v, cmp, res)
+              // end of [val]
+            in
+              $UN.castvwtp0{void}(res)
+            end // end of [list_vt_nil]
+        ) : void // end of [val]
+      in
+        true
+      end // end of [list_vt_cons]
+    | ~list_vt_nil ((*void*)) => false
+  end // end of [then]
+  else false // end of [else]
+// end of [if]
+end // end of [d2varmaplst_vt_remove]
+
+end // end of [local]
 
 (* ****** ****** *)
 

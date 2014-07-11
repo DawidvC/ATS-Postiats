@@ -104,12 +104,12 @@ lambda-expression representing a binary function, that is, a function
 taking two arguments. In order to assign a type of the form (T1, T2) -> T
 to the lambda-expression, we need to verify that the body of the function
 can be given the type T if the two arguments of the function are assumed to
-have the types T1 and T2.  What is stated also applies, <emphasis>mutatis
-mutandis</emphasis>, to lambda-expressions representing functions of fewer
-or more arguments. For instance, the lambda-expression #dyncode("lam (x:
-double): double => x * x") can be assigned the function type
-#dyncode("(double) -> double"), which may also be written as
-#dyncode("double -> double").\
+have the types T1 and T2.
+What is stated also applies, #emphasis("mutatis mutandis"), to
+lambda-expressions representing functions of fewer or more arguments. For
+instance, the lambda-expression #dyncode("lam (x: double): double => x *
+x") can be assigned the function type #dyncode("(double) -> double"), which
+may also be written as #dyncode("double -> double").\
 
 ")#comment("para")
 
@@ -167,9 +167,13 @@ fn sqrsum1 (x: int, y: int): int = x * x + y * y
 
 We can define a unary function #dyncode("sqrsum2") as follows:
 #atscode("\
+//
 typedef int2 = (int, int)
-fn sqrsum2 (xy: int2): int =
+//
+fn sqrsum2
+  (xy: int2): int =
   let val x = xy.0 and y = xy.1 in x * x + y * y end
+// end of [sqrsum2]
 ")
 
 The keyword #stacode("typedef") introduces a binding between the name
@@ -294,16 +298,27 @@ id="recursive-functions">
 #title("Recursive Functions")
 
 #para("\
-A recursive function is one that may make calls to itself in its
-body. Therefore, a non-recursive function is just a special kind of of
-recursive function: the kind that does not make any calls to itself in its
-body. I consider recursion the most enabling feature a programming language
-can provide. With recursion, we are enabled to do problem-solving based on
-a strategy of reduction: In order to solve a problem to which a solution is
+
+A recursive function is one that may make calls to itself in its body. In
+ATS, the keyword #keycode("fun") is used to initiate the definition of a
+recursive function.  Clearly, a non-recursive function is just a special
+kind of recursive function: the kind that does not make any calls to itself
+in its body. If one prefers, one can use #keycode("fun") (instead of
+#keycode("fn")) to initiate the definition of a non-recursive function.\
+
+")
+
+#para("\
+
+I consider recursion the most enabling feature a programming language can
+provide. With recursion, we are enabled to do problem-solving based on a
+strategy of reduction: In order to solve a problem to which a solution is
 difficult to find immediately, we reduce the problem to problems that are
-similar but simpler, and we repeat this reduction process if needed until
-solutions become apparent. Let us now see some concrete examples of
-problem-solving that make use of this reduction strategy.
+#emphasis("similar") but #emphasis("simpler"), and we repeat this
+reduction process if needed until solutions become apparent. Let us now see
+some concrete examples of problem-solving that make use of this reduction
+strategy.\
+
 ")#comment("para")
 
 #para("\
@@ -315,13 +330,13 @@ following recursive function #dyncode("sum1"):
 fun sum1 (n: int): int = if n >= 1 then sum1 (n-1) + n else 0
 ")
 
-Note that the keyword #dyncode("fun") initiates the definition of a
-recursive function. To find out the sum of all the integers ranging from
-#dyncode("1") to #dyncode("n"), we call #dyncode("sum1 (n)"). The
-reduction strategy for #dyncode("sum1 (n)") is straightforward: If
-#dyncode("n") is greater than #dyncode("1"), then we can readily find the
-value of #dyncode("sum1 (n)") by solving a simpler problem, that is,
-finding the value of #dyncode("sum1 (n-1)").
+To find out the sum of all the integers ranging from #dyncode("1") to
+#dyncode("n"), we call #dyncode("sum1 (n)"). The reduction strategy for
+#dyncode("sum1 (n)") is straightforward: If #dyncode("n") is greater than
+#dyncode("1"), then we can readily find the value of #dyncode("sum1 (n)")
+by solving a simpler problem, that is, finding the value of #dyncode("sum1
+(n-1)").\
+
 ")#comment("para")
 
 #para("\
@@ -473,7 +488,8 @@ fun coin_get
   else ~1 (* erroneous value *)
 // end of [coin_get]
 
-fun coin_change (sum: int) = let
+fun coin_change
+  (sum: int): int = let
   fun aux (sum: int, n: int): int =
     if sum > 0 then
      (if n >= 0 then aux (sum, n-1) + aux (sum-coin_get(n), n) else 0)
@@ -699,13 +715,13 @@ Clearly, the functions #dyncode("board_get") and #dyncode("board_set") are
 defined in a rather unwieldy fashion. This is entirely due to the use of
 tuples for representing board configurations. If we could use an array to
 represent a board configuration, then the implementation would be much
-simpler and cleaner. However, we have not yet covered arrays at this
-point.\
+simpler and cleaner. However, we have not yet covered arrays at this point.\
 
 ")#comment("para")
 
 #para("\
-We now implement two testing functions #dyncode("safety_test1") and
+
+Let us now implement two testing functions #dyncode("safety_test1") and
 #dyncode("safety_test2") as follows:
 
 #atscode("\
@@ -736,23 +752,28 @@ The functionalities of these two functions can be described as such:
 <itemizedlist>
 <listitem>
 #para("\
+
 The function #dyncode("safety_test1") tests whether a queen piece on row
 #dyncode("i0") and column #dyncode("j0") can capture another one on row
-#dyncode("i") and column #dyncode("j").
+#dyncode("i") and column #dyncode("j").\
+
 ")
 </listitem>
 
 <listitem>
 #para("\
+
 The function #dyncode("safety_test2") tests whether a queen piece on row
-#dyncode("i0") and column #dyncode("j0") can capture any pieces on a
-given board with a row number less than or equal to #dyncode("i").
+#dyncode("i0") and column #dyncode("j0") can capture any other pieces on a
+given board with a row number less than or equal to #dyncode("i").\
+
 ")
 </listitem>
 </itemizedlist>
 ")#comment("para")
 
 #para("\
+
 We are now ready to implement the following function
 #dyncode("search") based on a standard depth-first search (DFS) algorithm:
 
@@ -788,10 +809,9 @@ fun search
 
 The return value of #dyncode("search") is the number of distinct solutions
 to the eight queens puzzle. The symbol #dyncode("print!") in the body of
-#dyncode("search") is a special identifier in ATS: It takes an
-indefinite number of arguments and then applies #dyncode("print") to each of
-them. Here is the first solution printed out by a call to the function
-#dyncode("search"):
+#dyncode("search") is a special identifier in ATS: It takes an indefinite
+number of arguments and then applies #dyncode("print") to each of them. Here
+is the first solution printed out by a call to the function #dyncode("search"):
 
 #atscode("\
 Q . . . . . . . 
@@ -804,7 +824,8 @@ Q . . . . . . .
 . . . Q . . . . 
 ")
 
-There are 92 distinct solutions in total.
+There are 92 distinct solutions in total.\
+
 ")#comment("para")
 
 #para("\
@@ -991,7 +1012,7 @@ practice of replacing loops with recursive functions in ATS.\
 
 <sect1
 id="envless-functions-and-function-closures">
-#title("Envless Functions and Closure Functions")
+#title("Envless Functions and Closure-Functions")
 
 #para("\
 
@@ -1005,16 +1026,16 @@ out what it means.\
 
 An envless function is represented by a pointer pointing to some place in a
 code segment where the object code for executing a call to this function is
-located. Every function in the programming language C is envless. A closure
-function is also represented by a pointer, but the pointer points to some
-place in a heap where a tuple is allocated (at run-time). Usually, the
-first component of this tuple is a pointer representing an envless function
-and the rest of the components represent some bindings. A tuple as such is
-often referred to as a closure, which can be thought of as an envless
-function paired with an environment. It is possible that the environment of
-a closure function is empty, but this does not equate a closure function
-with an envless function. Every function in functional languages such as ML
-and Haskell is a closure function.\
+located. Every function in the programming language C is envless. A
+closure-function is also represented by a pointer, but the pointer points
+to some place in a heap where a tuple is allocated (at run-time). Usually,
+the first component of this tuple is a pointer representing an envless
+function and the rest of the components represent some bindings. A tuple as
+such is often referred to as a closure-function or simply closure, which
+can be thought of as an envless function paired with an environment. It is
+possible that the environment of a closure-function is empty, but this does
+not equate a closure-function with an envless function. Every function in
+functional languages such as ML and Haskell is a closure-function.\
 
 ")#comment("para")
 
@@ -1038,10 +1059,10 @@ in
 end // end of [sum]
 ")
 
-The inner function #dyncode("loop") is a closure function as is indicated
+The inner function #dyncode("loop") is a closure-function as is indicated
 by the special syntax #dyncode(":&lt;cloref1&gt;"), and the type assigned
 to #dyncode("loop") is denoted by #dyncode("(int, int) -&lt;cloref1&gt;
-int"). Hence, envless functions and closure functions can be distinguished
+int"). Hence, envless functions and closure-functions can be distinguished
 at the level of types.\
 
 ")#comment("para")
@@ -1075,8 +1096,7 @@ end // end of [sum]
 As a matter of fact, what happens during compilation is that the first
 implementation of #dyncode("sum") and #dyncode("loop") gets translated,
 more or less, into the second implementation, and there is #emphasis("no")
-actual creation of closures (for representing closure functions) at
-run-time.\
+actual creation of closures at run-time.\
 
 ")#comment("para")
 
@@ -1086,7 +1106,7 @@ The need for creating closures often appears when a function is not
 directly applied. For instance, the return value of a function call may
 also be a function. In the following code, the defined function
 #dyncode("addx") returns another function when applied to a given integer
-#dyncode("x"), and the returned function is a closure function, which
+#dyncode("x"), and the returned function is a closure-function, which
 always adds the integer #dyncode("x") to its own argument:
 
 
@@ -1098,12 +1118,12 @@ val plus2 = addx (2) // [plus2] is of the type int -<cloref1> int
 ")
 
 It should be clear that #dyncode("plus1(0)") and #dyncode("plus2(0)")
-return #dyncode("1") and #dyncode("2"), respectively.  The closure that is
-given the name #dyncode("plus1") consists of an envless function and an
-environment binding #dyncode("x") to #dyncode("1"). The envless function
-can essentially be described by the pseudo syntax #dyncode("lam (env, y) =>
-env.x + y"), where #dyncode("env") and #dyncode("env.x") refer to an
-environment and the value to which #dyncode("x") is bound in that
+return #dyncode("1") and #dyncode("2"), respectively.  The closure-function
+that is given the name #dyncode("plus1") consists of an envless function
+and an environment binding #dyncode("x") to #dyncode("1"). The envless
+function can essentially be described by the pseudo syntax #dyncode("lam
+(env, y) => env.x + y"), where #dyncode("env") and #dyncode("env.x") refer
+to an environment and the value to which #dyncode("x") is bound in that
 environment. When evaluating #dyncode("plus1(0)"), we can first bind
 #dyncode("env") and #dyncode("y") to the environment in #dyncode("plus1")
 and the argument #dyncode("0"), respectively, and then start to evaluate
@@ -1115,9 +1135,9 @@ the body of the envless function in #dyncode("plus1"), which is
 
 #para("\
 
-Closures are often passed as arguments to functions that are referred to as
-higher-order functions.  It is also fairly common for closures to be
-embedded in data structures.\
+Closures are often passed as arguments to functions that are referred
+to as higher-order functions.  It is also fairly common for closures to
+be embedded in data structures.\
 
 ")
 
@@ -1200,7 +1220,7 @@ fun sqrmodsum (n: int, d: int): int =
 ")
 
 For someone unfamilar with the distinction between an envless function and
-a closure function, it may be a bit suprising to learn that this
+a closure-function, it may be a bit suprising to learn that this
 generalization does not actually work. The simple reason is that
 #dyncode("ifold") expects its second argument to be an envless function but
 the function passed to #dyncode("ifold") in the body of
@@ -1224,15 +1244,15 @@ fun sqrmodsum (n: int, d: int): int =
 
 While #dyncode("ifold2") is indeed more general than #dyncode("ifold"),
 this generality does come with a price. Whenever #dyncode("sqrmodsum") is
-called, a closure function must be created on heap and then passed to
-#dyncode("ifold2"); this closure function is of no further use after the
+called, a closure-function must be created on heap and then passed to
+#dyncode("ifold2"); this closure-function is of no further use after the
 call returns and the memory it occupies can only be properly relcaimed
 through garbage collection (GC). Therefore, calling functions like
 #dyncode("sqrmodsum") can readily result in memory leaks in a setting where
-no GC is available. Fortunately, there are also linear closure functions in
-ATS, which do not cause any memory leaks even in the absence of GC as they
-are required to be explicitly freed by the programmer. I will cover this
-interesting programming feature elsewhere.\
+GC is not available. Fortunately, there are also linear closure-functions
+in ATS, which do not cause any memory leaks even in the absence of GC as
+they are required to be explicitly freed by the programmer. I will cover
+this interesting programming feature elsewhere.\
 
 ")#comment("para")
 
@@ -1324,7 +1344,7 @@ Let us first introduce a type definition as follows:
 typedef I (a:t@ype) = a -<cloref1> a
 ")
 
-Given a type T, I(T) is for a closure function that maps a given input
+Given a type T, I(T) is for a closure-function that maps a given input
 value of type T to an output value of the same type T. Given a function f
 of type I(T), we can compose f with itself to form another function, which
 just applies f twice to a given argument. The following function template
@@ -1423,7 +1443,8 @@ fun acker2
 The function #dyncode("acker2") is a curried version of #dyncode("acker1")
 while the function #dyncode("acker1") in an uncurried version of
 #dyncode("acker2"). Applying #dyncode("acker2") to an integer value
-generates a linear function closure, which I will explain elsewhere.\
+generates a closure-function, which causes a memory-leak unless it can be
+reclaimed by garbage collection (GC) at run-time.\
 
 ")#comment("para")
 
@@ -1456,7 +1477,6 @@ code for testing.\
 
 </chapter><!--id="functions"-->
 
-#comment(" ****** ****** ")
 #comment(" end of [main.atxt] ")
 
 %{

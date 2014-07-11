@@ -82,9 +82,12 @@ implement
 jsonval_loc (loc) = JSONloc (loc)
 
 (* ****** ****** *)
-
+//
+#define nil list_nil
+//
 #define :: list_cons
-
+#define cons list_cons
+//
 (* ****** ****** *)
 
 implement
@@ -110,6 +113,23 @@ jsonval_labval4
 (
   l1, x1, l2, x2, l3, x3, l4, x4
 ) = JSONlablist ((l1, x1) :: (l2, x2) :: (l3, x3) :: (l4, x4) :: list_nil)
+//
+implement
+jsonval_labval5
+(
+  l1, x1, l2, x2, l3, x3, l4, x4, l5, x5
+) = JSONlablist
+(
+  (l1, x1) :: (l2, x2) :: (l3, x3) :: (l4, x4) :: (l5, x5) :: list_nil
+)
+implement
+jsonval_labval6
+(
+  l1, x1, l2, x2, l3, x3, l4, x4, l5, x5, l6, x6
+) = JSONlablist
+(
+  (l1, x1) :: (l2, x2) :: (l3, x3) :: (l4, x4) :: (l5, x5) :: (l6, x6) :: list_nil
+)
 //
 (* ****** ****** *)
 //
@@ -335,6 +355,8 @@ jsonize_funkind (knd) =
 //
 ) (* end of [jsonize_funkind] *)
 
+(* ****** ****** *)
+
 implement
 jsonize_valkind (knd) =
 (
@@ -344,6 +366,22 @@ jsonize_valkind (knd) =
   | VK_val_pos () => jsonval_string "VK_val_pos"
   | VK_val_neg () => jsonval_string "VK_val_neg"
 ) (* end of [jsonize_valkind] *)
+
+(* ****** ****** *)
+
+implement
+jsonize_dcstkind (knd) =
+(
+  case+ knd of
+//
+  | DCKfun () => jsonval_string "DCKfun"
+  | DCKval () => jsonval_string "DCKval"
+  | DCKpraxi () => jsonval_string "DCKpraxi"
+  | DCKprfun () => jsonval_string "DCKprfun"
+  | DCKprval () => jsonval_string "DCKprval"
+  | DCKcastfn () => jsonval_string "DCKcastfn"
+//
+) (* end of [jsonize_dcstkind] *)
 
 (* ****** ****** *)
 //

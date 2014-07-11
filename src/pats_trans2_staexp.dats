@@ -552,7 +552,9 @@ fun s1exp_trup_sqid
 in
 //
 case+ ans of
-| ~Some_vt s2i0 => begin case+ s2i0 of
+//
+| ~Some_vt s2i0 => begin
+  case+ s2i0 of
 //
   | S2ITMcst s2cs => let
       val-list_cons (s2c, _) = s2cs // HX: [s2cs] cannot be empty
@@ -569,6 +571,7 @@ case+ ans of
       val s2c = loop (s2cs, s2c)
 //
       val s2e0 = s2exp_cst (s2c)
+//
     in
       case+ s2cst_get_srt (s2c) of
       | S2RTfun (
@@ -576,7 +579,7 @@ case+ ans of
         ) when s2rt_is_dat (s2t_res) =>
           s2exp_app_srt (s2t_res, s2e0, list_nil ()) // HX: automatically applied
         // S2RTfun
-      | _ => s2e0 // HX: [s2c] is not a nullary constructor
+      | _ (*non-S2RTfun*) => s2e0 // HX: [s2c] is not a nullary constructor
     end // end of [S2ITMcst]
 //
   | S2ITMe1xp e1xp => let
@@ -605,9 +608,10 @@ case+ ans of
       ) // end of [val]
       val () = prerr_newline ()
     in
-      $ERR.abort {s2exp} ()
+      $ERR.abort {s2exp} ((*void*))
     end (* end of [_] *)
   end // end of [Some_vt]
+//
 | ~None_vt () => let
     val () = prerr_error2_loc (loc0)
     val () = filprerr_ifdebug "s1exp_trup_sqid"
@@ -1006,7 +1010,7 @@ case+
   end // end of [S1Eexi]
 | _ => let
     val s2e = s1exp_trdn_impred (s1e)
-    val ws2es = auxwth (ws1es) in s2exp_wth (s2e, ws2es)
+    val ws2es = auxwth (ws1es) in s2exp_wthtype (s2e, ws2es)
   end // end of [_]
 //
 end // end of [auxres]
@@ -1821,6 +1825,7 @@ case+ s1e0.s1exp_node of
     (name, s1ess) => let
     val s2ess =
       list_map_fun (s1ess, s1explst_trdn_vt0ype)
+    // end of [val]
   in
     s2exp_extkind_srt (s2rt_tkind, name, (l2l)s2ess)
   end // end of [S1Eextkind]
@@ -2591,7 +2596,12 @@ case+ (
     Some (s2es)
   end // end of [Some, Some]
 | (None (), Some s2ts) => let
-    val-list_cons (s2vs, _) = s2vss0
+    val s2vs =
+    (
+      case+ s2vss0 of
+      | list_nil () => list_nil ()
+      | list_cons (s2vs, _) => s2vs
+    ) : s2varlst // end of [val]
     val sgn = list_length_compare (s2vs, s2ts)
     val s2es = (
       if sgn = 0 then let

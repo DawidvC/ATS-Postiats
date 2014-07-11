@@ -287,7 +287,7 @@ in
   | _ => let
       val () = prerr_error1_loc (loc0)
       val () = prerr ": the expression cannot be translated into a legal pattern."
-      val () = prerr_newline ()
+      val () = prerr_newline ((*void*))
     in
       p1at_errpat (loc0)
     end // end of [E1XPundef]
@@ -820,8 +820,10 @@ in
   | E1XPnone () => d1exp_empty (loc0)
   | _ => let
       val () = prerr_error1_loc (loc0)
-      val () = prerr ": the expression cannot be translated into a legal dynamic expression."
-      val () = prerr_newline ()
+      val () = prerr ": the expression ["
+      val () = prerr_e1xp (e0)
+      val () = prerr "] cannot be translated into a legal dynamic expression."
+      val () = prerr_newline ((*void*))
     in
       d1exp_errexp (loc0)
     end // end of [E1XPundef]
@@ -1119,26 +1121,46 @@ d1ecl_vardecs
 (* ****** ****** *)
 
 implement
-d1ecl_include (loc, ds) =
-  d1ecl_make_node (loc, D1Cinclude (ds))
-
-implement
-d1ecl_staload (
-  loc, idopt, fil, loadflag, d1cs
-) = d1ecl_make_node
-  (loc, D1Cstaload (idopt, fil, loadflag, d1cs))
-// end of [d1ecl_staload]
-
-implement
-d1ecl_dynload (loc, fil) =
-  d1ecl_make_node (loc, D1Cdynload (fil))
+d1ecl_include
+  (loc, knd, ds) = d1ecl_make_node (loc, D1Cinclude (knd, ds))
+// end of [d1ecl_include]
 
 (* ****** ****** *)
 
 implement
-d1ecl_local (loc, ds_head, ds_body) =
-  d1ecl_make_node (loc, D1Clocal (ds_head, ds_body))
+d1ecl_staload
+(
+  loc, idopt, fil, ldflag, d1cs
+) = d1ecl_make_node
+  (loc, D1Cstaload (idopt, fil, ldflag, d1cs))
+// end of [d1ecl_staload]
 
+implement
+d1ecl_staloadnm
+(
+  loc, alias, nspace
+) = d1ecl_make_node (loc, D1Cstaloadnm (alias, nspace))
+
+implement
+d1ecl_staloadloc
+(
+  loc, pfil, nspace, d1cs
+) = d1ecl_make_node (loc, D1Cstaloadloc (pfil, nspace, d1cs))
+
+(* ****** ****** *)
+//
+implement
+d1ecl_dynload
+  (loc, fil) = d1ecl_make_node (loc, D1Cdynload (fil))
+//
+(* ****** ****** *)
+//
+implement
+d1ecl_local
+(
+  loc, ds_head, ds_body
+) = d1ecl_make_node (loc, D1Clocal (ds_head, ds_body))
+//
 (* ****** ****** *)
 
 (* end of [pats_dynexp1.dats] *)

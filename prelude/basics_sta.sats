@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2010-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 **
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -27,7 +27,8 @@
 
 (* ****** ****** *)
 //
-// Author of the file: Hongwei Xi (hwxi AT cs DOT bu DOT edu)
+// Author of the file:
+// Hongwei Xi (gmhwxiATgmailDOTcom)
 // Start Time: September, 2011
 //
 (* ****** ****** *)
@@ -426,9 +427,9 @@ stadef Int64 = [i:int] int64_1 (i)
 tkindef
 uint64_kind = "atstype_uint64"
 typedef
-uint64_0 = g0uint (int64_kind)
+uint64_0 = g0uint (uint64_kind)
 typedef
-uint64_1 (i:int) = g1uint (int64_kind, i)
+uint64_1 (i:int) = g1uint (uint64_kind, i)
 stadef uint64 = uint64_1 // 2nd-select
 stadef uint64 = uint64_0 // 1st-select
 stadef uInt64 = [i:nat] uint64_1 (i)

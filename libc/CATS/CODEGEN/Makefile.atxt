@@ -51,6 +51,7 @@ all::
 
 ######
 
+#make_entry("alloca")
 #make_entry("dirent")
 #make_entry("dlfcn")
 #make_entry("errno")
@@ -58,6 +59,7 @@ all::
 #make_entry("fnmatch")
 #make_entry("malloc")
 #make_entry("math")
+#make_entry("signal")
 #make_entry("stdio")
 #make_entry("stdlib")
 #make_entry("string")

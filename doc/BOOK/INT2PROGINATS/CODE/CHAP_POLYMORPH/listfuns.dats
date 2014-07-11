@@ -104,6 +104,36 @@ list0_map
 
 (* ****** ****** *)
 
+fun
+{a:t@ype}
+{b:t@ype}
+list0_foldleft
+(
+  ini: a, xs: list0 (b), f: (a, b) -> a
+) : a =
+(
+  case+ xs of
+  | list0_cons
+      (x, xs) => list0_foldleft<a><b> (f (ini, x), xs, f)
+  | list0_nil ((*void*)) => ini
+)
+
+fun
+{a:t@ype}
+{b:t@ype}
+list0_foldright
+(
+  xs: list0 (a), res: b, f: (a, b) -> b
+) : b =
+(
+  case+ xs of
+  | list0_cons
+      (x, xs) => f (x, list0_foldright<a><b> (xs, res, f))
+  | list0_nil ((*void*)) => res
+)
+
+(* ****** ****** *)
+
 fun{
 a,b:t@ype
 } list0_zip
@@ -141,13 +171,24 @@ list0_zipwith
 (* ****** ****** *)
 
 staload "libc/SATS/stdlib.sats"
-staload "{$LIBATSHWXI}/testing/SATS/randgen.sats"
-staload _(*anon*) = "{$LIBATSHWXI}/testing/DATS/randgen.dats"
 
+(* ****** ****** *)
+//
+#define
+ATSCNTRB_sourceloc
+"http://www.ats-lang.org/LIBRARY/contrib"
+#define
+ATSCNTRB_targetloc "../.INT2PROGINATS-atscntrb"
+//
+staload RG =
+"{$ATSCNTRB}/libats-hwxi/testing/SATS/randgen.sats"
+staload _(*RG*) =
+"{$ATSCNTRB}/libats-hwxi/testing/DATS/randgen.dats"
+//
 (* ****** ****** *)
 
 typedef T = double
-implement randgen_val<T> () = drand48 ()
+implement $RG.randgen_val<T> () = drand48 ()
 
 (* ****** ****** *)
 
@@ -158,8 +199,8 @@ main0 () =
 #define N1 10
 #define N2 10
 //
-val xs1 = g0ofg1(randgen_list<T> (N1))
-val xs2 = g0ofg1(randgen_list<T> (N2))
+val xs1 = g0ofg1($RG.randgen_list<T> (N1))
+val xs2 = g0ofg1($RG.randgen_list<T> (N2))
 //
 typedef T2 = (T, T)
 //
@@ -176,4 +217,4 @@ val ((*void*)) = assertloc (g1ofg0(ys) = g1ofg0(zs))
 
 (* ****** ****** *)
 
-(* end of [listfun.dats] *)
+(* end of [listfuns.dats] *)

@@ -53,17 +53,17 @@ sbuffer_takeout (sbuf) = x where
 //
 extern
 fun
-sbuffer_cond_wait_isnil
+sbuffer_wait_isnil
   {a:vt0p}{m:int} (sbuffer(a), !buffer(a, m, 0) >> buffer(a)): void
 extern
-fun sbuffer_cond_signal_isnil{a:vt0p}{m,n:int} (sbuf: sbuffer(a)): void
+fun sbuffer_signal_isnil{a:vt0p}{m,n:int} (sbuf: sbuffer(a)): void
 //
 extern
 fun
-sbuffer_cond_wait_isful
+sbuffer_wait_isful
   {a:vt0p}{m:int} (sbuffer(a), !buffer(a, m, m) >> buffer(a)): void
 extern
-fun sbuffer_cond_signal_isful{a:vt0p}{m,n:int} (sbuf: sbuffer(a)): void
+fun sbuffer_signal_isful{a:vt0p}{m,n:int} (sbuf: sbuffer(a)): void
 //
 (* ****** ****** *)
 
@@ -80,7 +80,7 @@ in
 if isful
   then let
     val () =
-      sbuffer_cond_wait_isful (sbuf, buf)
+      sbuffer_wait_isful (sbuf, buf)
     // end of [val]
   in
     sbuffer_insert2 (sbuf, buf, x)
@@ -88,7 +88,7 @@ if isful
   else let
     val isnil = buffer_isnil (buf)
     val ((*void*)) = buffer_insert (buf, x)
-    val ((*void*)) = if isnil then sbuffer_cond_signal_isnil (sbuf)
+    val ((*void*)) = if isnil then sbuffer_signal_isnil (sbuf)
   in
     // nothing
   end // end of [else]
@@ -109,7 +109,7 @@ in
 if isnil
   then let
     val () =
-      sbuffer_cond_wait_isnil (sbuf, buf)
+      sbuffer_wait_isnil (sbuf, buf)
     // end of [val]
   in
     sbuffer_takeout2 (sbuf, buf)
@@ -118,7 +118,7 @@ if isnil
   {
     val isful = buffer_isful (buf)
     val x(*a*) = buffer_takeout (buf)
-    val ((*void*)) = if isful then sbuffer_cond_signal_isful (sbuf)
+    val ((*void*)) = if isful then sbuffer_signal_isful (sbuf)
   } (* end of [else] *)
 //  
 end // end of [sbuffer_takeout2]
@@ -128,14 +128,12 @@ end // end of [sbuffer_takeout2]
 local
 //
 staload UN = "prelude/SATS/unsafe.sats"
-//
-staload T =
-  "{$LIBATSHWXI}/teaching/mythread/SATS/mythread.sats"
+staload AT = "libats/SATS/athread.sats"
 //
 datatype
 sbuffer =
 {l1,l2,l3:agz}
-SBUFFER of (ptr(*buffer*), $T.mutex(l1), $T.condvar(l2), $T.condvar(l3))
+SBUFFER of (ptr(*buffer*), $AT.mutex(l1), $AT.condvar(l2), $AT.condvar(l3))
 //
 assume sbuffer_type (a:vt0ype) = sbuffer
 //
@@ -147,7 +145,7 @@ implement
 sbuffer_acquire{a}(sbuf) = let
 //
 val+SBUFFER (buf, mut, _, _) = sbuf
-val (pfmut | ()) = $T.mutex_lock (mut)
+val (pfmut | ()) = $AT.mutex_lock (mut)
 //
 in
   $UN.castvwtp0{buffer(a)}((pfmut | buf))
@@ -157,8 +155,8 @@ implement
 sbuffer_release{a}(sbuf, buf) = let
 //
 val+SBUFFER{l1,l2,l3}(_, mut, _, _) = sbuf
-prval pfmut = $UN.castview0{$T.mutex_v(l1)}(buf)
-val ((*void*)) = $T.mutex_unlock (pfmut | mut)
+prval pfmut = $UN.castview0{$AT.locked_v(l1)}(buf)
+val ((*void*)) = $AT.mutex_unlock (pfmut | mut)
 //
 in
   // nothing
@@ -167,60 +165,60 @@ end // end of [sbuffer_release]
 (* ****** ****** *)
 
 implement
-sbuffer_cond_wait_isnil
+sbuffer_wait_isnil
   (sbuf, buf) = let
 //
 val+SBUFFER
   {l1,l2,l3}(_, mut, cvr, _) = sbuf
 prval (pfmut, fpf) = __assert () where
 {
-  extern praxi __assert (): vtakeout0($T.mutex_v(l1))
+  extern praxi __assert (): vtakeout0($AT.locked_v(l1))
 }
-val ((*void*)) = $T.condvar_wait (pfmut | cvr, mut)
+val ((*void*)) = $AT.condvar_wait (pfmut | cvr, mut)
 prval ((*void*)) = fpf (pfmut)
 //
 in
   // nothing
-end // end of [sbuffer_cond_wait_isnil]
+end // end of [sbuffer_wait_isnil]
 
 implement
-sbuffer_cond_signal_isnil
+sbuffer_signal_isnil
   (sbuf) = let
 //
 val+SBUFFER(_, mut, cvr, _) = sbuf
 //
 in
-  $T.condvar_signal (cvr)
-end // end of [sbuffer_cond_signal_isnil]
+  $AT.condvar_signal (cvr)
+end // end of [sbuffer_signal_isnil]
 
 (* ****** ****** *)
 
 implement
-sbuffer_cond_wait_isful
+sbuffer_wait_isful
   (sbuf, buf) = let
 //
 val+SBUFFER
   {l1,l2,l3}(_, mut, _, cvr) = sbuf
 prval (pfmut, fpf) = __assert () where
 {
-  extern praxi __assert (): vtakeout0($T.mutex_v(l1))
+  extern praxi __assert (): vtakeout0($AT.locked_v(l1))
 }
-val ((*void*)) = $T.condvar_wait (pfmut | cvr, mut)
+val ((*void*)) = $AT.condvar_wait (pfmut | cvr, mut)
 prval ((*void*)) = fpf (pfmut)
 //
 in
   // nothing
-end // end of [sbuffer_cond_wait_isful]
+end // end of [sbuffer_wait_isful]
 
 implement
-sbuffer_cond_signal_isful
+sbuffer_signal_isful
   (sbuf) = let
 //
 val+SBUFFER(_, mut, _, cvr) = sbuf
 //
 in
-  $T.condvar_signal (cvr)
-end // end of [sbuffer_cond_signal_isful]
+  $AT.condvar_signal (cvr)
+end // end of [sbuffer_signal_isful]
 
 (* ****** ****** *)
 

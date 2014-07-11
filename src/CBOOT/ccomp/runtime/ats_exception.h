@@ -1,32 +1,29 @@
-/************************************************************************/
-/*                                                                      */
-/*                         Applied Type System                          */
-/*                                                                      */
-/*                              Hongwei Xi                              */
-/*                                                                      */
-/************************************************************************/
+/***********************************************************************/
+/*                                                                     */
+/*                         Applied Type System                         */
+/*                                                                     */
+/***********************************************************************/
 
-/*
-** ATS - Unleashing the Power of Types!
-**
-** Copyright (C) 2002-2008 Hongwei Xi.
+/* (*
+** ATS/Postiats - Unleashing the Potential of Types!
+** Copyright (C) 2002-2008 Hongwei Xi, ATS Trustful Software, Inc.
+** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
 ** 02110-1301, USA.
-**
-*/
+*) */
 
 /*
 **
@@ -49,17 +46,24 @@
 #include "ats_basics.h"
 
 /* ****** ****** */
-
-#ifndef _XOPEN_SOURCE
-#define _XOPEN_SOURCE // for [sigsetjmp] in gcc-4.5
-#endif // end of [_XOPEN_SOURCE]
+//
 #include <setjmp.h>
-
+//
 /* ****** ****** */
 //
-// HX-2011-04-24: the function [alloca] is declared in
-extern void *alloca (size_t bsz) ; // [alloca.h] or [stdlib.h]
-
+typedef jmp_buf ats_jmp_buf_type ;
+//
+#define atspre_setjmp(env, mask) setjmp(env)
+#define atspre_longjmp(env, ret) longjmp(env, ret)
+//
+/* ****** ****** */
+//
+// HX-2011-04-24:
+// the function [alloca]
+// is declared in [alloca.h] or [stdlib.h]
+//
+extern void *alloca (size_t bsz) ;
+//
 /* ****** ****** */
 
 /*
@@ -78,7 +82,7 @@ typedef
 struct ats_exception_frame_struct {
   ats_exn_ptr_type exn ;
   struct ats_exception_frame_struct *prev ;
-  sigjmp_buf env ;
+  ats_jmp_buf_type env ;
 } ats_exception_frame_type ;
 
 /* ****** ****** */
@@ -112,7 +116,7 @@ void *the_ats_exception_stack ;
   do { \
     if (ATS_CURRENT_FRAME == 0/*null*/) ats_uncaught_exception_handle(exn); \
     ATS_CURRENT_FRAME->exn = exn ; \
-    siglongjmp(ATS_CURRENT_FRAME->env, 0) ; \
+    atspre_longjmp(ATS_CURRENT_FRAME->env, 0) ; \
   } while (0) // end of [do]
 
 /* ****** ****** */
@@ -124,7 +128,7 @@ void *the_ats_exception_stack ;
 #define ATS_TRYWITH_TRY(tmp_exn) \
 do { \
 ATS_ENTER_EXCEPTION_FRAME() ; \
-tmp_exn = (ats_exn_ptr_type)(intptr_t)sigsetjmp(ATS_CURRENT_FRAME->env, 0) ; \
+tmp_exn = (ats_exn_ptr_type)((intptr_t)atspre_setjmp(ATS_CURRENT_FRAME->env, 0)) ; \
 if ((intptr_t)tmp_exn == 0) { /* ... */
 
 #define ATS_TRYWITH_WITH(tmp_exn) \

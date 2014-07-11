@@ -6,19 +6,19 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-**
+** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-**
+** 
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -28,7 +28,7 @@
 (* ****** ****** *)
 
 (* Author: Hongwei Xi *)
-(* Authoremail: hwxi AT cs DOT bu DOT edu *)
+(* Authoremail: gmmhwxiATgmailDOTcom *)
 (* Start time: May, 2012 *)
 
 (* ****** ****** *)
@@ -40,7 +40,6 @@
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libats.ML"
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
 #define ATS_EXTERN_PREFIX "atslib_ML_" // prefix for external names
 
 (* ****** ****** *)
@@ -60,28 +59,39 @@ typedef NSH(a:type) = a // for commenting purpose
 #define cons0 list0_cons
 
 (* ****** ****** *)
-
-#define list0_sing(x) list0_cons(x, list0_nil())
-#define list0_pair(x1, x2) list0_cons(x1, list0_cons (x2, list0_nil()))
-
+//
+#define
+list0_sing(x) list0_cons(x, list0_nil())
+//
+#define
+list0_pair(x1, x2)
+list0_cons(x1, list0_cons (x2, list0_nil()))
+//
 (* ****** ****** *)
-
+//
+castfn
+list0_cast{x:t0p} (xs: list0 (INV(x))):<> list0 (x)
+//
+(* ****** ****** *)
+//
 castfn
 list0_of_list{a:t@ype} (xs: List (INV(a))):<> list0 (a)
 castfn
 list0_of_list_vt{a:t@ype} (xs: List_vt (INV(a))):<> list0 (a)
-
+//
 (* ****** ****** *)
 //
 castfn
 g0ofg1_list{a:t@ype} (xs: List (INV(a))):<> list0 (a)
 castfn
 g0ofg1_list_vt{a:t@ype} (xs: List_vt (INV(a))):<> list0 (a)
+//
 overload g0ofg1 with g0ofg1_list
 overload g0ofg1 with g0ofg1_list_vt
 //
 castfn
 g1ofg0_list{a:t@ype} (xs: list0 (INV(a))):<> List0 (a)
+//
 overload g1ofg0 with g1ofg0_list
 //
 (* ****** ****** *)
@@ -98,6 +108,15 @@ list0_make_elt (n: int, x: a):<!exn> list0 (a)
 
 (* ****** ****** *)
 //
+symintr list0
+//
+fun{a:t0p}
+list0_make_arrpsz{n:int}
+  (psz: arrpsz (INV(a), n)):<!wrt> list0 (a)
+overload list0 with list0_make_arrpsz
+//
+(* ****** ****** *)
+//
 symintr list0_make_intrange
 //
 fun{}
@@ -108,31 +127,22 @@ overload list0_make_intrange with list0_make_intrange_lr
 overload list0_make_intrange with list0_make_intrange_lrd
 //
 (* ****** ****** *)
-//
-symintr list0
-//
-fun{a:t0p}
-list0_make_arrpsz{n:int} (psz: arrpsz (INV(a), n)):<!wrt> list0 (a)
-overload list0 with list0_make_arrpsz
-//
-(* ****** ****** *)
 
 fun{a:t0p}
 list0_is_nil (xs: list0 a):<> bool
-overload iseqz with list0_is_nil
 fun{a:t0p}
 list0_is_cons (xs: list0 a):<> bool
-overload isneqz with list0_is_cons
 
 (* ****** ****** *)
-
+//
 fun{a:t0p}
 list0_is_empty (xs: list0 a):<> bool
-overload iseqz with list0_is_empty
 fun{a:t0p}
 list0_isnot_empty (xs: list0 a):<> bool
+//
+overload iseqz with list0_is_empty
 overload isneqz with list0_isnot_empty
-
+//
 (* ****** ****** *)
 //
 fun{a:t0p}
@@ -151,31 +161,33 @@ list0_tail_opt
 //
 (* ****** ****** *)
 //
+overload .head with list0_head_exn
+overload .tail with list0_tail_exn
+//
+(* ****** ****** *)
+
 fun{a:t0p}
 list0_last_exn (xs: list0 (INV(a))):<!exn> (a)
 fun{a:t0p}
 list0_last_opt (xs: list0 (INV(a))):<> Option_vt(a)
+
+(* ****** ****** *)
+//
+fun{a:t0p}
+list0_nth_exn
+  (xs: list0 (INV(a)), i: int):<!exn> (a)
+fun{a:t0p}
+list0_nth_opt
+  (xs: list0 (INV(a)), i: int):<> Option_vt(a)
 //
 (* ****** ****** *)
 //
-symintr .head .tail .last
-overload .head with list0_head_exn
-overload .tail with list0_tail_exn
-overload .last with list0_last_exn
+fun{a:t0p}
+list0_get_at_exn
+  (xs: list0 (INV(a)), index: int):<!exn> (a)
 //
-(* ****** ****** *)
-
-fun{a:t0p}
-list0_nth_exn (xs: list0 (INV(a)), i: int):<!exn> (a)
-fun{a:t0p}
-list0_nth_opt (xs: list0 (INV(a)), i: int):<> Option_vt(a)
-
-(* ****** ****** *)
-
-fun{a:t0p}
-list0_get_at_exn (xs: list0 (INV(a)), i: int):<!exn> (a)
 overload [] with list0_get_at_exn
-
+//
 (* ****** ****** *)
 //
 fun{a:t0p}
@@ -185,6 +197,8 @@ prerr_list0 (xs: list0 (INV(a))): void
 //
 overload print with print_list0
 overload prerr with prerr_list0
+//
+(* ****** ****** *)
 //
 fun{a:t0p}
 fprint_list0
@@ -203,7 +217,8 @@ overload fprint with fprint_list0_sep
 (* ****** ****** *)
 
 fun{a:t0p}
-list0_insert_at_exn (
+list0_insert_at_exn
+(
   xs: SHR(list0 (INV(a))), i: int, x: a
 ) :<!exn> list0 (a) // endfun
 
@@ -314,8 +329,7 @@ a1,a2:t0p}{res:t0p
 } list0_foldleft2 (
   xs1: list0 (INV(a1))
 , xs2: list0 (INV(a2))
-, ini: res
-, f: cfun3 (res, a1, a2, res)
+, ini: res, f: cfun3 (res, a1, a2, res)
 ) : res // end of [list0_foldleft2]
 
 (* ****** ****** *)
@@ -342,7 +356,7 @@ list0_exists2
 (
   xs1: list0 (INV(a1))
 , xs2: list0 (INV(a2))
-, p: cfun2 (a1, a2, bool)
+, pred: cfun2 (a1, a2, bool)
 ) : bool // end of [list0_exists2]
 
 (* ****** ****** *)
@@ -354,7 +368,7 @@ fun{a1,a2:t0p}
 list0_forall2 (
   xs1: list0 (INV(a1))
 , xs2: list0 (INV(a2))
-, p: cfun2 (a1, a2, bool)
+, pred: cfun2 (a1, a2, bool)
 ) : bool // end of [list0_forall2]
 fun{a1,a2:t0p}
 list0_forall2_eq
@@ -376,10 +390,21 @@ list0_equal
 
 fun{a:t0p}
 list0_find_exn
-  (xs: list0 (INV(a)), p: cfun (a, bool)): a
+  (xs: list0 (INV(a)), p: cfun (a, bool)): (a)
 fun{a:t0p}
 list0_find_opt
   (xs: list0 (INV(a)), p: cfun (a, bool)): Option_vt (a)
+
+(* ****** ****** *)
+
+fun{
+a,b:t0p
+} list0_assoc_exn
+  (xys: list0 @(INV(a), b), x0: a, eq: cfun (a, a, bool)): (b)
+fun{
+a,b:t0p
+} list0_assoc_opt
+  (xys: list0 @(INV(a), b), x0: a, eq: cfun (a, a, bool)): Option_vt (b)
 
 (* ****** ****** *)
 
@@ -389,16 +414,23 @@ list0_filter
 // end of [list0_filter]
 
 (* ****** ****** *)
-
+//
 fun{
 a:t0p}{b:t0p
 } list0_map
   (xs: list0 (INV(a)), f: cfun (a, b)): list0 (b)
+//
 fun{
 a:t0p}{b:t0p
 } list0_mapopt
   (xs: list0 (INV(a)), f: cfun (a, Option_vt (b))): list0 (b)
-
+//
+(* ****** ****** *)
+//
+fun{a:t0p}
+list0_mapcons
+  (x0: a, xss: list0 (list0 (INV(a)))): list0 (list0 (a))
+//
 (* ****** ****** *)
 
 fun{

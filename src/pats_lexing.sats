@@ -28,7 +28,7 @@
 (* ****** ****** *)
 //
 // Author: Hongwei Xi
-// Authoremail: gmhwxi AT gmail DOT com
+// Authoremail: gmhwxiATgmailDOTcom
 // Start Time: March, 2011
 //
 (* ****** ****** *)
@@ -142,6 +142,7 @@ token_node =
   | T_OP of () // op // HX: taken from ML
   | T_REC of () // rec
   | T_REFAT of () // ref@
+  | T_REQUIRE of () // require
   | T_SCASE of () // scase
   | T_SIF of () // sif for static if
   | T_SORTDEF of () // sortdef
@@ -230,11 +231,11 @@ token_node =
   | T_IDENT_srp of string
   | T_IDENT_ext of string
 //
-  | T_CHAR of char
+  | T_CHAR of char (* character *)
 //
   | T_INTEGER of (
       int(*base*), string(*rep*), uint(*suffix*)
-    ) // end of [T_INTEGER]
+    ) (* end of [T_INTEGER] *)
 //
   | T_FLOAT of (int(*base*), string(*rep*), uint(*suffix*))
 //
@@ -246,15 +247,15 @@ token_node =
   | T_LABEL of (int(*knd*), string) // HX-2013-01: should it be supported?
 *)
 //
+  | T_COMMA of () // ,
+  | T_SEMICOLON of () // ;
+//
   | T_LPAREN of () // (
   | T_RPAREN of () // )
   | T_LBRACKET of () // [
   | T_RBRACKET of () // ]
   | T_LBRACE of () // {
   | T_RBRACE of () // }
-//
-  | T_COMMA of () // ,
-  | T_SEMICOLON of () // ;
 //
   | T_ATLPAREN of ()  // @(
   | T_QUOTELPAREN of () // '(
@@ -281,7 +282,7 @@ token_node =
 
 typedef token = '{
   token_loc= location, token_node= token_node
-} // end of [token]
+} (* end of [token] *)
 
 typedef tokenopt = Option (token)
 
@@ -429,13 +430,15 @@ val QMARK : tnode // = IDENT_sym ("?")
 val ZERO : tnode // = T_INTEGER_dec ("0")
 
 (* ****** ****** *)
-
-fun print_token (tok: token): void
-overload print with print_token
-fun prerr_token (tok: token): void
-overload prerr with prerr_token
+//
+fun print_token : token -> void
+fun prerr_token : token -> void
 fun fprint_token : fprint_type (token)
-
+//
+overload print with print_token
+overload prerr with prerr_token
+overload fprint with fprint_token
+//
 (* ****** ****** *)
 
 fun token_make
@@ -493,18 +496,19 @@ fun fprint_lexerr : fprint_type (lexerr)
 fun fprint_the_lexerrlst (out: FILEref): int(*err*) // 0/1
 
 (* ****** ****** *)
-
+//
 (*
 ** HX-2011:
 ** obtaining the next token
 *)
+//
 fun lexing_next_token (buf: &lexbuf): token
 (*
 ** HX-2011:
 ** obtaining the next token that is not a comment
 *)
 fun lexing_next_token_ncmnt (buf: &lexbuf): token
-
+//
 (* ****** ****** *)
 
 (* end of [pats_lexing.sats] *)

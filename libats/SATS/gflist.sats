@@ -28,7 +28,7 @@
 (* ****** ****** *)
 //
 // Author: Hongwei Xi
-// Authoremail: hwxiATcsDOTbuDOTedu
+// Authoremail: gmmhwxiATgmailDOTcom
 // Time: October, 2010
 //
 (* ****** ****** *)
@@ -42,7 +42,6 @@
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libats.gflist"
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
 
 (* ****** ****** *)
 

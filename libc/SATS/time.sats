@@ -40,7 +40,6 @@
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libc"
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
 #define ATS_EXTERN_PREFIX "atslib_" // prefix for external names
 
 (* ****** ****** *)
@@ -123,7 +122,7 @@ fun{
 
 typedef
 tm_struct =
-$extype_struct "atslib_tm_struct_type" of
+$extype_struct"atslib_tm_struct_type" of
 {
   tm_sec= int // natLt(60)
 , tm_min= int // natLt(60)
@@ -208,7 +207,7 @@ fun clock (): clock_t = "mac#%" // -1 for error
 
 typedef
 timespec =
-$extype_struct "atslib_timespec_type" of
+$extype_struct"atslib_timespec_type" of
 {
   tv_sec= time_t (*secs*), tv_nsec= lint (*nanosecs*)
 } // end of [extype_struct] // end of [timespec]

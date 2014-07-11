@@ -101,14 +101,19 @@ fun s3exp_get_fvs (s3e: s3exp): s2varset_vt
 (* ****** ****** *)
 //
 fun print_s3exp (x: s3exp): void
-overload print with print_s3exp
 fun prerr_s3exp (x: s3exp): void
-overload prerr with prerr_s3exp
 fun fprint_s3exp : fprint_type (s3exp)
 //
 fun print_s3explst (xs: s3explst): void
 fun prerr_s3explst (xs: s3explst): void
 fun fprint_s3explst : fprint_type (s3explst)
+//
+overload print with print_s3exp
+overload prerr with prerr_s3exp
+overload prerr with fprint_s3exp
+overload print with print_s3explst
+overload prerr with prerr_s3explst
+overload prerr with fprint_s3explst
 //
 (* ****** ****** *)
 
@@ -121,14 +126,23 @@ fun s3explst_syneq (xs1: s3explst, xs2: s3explst): bool
 ** HX-2012-02-20:
 ** this one is used to implement S3Eisum
 *)
-fun s3exp_gte (x1: s3exp, x2: s3exp): bool
+fun s3exp_isgte (x1: s3exp, x2: s3exp): bool
 
 (* ****** ****** *)
 
 fun s3exp_err (s2t: s2rt): s3exp
 
+(* ****** ****** *)
+
 fun s3exp_var (s2v: s2var): s3exp
+fun s3exp_bvar (s2v: s2var): s3exp
+
+(* ****** ****** *)
+
 fun s3exp_cst (s2c: s2cst): s3exp
+
+(* ****** ****** *)
+
 fun s3exp_app (_fun: s3exp, _arg: s3explst): s3exp
 
 (* ****** ****** *)
@@ -150,7 +164,6 @@ and s3exp_neg_1 : s3exp
 (* ****** ****** *)
 
 fun s3exp_bool (b: bool): s3exp
-fun s3exp_bvar (s2v: s2var): s3exp
 fun s3exp_bneg (s3e: s3exp): s3exp
 fun s3exp_beq (s3e1: s3exp, s3e2: s3exp): s3exp
 fun s3exp_bneq (s3e1: s3exp, s3e2: s3exp): s3exp

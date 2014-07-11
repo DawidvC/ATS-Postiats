@@ -59,9 +59,11 @@ staload "./pats_hidynexp.sats"
 //
 datatype trans4err =
   | T4E_d3exp_tyer_isprf of (d3exp)
-  | T4E_d3exp_tyer_isnotval of (d3exp)
+(*
+  | T4E_d3exp_tyer_isnotval of (d3exp) // HX: warning
+*)
 // end of [trans4err]
-
+//
 (* ****** ****** *)
 
 fun the_trans4errlst_add (x: trans4err): void
@@ -84,6 +86,10 @@ fun s2exp_tyer_deep
 fun s2exp_tyer_shallow
   (loc: location, s2e0: s2exp): hisexp
 // end of [s2exp_tyer_shallow]
+
+(* ****** ****** *)
+
+fun s2zexp_tyer (loc: location, s2ze: s2zexp): hisexp
 
 (* ****** ****** *)
 
@@ -124,6 +130,10 @@ fun decarg2imparg (s2qs: s2qualst): s2varlst
 
 fun d3ecl_tyer (d3c: d3ecl): hidecl
 fun d3eclist_tyer (d3cs: d3eclist): hideclist
+
+(* ****** ****** *)
+
+fun d3eclist_tyer_errck (d3cs: d3eclist): hideclist
 
 (* ****** ****** *)
 

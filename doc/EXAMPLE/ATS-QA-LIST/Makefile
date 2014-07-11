@@ -96,25 +96,133 @@ cleanall:: ; $(RMF) qa-list-97
 
 ######
 
-all:: list_last
+all:: qa-list-190
+qa-list-190: qa-list-190.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-190
+
+######
+
+all:: qa-list-191
+qa-list-191: qa-list-191.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-191
+
+######
+
+all:: qa-list-195
+qa-list-195: qa-list-195.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-195
+
+######
+
+all:: qa-list-197
+qa-list-197: qa-list-197.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-197
+
+######
+
+all:: qa-list-200
+qa-list-200: qa-list-200.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: qa-list-205
+qa-list-205: qa-list-205.dats ; $(PATSCC) -cleanaft -o $@ $<
+cleanall:: ; $(RMF) qa-list-205
+
+######
+
+all:: qa-list-209
+qa-list-209: qa-list-209.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-209
+
+######
+
+all:: qa-list-223
+qa-list-223: qa-list-223.dats ; $(PATSCC) -tcats $<
+
+######
+
+all:: qa-list-229
+qa-list-229: qa-list-229.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-229
+
+######
+
+all:: qa-list-244
+qa-list-244: qa-list-244.dats ; $(PATSCC) -o $@ $<
+cleanall:: ; $(RMF) qa-list-244
+
+######
+
+all:: qa-list-262
+qa-list-262: qa-list-262.dats ; $(PATSCC) -o $@ $<
+cleanall:: ; $(RMF) qa-list-262
+
+######
+
+all:: \
+qa-list-285
+qa-list-285: \
+qa-list-285.dats ; \
+  $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) qa-list-285
+
+######
+
+all:: \
+list_last
 list_last: list_last.dats ; \
   $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
 cleanall:: ; $(RMF) list_last
 
 ######
 
-all:: list_copy
+all:: \
+list_copy
 list_copy: list_copy.dats ; \
   $(PATSCC) -cleanaft -DATS_MEMALLOC_LIBC -o $@ $<
 cleanall:: ; $(RMF) list_copy
 
 ######
 
-all:: for-0install
-for-0install: for-0install.dats ; \
-  $(PATSCC) -D_BSD_SOURCE -IIATS ${PATSHOME}/contrib -DATS_MEMALLOC_LIBC -o $@ $< -ljson-c
-cleanall:: ; $(RMF) for-0install
+all:: strlen
+strlen: strlen.dats ; $(PATSCC) -D_BSD_SOURCE -o $@ $<
+cleanall:: ; $(RMF) strlen
 
+######
+
+all:: alloca
+alloca: alloca.dats ; $(PATSCC) -D_BSD_SOURCE -o $@ $<
+cleanall:: ; $(RMF) alloca
+
+######
+
+all:: stkclo
+stkclo: stkclo.dats ; $(PATSCC) -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) stkclo
+
+######
+
+all:: calc_refcnt
+calc_refcnt: calc_refcnt.dats ; $(PATSCC) -DATS_MEMALLOC_LIBC -o $@ $<
+cleanall:: ; $(RMF) calc_refcnt
+
+######
+#
+CFLAGSjson += $(shell pkg-config --cflags json-c)
+#
+all:: for-0install
+for-0install: \
+  for-0install.dats ; \
+  $(PATSCC) -D_BSD_SOURCE -DATS_MEMALLOC_LIBC -IIATS ${PATSHOME}/contrib $(CFLAGSjson) -o $@ $< -ljson-c
+cleanall:: ; $(RMF) for-0install
+#
 ######
 
 RMF=rm -f

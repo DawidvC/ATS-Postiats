@@ -118,6 +118,22 @@ do { \\
 
 #atscode_separator_for_C()
 
+\#define atslib_read_err read
+\#define atslib_write_err write
+
+#atscode_separator_for_C()
+
+\#define atslib_pread pread
+\#define atslib_pwrite pwrite
+
+#atscode_separator_for_C()
+
+\#define atslib_alarm alarm
+\#define atslib_alarm_set alarm
+\#define atslib_alarm_cancel() alarm(0)
+
+#atscode_separator_for_C()
+
 \#define atslib_sleep_int sleep
 \#define atslib_sleep_uint sleep
 
@@ -125,6 +141,10 @@ do { \\
 
 \#define atslib_usleep_int usleep
 \#define atslib_usleep_uint usleep
+
+#atscode_separator_for_C()
+
+\#define atslib_rmdir rmdir
 
 #atscode_separator_for_C()
 

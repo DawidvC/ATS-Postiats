@@ -37,6 +37,16 @@ vtypedef
 streamopt_vt (a:vt0p) = Option_vt(stream_vt(a))
 
 #atscode_separator()
+//
+// HX-2014-04-07:
+// this is a regular function
+// instead of a cast function
+//
+fun{a:t0p}
+stream_vt2t
+  (xs: stream_vt (INV(a))): stream (a)
+//
+#atscode_separator()
 
 fun{a:vt0p}
 stream2list_vt
@@ -49,12 +59,30 @@ fun{a:t0p}
 stream_vt_free (xs: stream_vt a):<!wrt> void
 
 #atscode_separator()
-
+//
 fun{a:t0p}
-stream_vt_drop
+stream_vt_drop_exn
+  (xs: stream_vt(INV(a)), n: intGte(0)): stream_vt(a)
+// end of [stream_vt_drop_exn]
+//
+fun{a:t0p}
+stream_vt_drop_opt
   (xs: stream_vt(INV(a)), n: intGte(0)): streamopt_vt(a)
-// end of [stream_vt_drop]
-
+// end of [stream_vt_drop_opt]
+//
+#atscode_separator()
+//
+fun{a:t0p}
+stream_vt_head
+  (xs: stream_vt(INV(a))):<!exnwrt> (a)
+fun{a:t0p}
+stream_vt_tail
+  (xs: stream_vt(INV(a))):<!exnwrt> stream_vt(a)
+//
+fun{a:vt0p}
+stream_vt_uncons
+  (xs: &stream_vt(INV(a)) >> stream_vt(a)):<!exnwrt> (a)
+//
 #atscode_separator()
 
 fun{
@@ -76,11 +104,13 @@ fun{a:t0p}
 stream_vt_filter (xs: stream_vt (INV(a))): stream_vt (a)
 //
 fun{a:t0p}
-stream_vt_filter_fun (
+stream_vt_filter_fun
+(
   xs: stream_vt (INV(a)), pred: (&a) -<fun> bool
 ) : stream_vt (a) // end of [stream_vt_filter_fun]
 fun{a:t0p}
-stream_vt_filter_cloptr (
+stream_vt_filter_cloptr
+(
   xs: stream_vt (INV(a)), pred: (&a) -<cloptr> bool
 ) : stream_vt (a) // end of [stream_vt_filter_cloptr]
 //
@@ -137,6 +167,53 @@ a1,a2:t0p}{b:vt0p
 , f: (&a1 >> _, &a2 >> _) -<cloptr> b
 ) : stream_vt (b) // end of [stream_vt_map2_cloptr]
 //
+#atscode_separator()
+
+fun{a:vt0p}
+stream_vt_tabulate (): stream_vt (a)
+fun{a:vt0p}
+stream_vt_tabulate$fopr (i: intGte(0)): (a)
+
+#atscode_separator()
+//
+absvtype
+streamer_vtype (a:vt@ype+) = ptr
+//
+vtypedef
+streamer_vt (a:vt0p) = streamer_vtype (a)
+//
+#atscode_separator()
+//
+fun{}
+streamer_vt_make
+  {a:vt0p} (stream_vt(INV(a))): streamer_vt(a)
+//
+fun{}
+streamer_vt_free{a:vt0p} (streamer_vt(INV(a))): void
+//
+fun{
+a:vt@ype
+} streamer_vt_eval_exn (xser: !streamer_vt(INV(a))): (a)
+//
+#atscode_separator()
+//
+// overloading for certain symbols
+//
+#atscode_separator()
+
+#atscode_separator()
+
+overload ~ with streamer_vt_free
+
+#atscode_separator()
+
+overload [] with streamer_vt_eval_exn
+
+(* ****** ****** *)
+
+overload .head with stream_vt_head
+overload .tail with stream_vt_tail
+
 #atscode_separator()
 
 #atscode_eof_strsub("\#thisfilename$")\

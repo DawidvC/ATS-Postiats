@@ -152,10 +152,20 @@ val symbol_PATSHOME : symbol
 val symbol_PATSHOMERELOC : symbol
 
 (* ****** ****** *)
+
+val symbol_ATSPKGRELOCROOT : symbol
+
+(* ****** ****** *)
 //
 val symbol_ATS_PACKNAME : symbol
 //
+(*
+//
+// HX-2014-06-06:
+// this one is no longer in use
+//
 val symbol_ATS_STALOADFLAG : symbol
+*)
 val symbol_ATS_DYNLOADFLAG : symbol
 //
 val symbol_ATS_EXTERN_PREFIX : symbol
@@ -173,13 +183,16 @@ fun compare_symbol_symbol (x1: symbol, x2: symbol):<> Sgn
 overload compare with compare_symbol_symbol
 
 (* ****** ****** *)
-
+//
 fun print_symbol (x: symbol): void
-overload print with print_symbol
 fun prerr_symbol (x: symbol): void
+//
+overload print with print_symbol
 overload prerr with prerr_symbol
+//
 fun fprint_symbol (out: FILEref, x: symbol): void
-
+fun fprint_symbolopt (out: FILEref, opt: symbolopt): void
+//
 (* ****** ****** *)
 
 fun symbol_get_name (x: symbol):<> string

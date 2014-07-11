@@ -24,16 +24,16 @@
 <!ENTITY chap_thmprving SYSTEM "CHAP_THMPRVING/main.db">
 <!ENTITY chap_prgthmprv SYSTEM "CHAP_PRGTHMPRV/main.db">
 <!ENTITY chap_vvtintro SYSTEM "CHAP_VVTINTRO/main.db">
+<!ENTITY chap_dataview SYSTEM "CHAP_DATAVIEW/main.db">
+<!ENTITY chap_datavtype SYSTEM "CHAP_DATAVTYPE/main.db">
+<!ENTITY chap_absvtype SYSTEM "CHAP_ABSVTYPE/main.db">
 ]>
-<book id="proginats" lang="en">
+<book id="INT2PROGINATS" lang="en">
 &bookinfo;
 
 <dedication>
 <para>
-<!--
-To my wife Jinning and daughters Zoe and Chloe.
--->
-To Jinning, Zoe and Chloe.
+To Jinning, Zoe, and Chloe.
 </para>
 </dedication>
 
@@ -72,6 +72,9 @@ id="programming-with-dependent-types">
 id="programming-with-linear-views-and-types">
 <title>Programming with Linear Views and Types</title>
 &chap_vvtintro;
+&chap_dataview;
+&chap_datavtype;
+&chap_absvtype;
 </part>
 
 </book>

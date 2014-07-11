@@ -118,6 +118,7 @@ fprint_token
   | T_OP () => fprintf (out, "OP()", @())
   | T_REC () => fprintf (out, "REC()", @())
   | T_REFAT () => fprintf (out, "REFAT()", @())
+  | T_REQUIRE () => fprintf (out, "REQUIRE()", @())
   | T_SCASE () => fprintf (out, "SCASE()", @())
   | T_SIF () => fprintf (out, "SIF()", @())
   | T_SORTDEF () => fprintf (out, "SORTDEF()", @())
@@ -212,15 +213,15 @@ fprint_token
   | T_LABEL (knd, x) => fprintf (out, "LABEL(%i; %s)", @(knd, x))
 *)
 //
+  | T_COMMA () => fprintf (out, "COMMA()", @())
+  | T_SEMICOLON () => fprintf (out, "SEMICOLON()", @())
+//
   | T_LPAREN () => fprintf (out, "LPAREN()", @())
   | T_RPAREN () => fprintf (out, "RPAREN()", @())
   | T_LBRACKET () => fprintf (out, "LBRACKET()", @())
   | T_RBRACKET () => fprintf (out, "RBRACKET()", @())
   | T_LBRACE () => fprintf (out, "LBRACE()", @())
   | T_RBRACE () => fprintf (out, "RBRACE()", @())
-//
-  | T_COMMA () => fprintf (out, "COMMA()", @())
-  | T_SEMICOLON () => fprintf (out, "SEMICOLON()", @())
 //
   | T_ATLPAREN () => fprintf (out, "ATLPAREN()", @())
   | T_QUOTELPAREN () => fprintf (out, "QUOTELPAREN()", @())

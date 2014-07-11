@@ -33,18 +33,18 @@
 //
 (* ****** ****** *)
 //
+#include "./pats_params.hats"
+//
+(* ****** ****** *)
+//
 staload
 ATSPRE = "./pats_atspre.dats"
 //
 (* ****** ****** *)
-
+//
 staload
 UN = "prelude/SATS/unsafe.sats"
-
-(* ****** ****** *)
-
-#include "./pats_params.hats"
-
+//
 (* ****** ****** *)
 
 staload "./pats_basics.sats"
@@ -81,8 +81,7 @@ staload "./pats_constraint3.sats"
 
 local
 //
-#include "./pats_lintprgm_myint_int.dats"
-#include "./pats_lintprgm_myint_intinf.dats"
+#include "./pats_lintprgm_myint.dats"
 //
 in (*nothing*) end
 
@@ -145,21 +144,21 @@ val ics_asmp = let
   ) : res = let
   in
     case+ s3ps of
-    | list_cons (s3p, s3ps) => let
+    | list_cons
+        (s3p, s3ps) => let
         val ic =
           s3exp2icnstr<a> (loc0, vim, n, s3p)
         // end ofl[val]
 (*
-        val () =
-        (
+        val () = (
           println! ("auxsolve: loop: s3p = ", s3p);
           print "auxsolve: loop: ic = "; print_icnstr (ic, n+1); print_newline ();
-        ) // end of [val]
+        ) (* end of [val] *)
 *)
       in
         loop (loc0, vim, n, s3ps, list_vt_cons (ic, res))
       end // end of [list_cons]
-    | list_nil () => res
+    | list_nil ((*void*)) => res
   end // end of [loop]
 in
   loop (loc0, vim, n, s3ps_asmp, list_vt_nil)
@@ -251,12 +250,12 @@ end // end of [val]
 //
 val (vim, n) = s2varindmap_make (s2vs)
 //
-// HX: [C3NSTRINTKIND] defined in [pats_params.hats]
+// HX: [C3NSTRINTKND] defined in [pats_params.hats]
 //
-#if C3NSTRINTKIND="intknd" #then
+#if C3NSTRINTKND="intknd" #then
 val ans = auxsolve<intknd> (loc0, vim, n, s3ps_asmp, s3p_conc)
-#elif C3NSTRINTKIND="intinfknd" #then
-val ans = auxsolve<intinfknd> (loc0, vim, n, s3ps_asmp, s3p_conc)
+#elif C3NSTRINTKND="gmpknd" #then
+val ans = auxsolve<gmpknd> (loc0, vim, n, s3ps_asmp, s3p_conc)
 #else
 val () = assertloc (false)
 val ans = 0 // HX: it is never executed at run-time

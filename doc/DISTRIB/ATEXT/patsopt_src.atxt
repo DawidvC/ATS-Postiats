@@ -31,8 +31,8 @@ val () = fprint_string (out, "\
 # This script is automatically generated.\n\
 #\n\
 \n\
-SOURCE=../../src/\n\
-TARGET=ATS-Postiats/src/\n\
+SOURCE=../../src\n\
+TARGET=ATS-Postiats/src\n\
 \n\
 srcget ()\n\
 {\n\
@@ -112,6 +112,8 @@ The ATS/Postiats (ATS2) Compiler\
 
 #packfilename("pats_intinf.sats")
 #packfilename("pats_intinf.dats")
+#packfilename("pats_intinf_int.dats")
+#packfilename("pats_intinf_gmp.dats")
 
 (* ****** ****** *)
 
@@ -445,8 +447,9 @@ The ATS/Postiats (ATS2) Compiler\
 #packfilename("pats_lintprgm.dats")
 #packfilename("pats_lintprgm_myint.cats")
 #packfilename("pats_lintprgm_print.dats")
+#packfilename("pats_lintprgm_myint.dats")
 #packfilename("pats_lintprgm_myint_int.dats")
-#packfilename("pats_lintprgm_myint_intinf.dats")
+#packfilename("pats_lintprgm_myint_gmp.dats")
 #packfilename("pats_lintprgm_solve.dats")
 
 (* ****** ****** *)

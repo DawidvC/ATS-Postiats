@@ -43,8 +43,8 @@ val () = fprint_string (out, "\
 # This script is automatically generated.\n\
 #\n\
 \n\
-SOURCE=../../doc/EXAMPLE/MISC/\n\
-TARGET=ATS-Postiats/doc/EXAMPLE/MISC/\n\
+SOURCE=../../doc/EXAMPLE/MISC\n\
+TARGET=ATS-Postiats/doc/EXAMPLE/MISC\n\
 \n\
 srcget ()\n\
 {\n\
@@ -143,6 +143,7 @@ The ATSHOME/doc/EXAMPLE/MISC\
 
 (* ****** ****** *)
 
+#packfilename("queens_lazy.dats")
 #packfilename("queens_loop.dats")
 
 (* ****** ****** *)

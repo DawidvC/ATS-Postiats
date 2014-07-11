@@ -37,6 +37,16 @@ This function is for turning integers into their string representations.\
 
 (* ****** ****** *)
 
+#declnamesynop("string_sing")
+#decldescrpt("\
+
+Given a non-null character, this function returns a singleton string
+consisting of the character.\
+
+")
+
+(* ****** ****** *)
+
 #declnamesynop("string_copy")
 #decldescrpt("Given a string, this function returns a copy of it.")
 #declexample("\
@@ -100,11 +110,11 @@ The following code shows a typical way of combining strings:
 staload "libats/ML/SATS/string.sats"
 //
 implement
-main () = 0 where {
-  val Hello = "H" + "e" + "l" + "l" + "o"
-  val _rest = ", world!\\\n"
-  val () = print (Hello + _rest)
-} // end of [main]
+main0 () =
+{
+  val Hello = "H"+"e"+"l"+"l"+"o"
+  val () = print (Hello + ", world!\\\n")
+} (* end of [main0] *)
 ')\
 
 Note that the evaluation of the expression
@@ -133,13 +143,18 @@ staload "libats/ML/SATS/list0.sats"
 staload "libats/ML/SATS/string.sats"
 //
 implement
-main () = 0 where {
-  val Hello = stringlst_concat (
-    (list0)$arrpsz{string} ("H", "e", "l", "l", "o")
-  ) // end of [val]
-  val _rest = ", world!\\\n"
-  val () = print (Hello + _rest)
-} // end of [main]
+main0 () =
+{
+//
+val Hello =
+stringlst_concat
+(
+  (list0)$arrpsz{string}("H","e","l","l","o")
+) (* end of [val] *)
+//
+val ((*void*)) = print (Hello + ", world!\\\n")
+//
+} (* end of [main0] *)
 ')\
 
 Note that the call to #dyncode("stringlst_concat") constructs the string

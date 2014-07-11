@@ -79,6 +79,11 @@
 
 /* ****** ****** */
 
+#define ATSFCreturn(x) return (x)
+#define ATSFCreturn_void(x) (x); return
+
+/* ****** ****** */
+
 #define ATScaseofbeg() do {
 #define ATScaseofend() } while (0) ;
 #define ATSbranchbeg()
@@ -123,7 +128,7 @@
 
 /* ****** ****** */
 
-#define ATSPMVcfunlab(knd, flab, env) (flab##$closurerize)env
+#define ATSPMVcfunlab(knd, flab, env) (flab##__closurerize)env
 
 /* ****** ****** */
 
@@ -290,14 +295,16 @@
 //
 /* ****** ****** */
 
+#define ATSINSclosure_initize(flab, tmpenv) (flab##__closureinit)tmpenv
+
+/* ****** ****** */
+//
 #define ATSINSraise_exn(tmp, pmv) atsruntime_raise(pmv)
-
+//
 #define ATSINScaseof_fail(msg) atsruntime_handle_unmatchedval(msg)
-
-/*
-#define ATSINSfunarg_fail(msg) ...
-*/
-
+//
+#define ATSINSfunarg_fail(msg) atsruntime_handle_unmatchedarg(msg)
+//
 /* ****** ****** */
 
 #define \

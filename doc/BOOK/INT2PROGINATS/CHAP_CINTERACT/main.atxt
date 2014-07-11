@@ -221,17 +221,17 @@ in C:
 
 #atscode('\
 macdef NULL = $extype(ptr, "0")
-macdef stdin_ref = $extype(FILEref, "stdin")
-macdef stdout_ref = $extype(FILEref, "stdout")
+macdef stdin_ref = $extval(FILEref, "stdin")
+macdef stdout_ref = $extval(FILEref, "stdout")
 ')
 
 External value can also be formed to refer to functions in C as done
 in the following code:
 
 #atscode('\
-macdef atoi = $extype(string -> int, "atoi")
-macdef atol = $extype(string -> lint, "atol")
-macdef atof = $extype(string -> double, "atof")
+macdef atoi = $extval(string -> int, "atoi")
+macdef atol = $extval(string -> lint, "atol")
+macdef atof = $extval(string -> double, "atof")
 ')
 
 Note that there are other ways in ATS that are often more approriate for
@@ -729,7 +729,7 @@ typedef list_node_ = $extype"list_node_" // [list_node_] for unboxed nodes
 #para('\
 
 The following code statically allocates an array of list-nodes and then
-initialize these nodes, turing the array into a list:
+initialize these nodes, turning the array into a list:
 
 #atscode('\
 local

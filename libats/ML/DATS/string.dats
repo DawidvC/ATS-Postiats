@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2010-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 **
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -28,7 +28,7 @@
 (* ****** ****** *)
 
 (* Author: Hongwei Xi *)
-(* Authoremail: hwxi AT cs DOT bu DOT edu *)
+(* Authoremail: gmhwxiATgmailDOTcom *)
 (* Start time: July, 2012 *)
 
 (* ****** ****** *)
@@ -48,10 +48,10 @@ staload UN = "prelude/SATS/unsafe.sats"
 (* ****** ****** *)
 //
 macdef
-prelude_string0_copy = string0_copy
+prelude_string_sing = string_sing
 //
 macdef
-prelude_string0_append = string0_append
+prelude_string0_copy = string0_copy
 //
 macdef
 prelude_string_make_list = string_make_list
@@ -60,6 +60,14 @@ prelude_string_make_rlist = string_make_rlist
 //
 macdef
 prelude_string_make_substring = string_make_substring
+//
+macdef
+prelude_string0_length = string0_length
+macdef
+prelude_string1_length = string1_length
+//
+macdef
+prelude_string0_append = string0_append
 //
 macdef
 prelude_stringlst_concat = stringlst_concat
@@ -92,13 +100,17 @@ implement{
 // end of [iota]
 
 (* ****** ****** *)
+//
+implement{
+} string_sing (c) =
+  strnptr2string ($effmask_wrt(prelude_string_sing (c)))
+//
+(* ****** ****** *)
 
 implement{
-} string_copy (str) = let
-  val res = $effmask_wrt(prelude_string0_copy (str))
-in
-  strptr2string (res)
-end // end of [string_copy]
+} string_copy (str) =
+  strptr2string ($effmask_wrt(prelude_string0_copy (str)))
+// end of [string_copy]
 
 (* ****** ****** *)
 //
@@ -122,16 +134,16 @@ end // end of [string_make_rlist]
 
 implement{
 } string_make_substring
-  (str, st, ln) = let
+  (x, st, ln) = let
 //
-val str = g1ofg0_string(str)
+val x = g1ofg0_string(x)
 val st = g1ofg0_uint(st) and ln = g1ofg0_uint(ln)
-val lnx = string_length (str)
+val lnx = prelude_string1_length (x)
 //
 val st = min (st, lnx)
 //
 val substr =
-$effmask_wrt(prelude_string_make_substring (str, st, min (ln, lnx-st)))
+$effmask_wrt(prelude_string_make_substring (x, st, min (ln, lnx-st)))
 //
 in
   $UN.castvwtp0{string}(substr)

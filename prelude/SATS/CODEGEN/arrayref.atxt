@@ -65,7 +65,6 @@ lemma_arrayref_param
 
 castfn
 arrayref2ptr{a:vt0p}{n:int} (A: arrayref(a, n)):<> Ptr0
-overload ptrcast with arrayref2ptr
 
 #atscode_separator()
 
@@ -126,70 +125,60 @@ arrayref_make_rlist{n:int}
 // end of [arrayref_make_rlist]
 
 #atscode_separator()
-
-(*
-fun{}
-fprint_array$sep (out: FILEref): void
-*)
-fun{a:vt0p}
-fprint_arrayref
-  {n:int} (
-  out: FILEref, A: arrayref (INV(a), n), n: size_t n
-) : void // end of [fprint_arrayref]
-fun{a:vt0p}
-fprint_arrayref_sep
-  {n:int} (
-  out: FILEref
-, A: arrayref (a, n), asz: size_t n, sep: NSH(string)
-) : void // end of [fprint_arrayref_sep]
-
-overload fprint with fprint_arrayref
-overload fprint with fprint_arrayref_sep
-
+//
+// HX-2014-02:
+// [A] must survive [arrayref_tail(A)]
+// in order to support proper garbage-collection
+//
+fun{a:t0p}
+arrayref_head
+  {n:pos} (A: arrayref (a, n)):<!ref> (a) // A[0]
+fun{a:t0p}
+arrayref_tail
+  {n:pos} (A: arrayref (a, n)):<!ref> arrayref (a, n-1)
+//
 #atscode_separator()
-
+//
 fun{
 a:t0p}{tk:tk
 } arrayref_get_at_gint
-  {n:int}{i:nat | i < n} (
+  {n:int}{i:nat | i < n}
+(
   A: arrayref (a, n), i: g1int (tk, i)
 ) :<!ref> a // end of [arrayref_get_at_gint]
-overload [] with arrayref_get_at_gint of 0
-
+//
 fun{
 a:t0p}{tk:tk
 } arrayref_get_at_guint
-  {n:int}{i:nat | i < n} (
+  {n:int}{i:nat | i < n}
+(
   A: arrayref (a, n), i: g1uint (tk, i)
 ) :<!ref> a // end of [arrayref_get_at_guint]
-overload [] with arrayref_get_at_guint of 0
-
+//
 symintr arrayref_get_at
 overload arrayref_get_at with arrayref_get_at_gint of 0
 overload arrayref_get_at with arrayref_get_at_guint of 0
-
+//
 #atscode_separator()
-
+//
 fun{
 a:t0p}{tk:tk
 } arrayref_set_at_gint
   {n:int}{i:nat | i < n} (
   A: arrayref (a, n), i: g1int (tk, i), x: a
 ) :<!refwrt> void // end of [arrayref_set_at_gint]
-overload [] with arrayref_set_at_gint of 0
-
+//
 fun{
 a:t0p}{tk:tk
 } arrayref_set_at_guint
   {n:int}{i:nat | i < n} (
   A: arrayref (a, n), i: g1uint (tk, i), x: a
 ) :<!refwrt> void // end of [arrayref_set_at_guint]
-overload [] with arrayref_set_at_guint of 0
-
+//
 symintr arrayref_set_at
 overload arrayref_set_at with arrayref_set_at_gint of 0
 overload arrayref_set_at with arrayref_set_at_guint of 0
-
+//
 #atscode_separator()
 
 fun{
@@ -219,6 +208,52 @@ arrayref_interchange
 
 #atscode_separator()
 
+fun{a:vt0p}
+arrayref_subcirculate
+  {n:int} (A: arrayref (a, n), i: sizeLt n, j: sizeLt n):<!refwrt> void
+// end of [arrayref_subcirculate]
+
+#atscode_separator()
+
+(*
+fun{}
+fprint_array$sep (out: FILEref): void
+*)
+fun{a:vt0p}
+fprint_arrayref
+  {n:int} (
+  out: FILEref, A: arrayref (INV(a), n), n: size_t n
+) : void // end of [fprint_arrayref]
+fun{a:vt0p}
+fprint_arrayref_sep
+  {n:int} (
+  out: FILEref
+, A: arrayref (a, n), asz: size_t n, sep: NSH(string)
+) : void // end of [fprint_arrayref_sep]
+
+#atscode_separator()
+
+fun{a:t0p}
+arrayref_copy{n:int}
+  (A: arrayref (a, n), n: size_t (n)): arrayptr (a, n)
+// end of [arrayref_copy]
+
+#atscode_separator()
+//
+(*
+fun{a:vt0p}
+array_tabulate$fopr (index: size_t): (a)
+*)
+fun{a:vt0p}
+arrayref_tabulate
+  {n:int} (asz: size_t n): arrayref (a, n)
+//
+fun{a:vt0p}
+arrayref_tabulate_cloref
+  {n:int} (size_t n, (sizeLt(n)) -<cloref> a): arrayref (a, n)
+//
+#atscode_separator()
+
 (*
 fun{a:vt0p}{env:vt0p}
 array_foreach$cont (x: &a, env: &env): void
@@ -227,12 +262,12 @@ array_foreach$fwork (x: &a >> a, env: &(env) >> _): void
 *)
 fun{
 a:vt0p
-} arrayref_foreach {n:int} (
+} arrayref_foreach{n:int} (
   A: arrayref (a, n), asz: size_t (n)
 ) : sizeLte(n) // end of [arrayref_foreach]
 fun{
 a:vt0p}{env:vt0p
-} arrayref_foreach_env {n:int} (
+} arrayref_foreach_env{n:int} (
   A: arrayref (a, n), asz: size_t (n), env: &(env)>>env
 ) : sizeLte(n) // end of [arrayref_foreach_env]
 
@@ -246,12 +281,12 @@ array_iforeach$fwork (i: size_t, x: &a >> a, env: &(env) >> _): void
 *)
 fun{
 a:vt0p
-} arrayref_iforeach {n:int} (
+} arrayref_iforeach{n:int} (
   A: arrayref (INV(a), n), asz: size_t (n)
 ) : sizeLte(n) // end of [arrayref_iforeach]
 fun{
 a:vt0p}{env:vt0p
-} arrayref_iforeach_env {n:int} (
+} arrayref_iforeach_env{n:int} (
   A: arrayref (INV(a), n), asz: size_t (n), env: &(env)>>env
 ) : sizeLte(n) // end of [arrayref_iforeach_env]
 
@@ -265,25 +300,15 @@ array_rforeach$fwork (x: &a >> a, env: &(env) >> _): void
 *)
 fun{
 a:vt0p
-} arrayref_rforeach {n:int} (
+} arrayref_rforeach{n:int} (
   A: arrayref (a, n), asz: size_t (n)
 ) : sizeLte(n) // end of [arrayref_rforeach]
 fun{
 a:vt0p}{env:vt0p
-} arrayref_rforeach_env {n:int} (
+} arrayref_rforeach_env{n:int} (
   A: arrayref (a, n), asz: size_t (n), env: &(env)>>env
 ) : sizeLte(n) // end of [arrayref_rforeach_env]
 
-#atscode_separator()
-//
-(*
-fun{a:vt0p}
-array_tabulate$fopr (index: size_t): (a)
-*)
-fun{a:vt0p}
-arrayref_tabulate
-  {n:int} (asz: size_t n): arrayref (a, n)
-//
 #atscode_separator()
 //
 // arrszref: a reference to an array with size information attached
@@ -330,12 +355,6 @@ fun{
 
 #atscode_separator()
 
-symintr .ref .size
-overload .ref with arrszref_get_ref
-overload .size with arrszref_get_size
-
-#atscode_separator()
-
 fun{}
 arrszref_get_refsize{a:vt0p}
   (A: arrszref (a), asz: &size_t? >> size_t n):<!wrt> #[n:nat] arrayref (a, n)
@@ -372,55 +391,46 @@ fprint_arrszref_sep (
   out: FILEref, A: arrszref (a), sep: NSH(string)
 ) : void // end of [fprint_arrszref_sep]
 
-overload fprint with fprint_arrszref
-overload fprint with fprint_arrszref_sep
-
 #atscode_separator()
-
+//
 fun{a:t0p}
 arrszref_get_at_size
   (A: arrszref (a), i: size_t):<!exnref> a
-// end of [arrszref_get_at_size]
-
+//
 fun{
 a:t0p}{tk:tk
 } arrszref_get_at_gint
   (A: arrszref (a), i: g0int (tk)):<!exnref> a
-overload [] with arrszref_get_at_gint of 0
-
+//
 fun{
 a:t0p}{tk:tk
 } arrszref_get_at_guint
   (A: arrszref (a), i: g0uint (tk)):<!exnref> a
-overload [] with arrszref_get_at_guint of 0
-
+//
 symintr arrszref_get_at
 overload arrszref_get_at with arrszref_get_at_gint of 0
 overload arrszref_get_at with arrszref_get_at_guint of 0
-
+//
 #atscode_separator()
-
+//
 fun{a:t0p}
 arrszref_set_at_size
   (A: arrszref (a), i: size_t, x: a):<!exnrefwrt> void
-// end of [arrszref_set_at_size]
-
+//
 fun{
 a:t0p}{tk:tk
 } arrszref_set_at_gint
   (A: arrszref (a), i: g0int (tk), x: a):<!exnrefwrt> void
-overload [] with arrszref_set_at_gint of 0
-
+//
 fun{
 a:t0p}{tk:tk
 } arrszref_set_at_guint
   (A: arrszref (a), i: g0uint (tk), x: a):<!exnrefwrt> void
-overload [] with arrszref_set_at_guint of 0
-
+//
 symintr arrszref_set_at
 overload arrszref_set_at with arrszref_set_at_gint of 0
 overload arrszref_set_at with arrszref_set_at_guint of 0
-
+//
 #atscode_separator()
 
 fun{a:vt0p}
@@ -445,6 +455,20 @@ overload arrszref_exch_at with arrszref_exch_at_gint of 0
 overload arrszref_exch_at with arrszref_exch_at_guint of 0
 
 #atscode_separator()
+
+fun{a:vt0p}
+arrszref_interchange
+  (A: arrszref (a), i: size_t, j: size_t):<!exnrefwrt> void
+// end of [arrszref_interchange]
+
+#atscode_separator()
+
+fun{a:vt0p}
+arrszref_subcirculate
+  (A: arrszref (a), i: size_t, j: size_t):<!exnrefwrt> void
+// end of [arrszref_subcirculate]
+
+#atscode_separator()
 //
 (*
 fun{a:vt0p}
@@ -453,6 +477,45 @@ array_tabulate$fopr (index: size_t): (a)
 fun{a:vt0p}
 arrszref_tabulate (asz: size_t): arrszref (a)
 //
+fun{a:vt0p}
+arrszref_tabulate_cloref
+  {n:int} (size_t n, (sizeLt(n)) -<cloref> a): arrszref (a)
+//
+#atscode_separator()
+//
+// overloading for certain symbols
+//
+#atscode_separator()
+
+overload [] with arrayref_get_at_gint of 0
+overload [] with arrayref_get_at_guint of 0
+overload [] with arrayref_set_at_gint of 0
+overload [] with arrayref_set_at_guint of 0
+overload [] with arrszref_get_at_gint of 0
+overload [] with arrszref_get_at_guint of 0
+overload [] with arrszref_set_at_gint of 0
+overload [] with arrszref_set_at_guint of 0
+
+#atscode_separator()
+
+overload .head with arrayref_head
+overload .tail with arrayref_tail
+
+#atscode_separator()
+
+overload .size with arrszref_get_size
+
+#atscode_separator()
+
+overload fprint with fprint_arrayref
+overload fprint with fprint_arrayref_sep
+overload fprint with fprint_arrszref
+overload fprint with fprint_arrszref_sep
+
+#atscode_separator()
+
+overload ptrcast with arrayref2ptr
+
 #atscode_separator()
 
 #atscode_eof_strsub("\#thisfilename$")\

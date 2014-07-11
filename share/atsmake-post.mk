@@ -16,6 +16,8 @@ PATSCC2=$(PATSCC) $(INCLUDE) $(INCLUDE_ATS)
 ######
 
 ifdef MYTARGET
+$(MYTARGET)_C_O := \
+  $(patsubst %.c, %_c.o, $(SOURCES_C))
 $(MYTARGET)_SATS_O := \
   $(patsubst %.sats, %_sats.o, $(SOURCES_SATS))
 $(MYTARGET)_DATS_O := \
@@ -29,9 +31,10 @@ ifeq ($(strip $(MYTARGET)),MYTARGET)
 else
 all:: $(MYTARGET)
 $(MYTARGET): \
+  $($(MYTARGET)_C_O) \
   $($(MYTARGET)_SATS_O) \
   $($(MYTARGET)_DATS_O) ; \
-  $(PATSCC) $(INCLUDE) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+  $(PATSCC) $(INCLUDE) $(CFLAGS) -o $@ $^ $(LDFLAGS) $(EXTRAFLAGS)
 cleanall:: ; $(RMF) $(MYTARGET)
 endif # end of [ifeq]
 endif # end of [ifdef]
@@ -43,8 +46,8 @@ endif # end of [ifdef]
 #
 ifdef MYCCRULE
 else
-%_sats.c: %.sats ; $(PATSCC) $(INCLUDE_ATS) -ccats $<
-%_dats.c: %.dats ; $(PATSCC) $(INCLUDE_ATS) -ccats $<
+%_sats.c: %.sats ; $(PATSCC) $(INCLUDE_ATS) -o $@ -ccats $<
+%_dats.c: %.dats ; $(PATSCC) $(INCLUDE_ATS) -o $@ -ccats $<
 endif
 #
 ######
@@ -54,9 +57,9 @@ endif
 ifdef MYCCRULE
 else
 %_sats.o: %.sats ; \
-  $(PATSCC) -cleanaft $(INCLUDE) $(INCLUDE_ATS) $(CFLAGS) -c $<
+  $(PATSCC) -cleanaft $(INCLUDE) $(INCLUDE_ATS) $(CFLAGS) -o $@ -c $<
 %_dats.o: %.dats ; \
-  $(PATSCC) -cleanaft $(INCLUDE) $(INCLUDE_ATS) $(MALLOCFLAG) $(CFLAGS) -c $<
+  $(PATSCC) -cleanaft $(INCLUDE) $(INCLUDE_ATS) $(MALLOCFLAG) $(CFLAGS) -o $@ -c $<
 endif
 #
 ######
@@ -65,8 +68,8 @@ endif
 #
 ifeq ($(strip $(MYCCRULE)),PORTABLE)
 #
-%_sats.o: %_sats.c ; $(CC) $(INCLUDE) $(CFLAGS) -c $<
-%_dats.o: %_dats.c ; $(CC) $(INCLUDE) $(MALLOCFLAG) $(CFLAGS) -c $<
+%_sats.o: %_sats.c ; $(CC) $(INCLUDE) $(CFLAGS) -o $@ -c $<
+%_dats.o: %_dats.c ; $(CC) $(INCLUDE) $(MALLOCFLAG) $(CFLAGS) -o $@ -c $<
 #
 endif
 #
@@ -76,11 +79,14 @@ endif
 #
 ifdef MYPORTDIR
 #
+$(MYPORTDIR)/Makefile: Makefile ; cp -f $< $@
+#
 $(MYPORTDIR)_SATS_C := \
   $(patsubst %.sats, $(MYPORTDIR)/%_sats.c, $(SOURCES_SATS))
 $(MYPORTDIR)_DATS_C := \
   $(patsubst %.dats, $(MYPORTDIR)/%_dats.c, $(SOURCES_DATS))
 #
+$(MYPORTDIR):: $(MYPORTDIR)/Makefile
 $(MYPORTDIR):: $($(MYPORTDIR)_SATS_C)
 $(MYPORTDIR):: $($(MYPORTDIR)_DATS_C)
 #
@@ -105,10 +111,12 @@ endif
 #
 depend:: ; $(RMF) .depend
 #
-ifeq ($(strip $(SOURCES_SATS)),"")
+ifeq ("$(strip $(SOURCES_SATS))","")
+else
 depend:: ; $(PATSOPT) --output-a .depend --depgen -s $(SOURCES_SATS)
 endif
-ifeq ($(strip $(SOURCES_DATS)),"")
+ifeq ("$(strip $(SOURCES_DATS))","")
+else
 depend:: ; $(PATSOPT) --output-a .depend --depgen -d $(SOURCES_DATS)
 endif
 #

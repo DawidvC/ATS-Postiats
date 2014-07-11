@@ -4,8 +4,8 @@
 
 ######
 #
-# Author: Hongwei Xi
-# Author: Ian Denhardt
+# Author: Hongwei Xi (githwxi)
+# Author: Ian Denhardt (zenhack.net)
 #
 ######
 #
@@ -64,6 +64,10 @@ LDFLAGS += -latslib
 
 ######
 
+EXTRAFLAGS =
+
+######
+
 MALLOCFLAG := -DATS_MEMALLOC_LIBC
 
 ######
@@ -75,6 +79,7 @@ endif
 
 ######
 
+SOURCES_C=
 SOURCES_SATS=
 SOURCES_DATS=
 

@@ -6,7 +6,7 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2014 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
@@ -138,6 +138,7 @@ staload CCOMP = "./pats_ccomp.sats"
 dynload "pats_error.dats"
 //
 dynload "pats_intinf.dats"
+//
 dynload "pats_counter.dats"
 //
 dynload "pats_utils.dats"
@@ -316,7 +317,7 @@ dynload "pats_lintprgm_print.dats"
 // HX: ATS_DYNLOADFLAG set to 0
 //
 dynload pats_lintprgm_myint_int.dats
-dynload pats_lintprgm_myint_intinf.dats
+dynload pats_lintprgm_myint_gmp.dats
 *)
 dynload "pats_lintprgm_solve.dats"
 //
@@ -389,8 +390,10 @@ dynload "pats_ccomp_main.dats"
 //
 extern void patsopt_PATSHOME_set () ;
 extern char *patsopt_PATSHOME_get () ;
+//
 extern void patsopt_PATSHOMERELOC_set () ;
-extern char *patsopt_PATSHOMERELOC_get () ;
+//
+extern void patsopt_ATSPKGRELOCROOT_set () ;
 //
 %} // end of [%{^]
 
@@ -421,11 +424,12 @@ fprintln! (out, "  --output-w filename (output-write into <filename>)");
 fprintln! (out, "  --output-a filename (output-append into <filename>)");
 fprintln! (out, "  -tc (for typechecking only)");
 fprintln! (out, "  --typecheck (for typechecking only)");
-fprintln! (out, "  --gline (for generating line pragma information in target code)");
 fprintln! (out, "  -dep (for generating information on file dependencices)");
 fprintln! (out, "  --depgen (for generating information on file dependencices)");
 fprintln! (out, "  -tag (for generating tagging information on syntactic entities)");
 fprintln! (out, "  --taggen (for generating tagging information on syntactic entities)");
+fprintln! (out, "  --gline (for generating line pragma information in target code)");
+fprintln! (out, "  --pkgreloc (for generating a script to help relocate packages in need)");
 fprintln! (out, "  --jsonize-2 (for output level-2 syntax in JSON format)");
 fprintln! (out, "  --constraint-export (for exporting constraints in JSON format)");
 fprintln! (out, "  --constraint-ignore (for entirely ignoring constraint-solving)");
@@ -436,14 +440,22 @@ end // end of [patsopt_usage]
 (* ****** ****** *)
 //
 (*
+//
 HX: VERSION-0.0.1 released on September 2, 2013
 HX: VERSION-0.0.2 released on September 19, 2013
 HX: VERSION-0.0.3 released in the October of 2013
 HX: VERSION-0.0.4 released in the November of 2013
+HX: VERSION-0.0.5 released on January 15, 2014
+HX: VERSION-0.0.6 released on February 16, 2014
+HX: VERSION-0.0.7 released on March 30, 2014
+HX: VERSION-0.0.8 released on Sunday, May 4, 2014
+//
+HX: VERSION-0.1.0 released on Monday, June 9, 2014
+//
 *)
 #define PATS_MAJOR_VERSION 0
-#define PATS_MINOR_VERSION 0
-#define PATS_MICRO_VERSION 4
+#define PATS_MINOR_VERSION 1
+#define PATS_MICRO_VERSION 1
 (*
 //
 // HX-2011-04-27: this is supported in Postiats:
@@ -462,7 +474,7 @@ implement
 patsopt_version (out) =
 {
   val () = fprintf (out
-, "ATS/Postiats version %i.%i.%i with Copyright (c) 2011-2013 Hongwei Xi\n"
+, "ATS/Postiats version %i.%i.%i with Copyright (c) 2011-2014 Hongwei Xi\n"
 , @(PATS_MAJOR_VERSION, PATS_MINOR_VERSION, PATS_MICRO_VERSION)
   ) // end of [fprintf]
 } (* end of [patsopt_version] *)
@@ -527,8 +539,10 @@ cmdstate = @{
 , outmode= fmode
 , outchan= outchan
 //
-, depgenflag= int // dep info generation
-, taggenflag= int // tagging info generation
+, depgen= int // dep info generation
+, taggen= int // tagging info generation
+//
+, pkgreloc= int // relocating packages
 //
 , jsonizeflag= int // level-2 syntax in JSON
 //
@@ -731,16 +745,23 @@ val () = pervasive_load (PATSHOME, "prelude/macrodef.sats")
 val () = stacst2_initialize () // internalizing some static consts
 val () = $CNSTR3.constraint3_initialize () // internalizing some maps
 //
-val () = pervasive_load (PATSHOME, "prelude/SATS/arith_prf.sats")
+(*
+//
+// HX: Primary
+//
+*)
+//
+val () =
+  pervasive_load (PATSHOME, "prelude/SATS/arith_prf.sats")
 //
 val () = pervasive_load (PATSHOME, "prelude/SATS/integer.sats")
-//
 val () = pervasive_load (PATSHOME, "prelude/SATS/pointer.sats")
+//
+val () = pervasive_load (PATSHOME, "prelude/SATS/integer_ptr.sats")
+val () = pervasive_load (PATSHOME, "prelude/SATS/integer_fixed.sats")
 //
 val () = pervasive_load (PATSHOME, "prelude/SATS/bool.sats")
 val () = pervasive_load (PATSHOME, "prelude/SATS/char.sats")
-val () = pervasive_load (PATSHOME, "prelude/SATS/integer_ptr.sats")
-val () = pervasive_load (PATSHOME, "prelude/SATS/integer_fixed.sats")
 val () = pervasive_load (PATSHOME, "prelude/SATS/float.sats")
 //
 val () = pervasive_load (PATSHOME, "prelude/SATS/memory.sats")
@@ -759,10 +780,19 @@ val () = pervasive_load (PATSHOME, "prelude/SATS/gorder.sats")
 val () = pervasive_load (PATSHOME, "prelude/SATS/gnumber.sats")
 //
 (*
-val () = pervasive_load (PATSHOME, "prelude/SATS/unsafe.sats") // manual loading
+//
+// manual loading
+//
+val () = pervasive_load (PATSHOME, "prelude/SATS/unsafe.sats")
 *)
 //
 val () = pervasive_load (PATSHOME, "prelude/SATS/checkast.sats")
+//
+(*
+//
+// HX: Secondary
+//
+*)
 //
 val () = pervasive_load (PATSHOME, "prelude/SATS/list.sats")
 val () = pervasive_load (PATSHOME, "prelude/SATS/list_vt.sats")
@@ -815,8 +845,6 @@ extern
 fun do_taggen
   (state: &cmdstate, given: string, d0cs: d0eclist): void
 //
-(* ****** ****** *)
-
 implement
 do_depgen
   (state, given, d0cs) = let
@@ -825,7 +853,7 @@ do_depgen
 in
   $DEPGEN.fprint_entlst (filr, given, ents)
 end // end of [do_depgen]
-
+//
 implement
 do_taggen
   (state, given, d0cs) = let
@@ -834,7 +862,26 @@ do_taggen
 in
   $TAGGEN.fprint_entlst (filr, given, ents)
 end // end of [do_taggen]
-
+//
+(* ****** ****** *)
+//
+extern
+fun do_pkgreloc
+  (state: &cmdstate, given: string, d1cs: d1eclist): void
+//
+implement
+do_pkgreloc
+  (state, given, d1cs) = let
+//
+val itms =
+  $TRENV1.the_pkgrelocitmlst_get ()
+//
+val filr = outchan_get_filr (state.outchan)
+//
+in
+  $TRENV1.fprint_pkgrelocitmlst (filr, itms)
+end // end of [do_pkgreloc]
+//
 (* ****** ****** *)
 //
 extern
@@ -898,8 +945,11 @@ end // end of [local]
 (* ****** ****** *)
 //
 extern
+fun do_trans1
+  (state: &cmdstate, given: string, d0cs: d0eclist): d1eclist
+extern
 fun do_trans12
-  (given: string, d0cs: d0eclist): d2eclist
+  (state: &cmdstate, given: string, d0cs: d0eclist): d2eclist
 extern
 fun do_trans123
   (state: &cmdstate, given: string, d0cs: d0eclist): d3eclist
@@ -914,8 +964,8 @@ fun do_transfinal
 (* ****** ****** *)
 
 implement
-do_trans12
-  (given, d0cs) = let
+do_trans1
+  (state, given, d0cs) = let
 //
 val d1cs =
   $TRANS1.d0eclist_tr_errck (d0cs)
@@ -925,17 +975,29 @@ val () = $TRANS1.trans1_finalize ()
 val (
 ) = if isdebug() then
 {
-  val () = println! (
+  val () = prerrln! (
     "The 1st translation (fixity) of [", given, "] is successfully completed!"
   ) (* end of [val] *)
 } // end of [if] // end of [val]
+//
+in
+  d1cs
+end // end of [do_trans1]
+
+(* ****** ****** *)
+
+implement
+do_trans12
+  (state, given, d0cs) = let
+//
+val d1cs = do_trans1 (state, given, d0cs)
 //
 val d2cs = $TRANS2.d1eclist_tr_errck (d1cs)
 //
 val (
 ) = if isdebug() then
 {
-  val () = println! (
+  val () = prerrln! (
     "The 2nd translation (binding) of [", given, "] is successfully completed!"
   ) (* end of [val] *)
 } // end of [if] // end of [val]
@@ -950,7 +1012,8 @@ implement
 do_trans123
   (state, given, d0cs) = let
 //
-val d2cs = do_trans12 (given, d0cs)
+val d2cs = do_trans12 (state, given, d0cs)
+//
 val () = $TRENV3.trans3_env_initialize ()
 val d3cs = $TRANS3.d2eclist_tr_errck (d2cs)
 //
@@ -959,7 +1022,7 @@ val () = {
   val () = print "do_trans123: the_s3itmlst =\n"
   val () = $TRENV3.fprint_the_s3itmlst (stdout_ref)
   val () = print_newline ()
-} // end of [val]
+} (* end of [val] *)
 *)
 //
 val () = 
@@ -983,7 +1046,7 @@ val () =
 val (
 ) = if isdebug() then
 {
-  val () = println! (
+  val () = prerrln! (
     "The 3rd translation (type-checking) of [", given, "] is successfully completed!"
   ) (* end of [val] *)
 } // end of [if] // end of [val]
@@ -1001,7 +1064,7 @@ do_trans1234
 val d3cs =
   do_trans123 (state, given, d0cs)
 // end of [d3cs]
-val hids = $TYER.d3eclist_tyer (d3cs)
+val hids = $TYER.d3eclist_tyer_errck (d3cs)
 //
 (*
 val () = fprint_hideclist (stdout_ref, hids)
@@ -1010,7 +1073,7 @@ val () = fprint_hideclist (stdout_ref, hids)
 val (
 ) = if isdebug() then
 {
-  val () = println! (
+  val () = prerrln! (
     "The 4th translation (type/proof-erasing) of [", given, "] is successfully completed!"
   ) (* end of [val] *)
 } // end of [if] // end of [val]
@@ -1028,8 +1091,20 @@ in
 //
 case+ 0 of
 | _ when
+    state.pkgreloc > 0 => let
+    val d1cs =
+      do_trans1 (state, given, d0cs)
+    // end of [val]
+  in
+    do_pkgreloc (state, given, d1cs)
+  end // end of [when ...]
+| _ when
     state.jsonizeflag = 2 => let
-    val d2cs = do_trans12 (given, d0cs) in do_jsonize_2 (state, given, d2cs)
+    val d2cs =
+      do_trans12 (state, given, d0cs)
+    // end of [val]
+  in
+    do_jsonize_2 (state, given, d2cs)
   end // end of [when ...]
 | _ when
     state.typecheckflag > 0 => let
@@ -1078,9 +1153,9 @@ case+ arglst of
         val d0cs = parse_from_stdin_toplevel (stadyn)
 //
         var istrans: bool = true
-        val isdepgen = state.depgenflag > 0
+        val isdepgen = state.depgen > 0
         val () = if isdepgen then istrans := false
-        val istaggen = state.taggenflag > 0
+        val istaggen = state.taggen > 0
         val () = if istaggen then istrans := false
 //
         val given = "<STDIN>"
@@ -1131,9 +1206,9 @@ case+ arg of
         val d0cs = parse_from_givename_toplevel (stadyn, given, state.infil)
 //
         var istrans: bool = true
-        val isdepgen = state.depgenflag > 0
+        val isdepgen = state.depgen > 0
         val () = if isdepgen then istrans := false
-        val istaggen = state.taggenflag > 0
+        val istaggen = state.taggen > 0
         val () = if istaggen then istrans := false
 //
         val () = if isdepgen then do_depgen (state, given, d0cs)
@@ -1224,8 +1299,7 @@ case+ key of
 //
 | "-tc" => (state.typecheckflag := 1)
 //
-| "-dep" => (state.depgenflag := 1)
-| "-tag" => (state.taggenflag := 1)
+| "-dep" => (state.depgen := 1) | "-tag" => (state.taggen := 1)
 //
 | _ when
     is_DATS_flag (key) => let
@@ -1289,27 +1363,32 @@ case+ key of
 | "--output-w" => {
     val () = state.outmode := file_mode_w
     val () = state.waitkind := WTKoutput ()
-  }
+  } // end of [--output-w]
 | "--output-a" => {
     val () = state.outmode := file_mode_a
     val () = state.waitkind := WTKoutput ()
-  }
+  } // end of [--output-a]
 //
-| "--static" =>
-    state.waitkind := WTKinput_sta
-| "--dynamic" =>
-    state.waitkind := WTKinput_dyn
+| "--static" => {
+    val () = state.waitkind := WTKinput_sta
+  } // end of [--static]
+| "--dynamic" => {
+    val () = state.waitkind := WTKinput_dyn
+  } // end of [--dynamic]
 //
-| "--typecheck" => {
-    val () = state.typecheckflag := 1
-  } // end of [--typecheck]
+| "--typecheck" => (state.typecheckflag := 1)
 //
 | "--gline" => {
     val () = $GLOB.the_DEBUGATS_dbgline_set (1)
-  } // end of [--gline]
+  } // end of [--gline] // mostly for debugging
 //
-| "--depgen" => (state.depgenflag := 1)
-| "--taggen" => (state.taggenflag := 1)
+| "--depgen" => (state.depgen := 1)
+| "--taggen" => (state.taggen := 1)
+//
+| "--pkgreloc" => {
+    val () = state.pkgreloc := 1
+    val () = $GLOB.the_PKGRELOC_set (1)
+  } (* end of [--pkgreloc] *)
 //
 | "--jsonize-2" => (state.jsonizeflag := 2)
 //
@@ -1343,7 +1422,7 @@ main (
 ) = () where {
 //
 val () =
-println! ("Hello from ATS2(ATS/Postiats)!")
+prerrln! ("Hello from ATS2(ATS/Postiats)!")
 (*
 val ((*void*)) = patsopt_version (stdout_ref)
 *)
@@ -1357,6 +1436,12 @@ val (
 ) = set () where
 {
   extern fun set (): void = "mac#patsopt_PATSHOMERELOC_set"
+} // end of [where] // end of [val]
+//
+val (
+) = set () where
+{ 
+  extern fun set (): void = "mac#patsopt_ATSPKGRELOCROOT_set"
 } // end of [where] // end of [val]
 //
 val PATSHOME = let
@@ -1403,8 +1488,10 @@ state = @{
 , outmode= file_mode_w
 , outchan= OUTCHANref (stdout_ref)
 //
-, depgenflag= 0 // dep info generation
-, taggenflag= 0 // tagging info generation
+, depgen= 0 // dep info generation
+, taggen= 0 // tagging info generation
+//
+, pkgreloc= 0 // for package relocation
 //
 , jsonizeflag= 0 // JSONizing syntax trees
 //
@@ -1415,7 +1502,9 @@ state = @{
 , nerror= 0 // number of accumulated errors
 } : cmdstate // end of [var]
 //
-val () = process_cmdline (state, arglst)
+val () = process_ATSPKGRELOCROOT ()
+//
+val ((*void*)) = process_cmdline (state, arglst)
 //
 } // end of [main]
 

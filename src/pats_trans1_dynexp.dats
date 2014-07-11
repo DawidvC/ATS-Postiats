@@ -32,6 +32,10 @@
 // Start Time: April, 2011
 //
 (* ****** ****** *)
+
+#include "./pats_params.hats"
+
+(* ****** ****** *)
 //
 staload
 ATSPRE = "./pats_atspre.dats"
@@ -164,7 +168,7 @@ in
   FXITMatm (d1e_app)
 end // end of [appf]
 
-in // in of [local]
+in (* in of [local] *)
 
 fn d1expitm_app
   (loc: location): d1expitm = fxitm_app (loc, appf)
@@ -175,7 +179,8 @@ end // end of [local]
 fn d1exp_get_loc (x: d1exp): location = x.d1exp_loc
 
 fn
-d1exp_make_opr (
+d1exp_make_opr
+(
   opr: d1exp, f: fxty
 ) : d1expitm = begin
 fxopr_make {d1exp} (
@@ -186,7 +191,8 @@ fxopr_make {d1exp} (
 end // end of [d1exp_make_opr]
 
 fn
-d1expitm_backslash (
+d1expitm_backslash
+(
   loc_opr: location
 ) : d1expitm = begin
 fxopr_make_backslash {d1exp} (
@@ -202,7 +208,9 @@ fn d1expitm_underscore
 
 (* ****** ****** *)
 
-fn s0expdarg_tr (
+fun
+s0expdarg_tr
+(
   d0e: d0exp
 ) : s1exparg = let
   val d1e = d0exp_tr (d0e)
@@ -213,9 +221,7 @@ case+ d1e.d1exp_node of
 | _ => let
     val loc = d0e.d0exp_loc
     val () = prerr_interror_loc (loc)
-    val () = prerr ": s0expdarg_tr: d1e = "
-    val () = prerr_d1exp (d1e)
-    val () = prerr_newline ()
+    val () = prerrln! (": s0expdarg_tr: d1e = ", d1e)
   in
     $ERR.abort {s1exparg} ()
   end // end of [_]
@@ -228,8 +234,18 @@ fn s0expdarglst_tr
 
 (* ****** ****** *)
 
+#if (FUNCLO_DEFAULT = 1)
+macdef FUNCLOdefault = FUNCLOcloptr
+#endif
+#if (FUNCLO_DEFAULT = ~1)
+macdef FUNCLOdefault = FUNCLOcloref
+#endif
+
+(* ****** ****** *)
+
 implement
-d0exp_tr_lams_dyn (
+d0exp_tr_lams_dyn
+(
   lamknd, locopt, fcopt, lin, args, res, efcopt, d0e_body
 ) = let
 //
@@ -241,25 +257,36 @@ fun aux (
 ) :<cloref1> d1exp = begin
 //
 case+ args of
-| list_cons (arg, args) => let
+| list_cons
+    (arg, args) => let
     val loc_arg = arg.f0arg_loc
-    val d1e_body = aux (lamknd, args, d1e_body, flag1) where {
+    val d1e_body =
+    aux (
+      lamknd, args, d1e_body, flag1
+    ) where {
+      val f0a = arg.f0arg_node
       val flag1 = (
-        case+ arg.f0arg_node of F0ARGdyn _ => flag + 1 | _ => flag
+        case+ f0a of F0ARGdyn _ => flag+1 | _ => flag
       ) : int // end of [val]
-    } // end of [where]
+    } (* end of [where] *)
     val loc_body = d1e_body.d1exp_loc
-    val loc = (case+ locopt of
+    val loc = (
+      case+ locopt of
       | Some loc => loc | None () => loc_arg + loc_body
     ) : location // end of [val]
   in
     case+ arg.f0arg_node of
+//
     | F0ARGsta1 qua =>
-        d1exp_lam_sta_syn (loc, loc_arg, s0qualst_tr qua, d1e_body)
+      d1exp_lam_sta_syn
+        (loc, loc_arg, s0qualst_tr qua, d1e_body)
       // end of [F0ARGsta1]
+//
     | F0ARGsta2 s0v =>
-        d1exp_lam_sta_ana (loc, loc_arg, s0vararg_tr s0v, d1e_body)
+      d1exp_lam_sta_ana
+        (loc, loc_arg, s0vararg_tr s0v, d1e_body)
       // end of [F0ARGsta2]
+//
     | F0ARGdyn p0t when flag = 0 => let
         val p1t = p0at_tr p0t
         val isbox = lamkind_isbox (lamknd)
@@ -270,22 +297,23 @@ case+ args of
           d1exp_laminit_dyn (loc, lin, p1t, d1e_body)
         // end of [if]
       end // end of [F0ARGdyn when ...]
+//
     | F0ARGdyn p0t (* flag > 0 *) => let
         val p1t = p0at_tr (p0t)
-        val d1e_body = // linear closure
-(*
-** HX: funcloknd is set to FUNCLOcloptr if no annotation is available
-*)
-          d1exp_ann_funclo_opt (loc_body, d1e_body, FUNCLOcloptr)
+        val fc0 = FUNCLOdefault(*mac*)
+        val d1e_body =
+          d1exp_ann_funclo_opt (loc_body, d1e_body, fc0)
         // end of [val]
       in
         d1exp_lam_dyn (loc, lin, p1t, d1e_body)
       end // end of [F0ARGdyn]
+//
     | F0ARGmet s0es =>
         d1exp_lam_met (loc, loc_arg, s0explst_tr s0es, d1e_body)
       // end of [F0ARGmet]
   end // end of [list_cons]
-| list_nil () => d1e_body
+//
+| list_nil ((*void*)) => d1e_body
 //
 end (* end of [aux] *)
 //
@@ -301,14 +329,18 @@ val d1e_body = (case+ res of
   | None () => d1e_body // end of [None]
 ) : d1exp
 //
-val d1e_body = (case+ efcopt of
+val d1e_body =
+(
+  case+ efcopt of
   | Some efc => begin
       d1exp_ann_effc (d1e_body.d1exp_loc, d1e_body, efc)
     end // end of [Some]
   | None () => d1e_body
 ) : d1exp // end of [val]
 //
-val d1e_body = (case+ fcopt of
+val d1e_body =
+(
+  case+ fcopt of
   | Some fc => begin
       d1exp_ann_funclo (d1e_body.d1exp_loc, d1e_body, fc)
     end // end of [Some]
@@ -323,7 +355,9 @@ end // end of [d0exp_tr_lams_dyn]
 
 implement
 termination_metric_check
-  (loc, ismet, efcopt) = case+ efcopt of
+  (loc, ismet, efcopt) = let
+in
+  case+ efcopt of
   | Some efc => let
       val okay = (
         if ismet then true else effcst_contain_ntm (efc)
@@ -331,15 +365,14 @@ termination_metric_check
     in
       if ~okay then let
         val () = prerr_error1_loc (loc)
-        val () = prerr ": a termination metric is missing"
-        val () = prerr_newline ()
-        val () = the_trans1errlst_add (T1E_termination_metric_check (loc))
+        val () = prerrln! (": a termination metric is missing")
+        val () = the_trans1errlst_add (T1E_termination_metric_check(loc))
       in
         // nothing
       end // end of [if]
     end // end of [Some]
-  | None () => () // end of [None]
-// end of [termination_metric_check]
+  | None ((*void*)) => () // end of [None]
+end // end of [termination_metric_check]
 
 (* ****** ****** *)
 
@@ -439,14 +472,13 @@ fn d0exp_tr_errmsg_opr
   (d0e0: d0exp): d1exp = let
   val loc0 = d0e0.d0exp_loc
   val () = prerr_error1_loc (loc0)
-  val () = prerr ": the operator needs to be applied."
-  val () = prerr_newline ()
-  val () = the_trans1errlst_add (T1E_d0exp_tr (d0e0))
+  val () = prerrln! (": the operator needs to be applied.")
+  val () = the_trans1errlst_add (T1E_d0exp_tr(d0e0))
 in
   d1exp_errexp (loc0)
 end // end of [d0exp_tr_errmsg_opr]
 
-in // in of [local]
+in (* in of [local] *)
 
 implement
 d0exp_tr (d0e0) = let

@@ -15,8 +15,17 @@ staload _(*ERRNO*) = "libc/DATS/errno.dats"
 
 (* ****** ****** *)
 
+staload DIRENT = "libc/SATS/dirent.sats"
+staload _(*DIRENT*) = "libc/DATS/dirent.dats"
+
+(* ****** ****** *)
+
 staload MATH = "libc/SATS/math.sats"
 staload _(*MATH*) = "libc/DATS/math.dats"
+
+(* ****** ****** *)
+
+staload SIGNAL = "libc/SATS/signal.sats"
 
 (* ****** ****** *)
 

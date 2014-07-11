@@ -68,8 +68,6 @@ val HITNAM_BOXED =
 //
 val HITNAM_FUNPTR =
   HITNAM (1(*ptr*), 1(*fin*), "atstype_funptr")
-val HITNAM_CFUNPTR =
-  HITNAM (1(*ptr*), 1(*fin*), "atstype_cfunptr")
 val HITNAM_CLOPTR =
   HITNAM (1(*ptr*), 1(*fin*), "atstype_cloptr")
 //
@@ -123,6 +121,8 @@ val HITNAM_VARARG =
 //
 val HITNAM_S2EXP =
   HITNAM (0(*non*), 0(*tmp*), "postiats_s2exp")
+val HITNAM_S2ZEXP =
+  HITNAM (0(*non*), 0(*tmp*), "postiats_s2zexp")
 //
 (* ****** ****** *)
 
@@ -131,7 +131,9 @@ hisexp_get_boxknd
   (hse) = let
 in
 //
-case+ hse.hisexp_node of
+case+
+hse.hisexp_node of
+//
 | HSEtyrec (knd, _) =>
   (
     if tyreckind_is_boxed (knd) then 1 else 0
@@ -262,12 +264,19 @@ in '{
 
 (* ****** ****** *)
 
+local
+//
+val ATSTYCLO_TOP =
+  $SYM.symbol_make_string ("atstyclo_top")
+//
+in (* in-of-local *)
+
 implement
-hisexp_tyclo = let
-  val sym = $SYM.symbol_empty
-in '{
-  hisexp_name= HITNAM_TYCLO, hisexp_node= HSEtyabs (sym)
-} end // end of [hisexp_tyclo]
+hisexp_clotyp = '{
+  hisexp_name= HITNAM_TYCLO, hisexp_node= HSEtyabs (ATSTYCLO_TOP)
+} (* [hisexp_clotyp] *)
+
+end (* end of [local] *)
 
 (* ****** ****** *)
 
@@ -453,13 +462,6 @@ in '{
 (* ****** ****** *)
 
 implement
-hisexp_cfun (fl) =
-  hisexp_make_node (HITNAM_CFUNPTR, HSEcfun (fl))
-// end of [hisexp_cfun]
-
-(* ****** ****** *)
-
-implement
 hisexp_tyarr (hse, dim) =
   hisexp_make_node (HITNAM_TYARR, HSEtyarr (hse, dim))
 // end of [hisexp_tyarr]
@@ -522,6 +524,13 @@ end // end of [hisexp_tyvar]
 (* ****** ****** *)
 
 implement
+hisexp_tyclo (flab) =
+  hisexp_make_node (HITNAM_TYCLO, HSEtyclo (flab))
+// end of [hisexp_tyclo]
+
+(* ****** ****** *)
+
+implement
 hisexp_vararg (s2e) = '{
   hisexp_name= HITNAM_VARARG, hisexp_node= HSEvararg (s2e)
 } // end of [hisexp_vararg]
@@ -532,6 +541,11 @@ implement
 hisexp_s2exp (s2e) =
   hisexp_make_node (HITNAM_S2EXP, HSEs2exp (s2e))
 // end of [hisexp_s2exp]
+
+implement
+hisexp_s2zexp (s2ze) =
+  hisexp_make_node (HITNAM_S2ZEXP, HSEs2zexp (s2ze))
+// end of [hisexp_s2zexp]
 
 (* ****** ****** *)
 
@@ -560,8 +574,6 @@ of // of [case]
       then hisexp_fun (fc, hses_arg, hse_res) else hse0
     // end of [if]
   end // end of [HSEfun]
-//
-| HSEcfun _ => hse0
 //
 | HSEapp (hse_fun, hses_arg) => let
     val f0 = flag
@@ -623,6 +635,8 @@ of // of [case]
     | ~None_vt () => hse0
   end // end of [HSEtyvar]
 //
+| HSEtyclo (flab) => hse0
+//
 | HSEvararg (s2e) => let
     val f0 = flag
     val s2e = s2exp_subst_flag (sub, s2e, flag)
@@ -636,6 +650,13 @@ of // of [case]
   in
     if flag > f0 then hisexp_s2exp (s2e) else hse0
   end // end of [HSEs2exp]
+//
+| HSEs2zexp (s2ze) => let
+    val f0 = flag
+    val s2ze = s2zexp_subst_flag (sub, s2ze, flag)
+  in
+    if flag > f0 then hisexp_s2zexp (s2ze) else hse0
+  end // end of [HSEs2zexp]
 //
 | _ => hse0
 //

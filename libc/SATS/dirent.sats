@@ -39,7 +39,6 @@
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libc"
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
 #define ATS_EXTERN_PREFIX "atslib_" // prefix for external names
 
 (* ****** ****** *)
@@ -72,11 +71,14 @@ viewdef DIR_v (l:addr) = DIR_view (l)
 
 (* ****** ****** *)
 
-praxi DIRptr_free_null (dirp: DIRptr (null)): void
+praxi
+DIRptr_free_null (dirp: DIRptr (null)): void
 
 (* ****** ****** *)
 
-castfn DIRptr2ptr {l:addr} (dirp: !DIRptr l):<> ptr (l)
+castfn
+DIRptr2ptr{l:addr} (dirp: !DIRptr l):<> ptr (l)
+overload ptrcast with DIRptr2ptr
 
 (* ****** ****** *)
 

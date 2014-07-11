@@ -34,6 +34,7 @@
 (* ****** ****** *)
 //
 // HX: shared by hashtbl_chain
+// HX: shared by hashtbl_linprb
 //
 (* ****** ****** *)
 //
@@ -167,11 +168,6 @@ end // end of [hashtbl_remove]
 
 (* ****** ****** *)
 
-implement{}
-fprint_hashtbl$sep (out) = fprint (out, "; ")
-implement{}
-fprint_hashtbl$mapto (out) = fprint (out, "->")
-
 implement
 {key,itm}
 fprint_hashtbl
@@ -195,6 +191,13 @@ end // end of [fprint_hashtbl]
 
 (* ****** ****** *)
 
+implement{}
+fprint_hashtbl$sep (out) = fprint (out, "; ")
+implement{}
+fprint_hashtbl$mapto (out) = fprint (out, "->")
+
+(* ****** ****** *)
+
 implement
 {key,itm}
 hashtbl_foreach
@@ -202,6 +205,22 @@ hashtbl_foreach
   var env: void = () in
   hashtbl_foreach_env<key,itm><void> (tbl, env)
 end // end of [hashtbl_foreach]
+
+(* ****** ****** *)
+
+implement
+{key,itm}
+hashtbl_listize
+  (tbl) = let
+//
+vtypedef ki2 = @(key, itm)
+//
+implement
+hashtbl_flistize$fopr<key,itm><ki2> (k, x) = @(k, x)
+//
+in
+  hashtbl_flistize<key,itm><ki2> (tbl)
+end // end of [hashtbl_listize]
 
 (* ****** ****** *)
 

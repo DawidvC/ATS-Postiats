@@ -16,6 +16,8 @@ mul_scalar_matrix
 , m: size_t m, n: size_t n
 ) : void // end of [mul_scalar_matrix]
 
+(* ****** ****** *)
+
 implement{a}
 mul_scalar_matrix
   (c, A, m, n) = let
@@ -26,6 +28,10 @@ matrix_foreach$fwork<a><env> (x, env) = x := gmul_val<a> (c, x)
 in
   matrix_foreach<a> (A, m, n)
 end // end of [mul_scalar_matrix]
+
+(* ****** ****** *)
+
+implement main () = 0
 
 (* ****** ****** *)
 

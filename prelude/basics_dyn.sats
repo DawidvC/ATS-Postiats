@@ -6,19 +6,19 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2010-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-** 
+**
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-** 
+**
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -27,7 +27,8 @@
 
 (* ****** ****** *)
 //
-// Author of the file: Hongwei Xi (hwxi AT cs DOT bu DOT edu)
+// Author of the file:
+// Hongwei Xi (gmhwxiATgmailDOTcom)
 // Start Time: September, 2011
 //
 (* ****** ****** *)
@@ -60,16 +61,22 @@ val false_bool : bool (false) = "mac#atsbool_false" // = 0
 //
 // HX: [false] implies all
 //
-prfun false_elim {X:prop | false} (): X
+prfun false_elim{X:prop | false} ((*void*)): X
 //
 (* ****** ****** *)
 //
 praxi
-lemma_subcls_reflexive {c:cls} (): [c <= c] void
+lemma_subcls_reflexive{c:cls} ((*void*)): [c <= c] void
 praxi
 lemma_subcls_transitive
   {c1,c2,c3:cls | c1 <= c2; c2 <= c3} (): [c1 <= c3] void
 //
+(* ****** ****** *)
+
+praxi praxi_int{i:int} ((*void*)): int (i)
+praxi praxi_bool{b:bool} ((*void*)): bool (b)
+praxi praxi_ptr{l:addr} ((*void*)): ptr (l)
+
 (* ****** ****** *)
 
 dataprop
@@ -104,12 +111,12 @@ prfun eqbool_make_bool {x:bool} (x: bool (x)): [y:bool] EQBOOL (x, y)
 //
 (* ****** ****** *)
 
-prfun prop_verify {b:bool | b} ():<prf> void
-prfun prop_verify_and_add {b:bool | b} ():<prf> [b] void
+prfun prop_verify{b:bool | b} ():<prf> void
+prfun prop_verify_and_add{b:bool | b} ():<prf> [b] void
 
 (* ****** ****** *)
 
-prfun pridentity {v:view} (pf: !INV(v)): void
+prfun pridentity{v:view} (pf: !INV(v)): void
 
 (* ****** ****** *)
 
@@ -125,9 +132,12 @@ viewptr_match
 // end of [viewptr_match]
 
 (* ****** ****** *)
-
+//
 val{a:vt@ype} sizeof : size_t (sizeof(a))
-
+//
+praxi
+lemma_sizeof{a:vt@ype} (): [sizeof(a) >= 0] void
+//
 (* ****** ****** *)
 
 praxi topize {a:t@ype} (x: !INV(a) >> a?): void
@@ -142,7 +152,7 @@ castfn dataget {a:vt@ype} (x: !INV(a) >> a): a?!
 //
 praxi
 mfree_gc_v_elim
-  {l:addr} (pf: mfree_gc_v l): void
+  {l:addr} (pf: mfree_gc_v l):<prf> void
 // end of [mfree_gc_v_elim]
 
 (* ****** ****** *)
@@ -156,14 +166,24 @@ mfree_gcngc_v_nullify
 (* ****** ****** *)
 //
 fun
-cloptr_free{a:t0p}
-  (pclo: cloptr (a)):<!wrt> void = "mac#%"
+cloptr_free
+  {a:t0p} (pclo: cloptr (a)):<!wrt> void = "mac#%"
 //
 (* ****** ****** *)
 //
+fun{a:t0p}
+lazy_force (lazyval: lazy (a)):<!laz> a
+fun{a:vt0p}
+lazy_vt_force (lazyval: lazy_vt (a)): (a)
+//
+(* ****** ****** *)
+//
+// HX-2013:
+// macro implemented in [pats_ccomp_instrset]
+//
 fun
-lazy_vt_free{a:vt0p}
-  (lazyval: lazy_vt (a)):<!wrt> void = "mac#%"
+lazy_vt_free
+  {a:vt0p} (lazyval: lazy_vt (a)):<!wrt> void = "mac#%"
 overload ~ with lazy_vt_free
 //
 (* ****** ****** *)
@@ -179,7 +199,7 @@ read_getval // copy out a non-linear value
 // end of [read_getval]
 
 praxi
-read_takeout {v:view}
+read_takeout{v:view}
   (pf: !v >> READOUT (v, s)): #[s:int] READ (v, s, 0)
 // end of [read_takeout]
 praxi
@@ -241,7 +261,7 @@ the_null_ptr : ptr (null) = "mac#atsptr_null"
 (* ****** ****** *)
 
 praxi
-lemma_addr_param {l:addr} (): [l >= null] void
+lemma_addr_param{l:addr} (): [l >= null] void
 
 (* ****** ****** *)
 

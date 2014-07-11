@@ -158,13 +158,13 @@ case+
 //
 | D3Cprvardecs _ => hidecl_none (loc0) // proof vars
 //
-| D3Cinclude (d3cs) => let
-    val hids = d3eclist_tyer (d3cs) in hidecl_include (loc0, hids)
+| D3Cinclude (knd, d3cs) => let
+    val hids = d3eclist_tyer (d3cs) in hidecl_include (loc0, knd, hids)
   end // end of [D3Cinclude]
 //
 | D3Cstaload
   (
-    fname, flag, fenv, loaded
+    idopt, fname, flag, fenv, loaded
   ) => let
     val-Some (d3cs) =
       $TRENV3.filenv_get_d3eclistopt (fenv)
@@ -192,17 +192,26 @@ case+
       end // end of [Some]
     ) : void // end of [val]
   in
-    hidecl_staload (loc0, fname, flag, fenv, loaded)
+    hidecl_staload (loc0, idopt, fname, flag, fenv, loaded)
   end // end of [D3Cstaload]
 //
-| D3Cdynload (fil) => hidecl_dynload (loc0, fil)
+| D3Cstaloadloc
+    (pfil, nspace, fenv) => let
+    val-Some (d3cs) =
+      $TRENV3.filenv_get_d3eclistopt (fenv)
+    val hids = d3eclist_tyer (d3cs)
+  in
+    hidecl_staloadloc (loc0, pfil, nspace, hids)
+  end // end of [D3Cstaloadloc]
+//
+| D3Cdynload (cfil) => hidecl_dynload (loc0, cfil)
 //
 | D3Clocal
-    (head, body) => let
-    val head = d3eclist_tyer (head)
-    val body = d3eclist_tyer (body)
+    (d3cs_head, d3cs_body) => let
+    val hids_head = d3eclist_tyer (d3cs_head)
+    val hids_body = d3eclist_tyer (d3cs_body)
   in
-    hidecl_local (loc0, head, body)
+    hidecl_local (loc0, hids_head, hids_body)
   end // end of [D3Clocal]
 //
 (*
@@ -249,6 +258,15 @@ val hids = list_vt_reverse<hidecl> (hids)
 in
   list_of_list_vt (hids)
 end // end of [d3eclist_tyer]
+
+(* ****** ****** *)
+
+implement
+d3eclist_tyer_errck
+  (d3cs) = hids where {
+  val hids = d3eclist_tyer (d3cs)
+  val () = the_trans4errlst_finalize ()
+} // end of [d3eclist_tyer_errck]
 
 (* ****** ****** *)
 
@@ -312,7 +330,8 @@ fun f3undec_tyer
 //
   val isprf = d3exp_is_prf (d3e_def)
 //
-  val () = if isprf then let
+  val ((*void*)) =
+  if isprf then let
     val () = prerr_error4_loc (loc)
     val () = prerr ": [fun] should be replaced with [prfun] as this is a proof binding."
     val () = prerr_newline ()
@@ -377,7 +396,8 @@ fun v3aldec_tyer
   val hip = p3at_tyer (v3d.v3aldec_pat)
   val d3e_def = v3d.v3aldec_def
   val isprf = d3exp_is_prf (d3e_def)
-  val () = if isprf then let
+  val ((*void*)) =
+  if isprf then let
     val () = prerr_error4_loc (loc)
     val () = prerr ": [val] should be replaced with [prval] as this is a proof binding."
     val () = prerr_newline ()
@@ -497,7 +517,7 @@ case+ x.hidecl_node of
   end // end of [HIDimpdec]
 //
 | HIDinclude
-    (xs_incl) => auxlst (map, xs_incl)
+    (knd, xs_incl) => auxlst (map, xs_incl)
   (* end of [HIDinclude] *)
 //
 | HIDlocal
@@ -554,7 +574,7 @@ case+ x.hidecl_node of
   end // end of [HIDfundecs]
 //
 | HIDinclude
-    (xs_incl) => auxlst (map, xs_incl)
+    (knd, xs_incl) => auxlst (map, xs_incl)
   (* end of [HIDinclude] *)
 //
 | HIDlocal

@@ -50,6 +50,7 @@ staload "./pats_utils.sats"
 //
 static char *patsopt_PATSHOME = (char*)0 ;
 static char *patsopt_PATSHOMERELOC = (char*)0 ;
+static char *patsopt_ATSPKGRELOCROOT = (char*)0 ;
 extern char *getenv (const char *name) ; // [stdlib.h]
 //
 ATSextfun()
@@ -77,6 +78,17 @@ patsopt_PATSHOMERELOC_set () {
   if (!patsopt_PATSHOMERELOC) patsopt_PATSHOMERELOC = getenv ("ATSHOMERELOC") ;
   return ;
 } // end of [patsopt_PATSHOMERELOC_set]
+//
+ATSextfun()
+ats_ptr_type
+patsopt_ATSPKGRELOCROOT_get () {
+  return patsopt_ATSPKGRELOCROOT ; // optional string
+} // end of [patsopt_ATSPKGRELOCROOR_get]
+ATSextfun()
+ats_void_type
+patsopt_ATSPKGRELOCROOT_set () {
+  patsopt_ATSPKGRELOCROOT = getenv ("ATSPKGRELOCROOT") ; return ;
+} // end of [patsopt_ATSPKGRELOCROOT_set]
 //
 %} // end of [%{^]
 
@@ -177,7 +189,10 @@ end // end of [string_test_sffx]
 
 local
 
-staload STDLIB = "libc/SATS/stdlib.sats"
+staload
+STDLIB = "libc/SATS/stdlib.sats"
+
+(* ****** ****** *)
 
 fun
 llint_make_string_sgn

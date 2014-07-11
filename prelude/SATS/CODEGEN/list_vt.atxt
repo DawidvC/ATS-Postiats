@@ -95,39 +95,39 @@ list_vt_cast
   list_vt_cons(x1, list_vt_cons (x2, list_vt_nil()))
 
 #atscode_separator()
+
+fun{x:vt0p}
+list_vt_make_sing (x: x):<!wrt> list_vt (x, 1)
+fun{x:vt0p}
+list_vt_make_pair (x1: x, x2: x):<!wrt> list_vt (x, 2)
+
+#atscode_separator()
 //
 fun{x:vt0p}
 print_list_vt (xs: !List_vt (INV(x))): void
 fun{x:vt0p}
 prerr_list_vt (xs: !List_vt (INV(x))): void
 //
-fun{}
-fprint_list_vt$sep (out: FILEref): void
 fun{x:vt0p}
 fprint_list_vt
   (out: FILEref, xs: !List_vt (INV(x))): void
+fun{} fprint_list_vt$sep (out: FILEref): void
+//
 fun{x:vt0p}
 fprint_list_vt_sep (
   out: FILEref, xs: !List_vt (INV(x)), sep: NSH(string)
 ) : void // end of [fprint_list_vt_sep]
 //
-overload print with print_list_vt
-overload prerr with prerr_list_vt
-overload fprint with fprint_list_vt
-overload fprint with fprint_list_vt_sep
-//
 #atscode_separator()
-
+//
 fun{x:vt0p}
 list_vt_is_nil
   {n:int} (xs: !list_vt (INV(x), n)):<> bool (n==0)
-overload iseqz with list_vt_is_nil
-
+//
 fun{x:vt0p}
 list_vt_is_cons
   {n:int} (xs: !list_vt (INV(x), n)):<> bool (n > 0)
-overload isneqz with list_vt_is_cons
-
+//
 #atscode_separator()
 
 fun{x:vt0p}
@@ -155,20 +155,7 @@ list_vt_uncons{n:pos}
 #atscode_separator()
 
 fun{x:vt0p}
-list_vt_length {n:int} (xs: !list_vt (INV(x), n)):<> int n
-overload length with list_vt_length
-
-#atscode_separator()
-
-fun{x:t0p}
-list_vt_copy {n:int}
-  (xs: !list_vt (INV(x), n)):<!wrt> list_vt (x, n)
-// end of [list_vt_copy]
-
-fun{x:vt0p}
-list_vt_copylin$copy (x: &RD(x)): x
-fun{x:vt0p}
-list_vt_copylin {n:int} (xs: !list_vt (INV(x), n)): list_vt (x, n)
+list_vt_length{n:int} (xs: !list_vt (INV(x), n)):<> int n
 
 #atscode_separator()
 
@@ -179,64 +166,81 @@ list_vt_getref_at
 // end of [list_vt_getref_at]
 
 #atscode_separator()
-
+//
 fun{x:t0p}
-list_vt_get_at {n:int}
+list_vt_get_at{n:int}
   (xs: !list_vt (INV(x), n), i: natLt n):<> x
-overload [] with list_vt_get_at
-
-#atscode_separator()
-
+//
 fun{x:t0p}
-list_vt_set_at {n:int}
+list_vt_set_at{n:int}
   (xs: !list_vt (INV(x), n), i: natLt n, x: x):<!wrt> void
-overload [] with list_vt_set_at
-
+//
 #atscode_separator()
 
 fun{x:vt0p}
-list_vt_exch_at {n:int}
+list_vt_exch_at{n:int}
   (xs: !list_vt (INV(x), n), i: natLt n, x: &x>>_):<!wrt> void
 // end of [list_vt_exch_at]
 
 #atscode_separator()
 
 fun{x:vt0p}
-list_vt_insert_at {n:int} (
+list_vt_insert_at{n:int}
+(
   xs: &list_vt (INV(x), n) >> list_vt (x, n+1), i: natLte n, x: x
 ) :<!wrt> void // end of [list_vt_insert_at]
 
 fun{x:vt0p}
-list_vt_takeout_at {n:int}
+list_vt_takeout_at{n:int}
   (xs: &list_vt (INV(x), n) >> list_vt (x, n-1), i: natLt n):<!wrt> x
 // end of [list_vt_takeout_at]
 
 #atscode_separator()
 
 fun{x:t0p}
-list_vt_free (xs: List_vt (INV(x))):<!wrt> void
-
-fun{x:vt0p}
-list_vt_freelin$clear
-  (x: &x >> x?):<!wrt> void
-fun{x:vt0p}
-list_vt_freelin (xs: List_vt (INV(x))):<!wrt> void
+list_vt_copy{n:int}
+  (xs: !list_vt (INV(x), n)):<!wrt> list_vt (x, n)
+// end of [list_vt_copy]
 
 #atscode_separator()
 
 fun{x:vt0p}
-list_vt_uninitize$clear (x: &x>>x?):<!wrt> void
+list_vt_copylin{n:int}
+  (xs: !list_vt (INV(x), n)):<!wrt> list_vt (x, n)
+fun{x:vt0p}
+list_vt_copylin$copy (x: &RD(x)): (x)
+
+#atscode_separator()
+
+fun{x:t0p}
+list_vt_free (xs: List_vt (INV(x))):<!wrt> void
+
+#atscode_separator()
+
+fun{x:vt0p}
+list_vt_freelin (xs: List_vt (INV(x))):<!wrt> void
+fun{x:vt0p}
+list_vt_freelin$clear (x: &x >> x?):<!wrt> void
+
+#atscode_separator()
+//
 fun{
 x:vt0p
-} list_vt_uninitize {n:int} (
+} list_vt_uninitize
+  {n:int} (
   xs: !list_vt (INV(x), n) >> list_vt (x?, n)
 ) :<!wrt> void // end of [list_vt_uninitize]
+//
+fun{x:vt0p}
+list_vt_uninitize$clear (x: &(x)>>x?):<!wrt> void
+//
 fun{
 x:vt0p
-} list_vt_uninitize_fun {n:int}{fe:eff} (
+} list_vt_uninitize_fun
+  {n:int}{fe:eff} (
   xs: !list_vt (INV(x), n) >> list_vt (x?, n), f: (&x>>x?) -<fe> void
 ) :<fe> void // end of [list_vt_uninitize_fun]
-
+//
 #atscode_separator()
 
 fun{
@@ -294,77 +298,103 @@ list_vt_concat
 #atscode_separator()
 
 fun{x:vt0p}
-list_vt_separate$pred (x: &RD(x)): bool
-fun{x:vt0p}
 list_vt_separate{n:int}
 (
   xs: &list_vt (INV(x), n) >> list_vt (x, n1)
 ) : \#[n1:nat|n1 <= n] list_vt (x, n-n1)
 
+fun{x:vt0p}
+list_vt_separate$pred (x: &RD(x)): bool
+
 #atscode_separator()
+
+fun{x:t0p}
+list_vt_filter{n:int}
+  (x: list_vt (INV(x), n)):<!wrt> listLte_vt (x, n)
+// end of [list_vt_filter]
 
 fun{x:t0p}
 list_vt_filter$pred (x: &RD(x)):<> bool
-fun{x:t0p}
-list_vt_filter
-  {n:int} (x: list_vt (INV(x), n)):<!wrt> listLte_vt (x, n)
-// end of [list_vt_filter]
 
 #atscode_separator()
-
+//
+fun{x:vt0p}
+list_vt_filterlin
+  {n:int} (list_vt (INV(x), n)):<!wrt> listLte_vt (x, n)
+//
 fun{x:vt0p}
 list_vt_filterlin$pred (x: &RD(x)):<> bool
 fun{x:vt0p}
 list_vt_filterlin$clear (x: &x>>x?):<!wrt> void
+//
+#atscode_separator()
+
 fun{x:vt0p}
-list_vt_filterlin
-  {n:int} (x: list_vt (INV(x), n)):<!wrt> listLte_vt (x, n)
-// end of [list_vt_filterlin]
+list_vt_app (xs: !List_vt (INV(x))): void
+fun{x:vt0p}
+list_vt_app$fwork (x: &x >> _): void
 
 #atscode_separator()
 
+fun{x:vt0p}
+list_vt_appfree (xs: List_vt (INV(x))): void
+fun{x:vt0p}
+list_vt_appfree$fwork (x: &x >> x?): void
+
+#atscode_separator()
+
+fun{
+x:vt0p}{y:vt0p
+} list_vt_map{n:int} (!list_vt (INV(x), n)): list_vt (y, n)
+fun{
+x:vt0p}{y:vt0p
+} list_vt_map$fopr (x: &x >> _): (y)
+
+#atscode_separator()
+
+fun{
+x:vt0p}{y:vt0p
+} list_vt_map_fun{n:int}
+  (xs: !list_vt (INV(x), n), f: (&x) -<fun1> y): list_vt(y, n)
+
+fun{
+x:vt0p}{y:vt0p
+} list_vt_map_cloref{n:int}
+  (xs: !list_vt (INV(x), n), f: (&x) -<cloref1> y): list_vt(y, n)
+
+fun{
+x:vt0p}{y:vt0p
+} list_vt_map_clo{n:int}
+  (xs: !list_vt (INV(x), n), f: &(&x) -<clo1> y): list_vt(y, n)
+
+#atscode_separator()
+
+fun{
+x:vt0p}{y:vt0p
+} list_vt_mapfree{n:int}
+  (list_vt (INV(x), n)): list_vt (y, n)
+fun{
+x:vt0p}{y:vt0p
+} list_vt_mapfree$fopr (x: x): (y)
+
+#atscode_separator()
+//
 fun{
 x:vt0p
-} list_vt_app$fwork (x: &x >> _): void
-fun{x:vt0p} list_vt_app (xs: !List_vt (INV(x))): void
-
+} list_vt_foreach (xs: !List_vt (INV(x))): void
+//
 fun{
-x:vt0p
-} list_vt_appfree$fwork (x: &x >> x?): void
-fun{x:vt0p} list_vt_appfree (xs: List_vt (INV(x))): void
-
-#atscode_separator()
-
-fun{
-x:vt0p}{y:vt0p
-} list_vt_map$fopr (&x >> _): y
-fun{
-x:vt0p}{y:vt0p
-} list_vt_map {n:int} (!list_vt (INV(x), n)): list_vt (y, n)
-
-#atscode_separator()
-
-fun{
-x:vt0p}{y:vt0p
-} list_vt_mapfree$fopr (x: x): y
-fun{
-x:vt0p}{y:vt0p
-} list_vt_mapfree {n:int} (xs: list_vt (INV(x), n)): list_vt (y, n)
-
-#atscode_separator()
-
+x:vt0p}{env:vt0p
+} list_vt_foreach_env (xs: !List_vt (INV(x)), env: &(env) >> _): void
+//
 fun{
 x:vt0p}{env:vt0p
 } list_vt_foreach$cont (x: &x, env: &env): bool
 fun{
 x:vt0p}{env:vt0p
 } list_vt_foreach$fwork (x: &x >> _, env: &(env) >> _): void
-fun{
-x:vt0p
-} list_vt_foreach (xs: !List_vt (INV(x))): void
-fun{
-x:vt0p}{env:vt0p
-} list_vt_foreach_env (xs: !List_vt (INV(x)), env: &(env) >> _): void
+//
+#atscode_separator()
 
 fun{
 x:vt0p
@@ -372,7 +402,6 @@ x:vt0p
   {fe:eff} (
   xs: !List_vt (INV(x)), f: (&x) -<fe> void
 ) :<fe> void // end of [list_vt_foreach_fun]
-
 fun{
 x:vt0p
 } list_vt_foreach_funenv
@@ -382,36 +411,35 @@ x:vt0p
 ) :<fe> void // end of [list_vt_foreach_funenv]
 
 #atscode_separator()
-
-fun{
-x:vt0p}{env:vt0p
-} list_vt_iforeach$cont
-  (i: int, x: &x, env: &env): bool
-fun{
-x:vt0p}{env:vt0p
-} list_vt_iforeach$fwork
-  (i: int, x: &x >> _, env: &(env) >> _): void
+//
 fun{
 x:vt0p
 } list_vt_iforeach
   {n:int} (xs: !list_vt (INV(x), n)): natLte(n)
+//
 fun{
 x:vt0p}{env:vt0p
 } list_vt_iforeach_env
   {n:int} (xs: !list_vt (INV(x), n), env: &(env) >> _): natLte(n)
-// end of [list_vt_iforeach_env]
-
-#atscode_separator()
 //
 fun{
-a:vt0p
-} list_vt_mergesort$cmp
-  (x1: &RD(a), x2: &RD(a)):<> int
+x:vt0p}{env:vt0p
+} list_vt_iforeach$cont
+  (i: intGte(0), x: &x, env: &env): bool
+fun{
+x:vt0p}{env:vt0p
+} list_vt_iforeach$fwork
+  (i: intGte(0), x: &x >> _, env: &(env) >> _): void
+//
+#atscode_separator()
 //
 fun{
 a:vt0p
 } list_vt_mergesort
   {n:int} (xs: list_vt (INV(a), n)):<!wrt> list_vt (a, n)
+fun{
+a:vt0p
+} list_vt_mergesort$cmp (x1: &RD(a), x2: &RD(a)):<> int(*sgn*)
 //
 fun{
 a:vt0p
@@ -424,13 +452,11 @@ a:vt0p
 //
 fun{
 a:vt0p
-} list_vt_quicksort$cmp
-  (x1: &RD(a), x2: &RD(a)):<> int
-//
-fun{
-a:vt0p
 } list_vt_quicksort
   {n:int} (xs: list_vt (INV(a), n)):<!wrt> list_vt (a, n)
+fun{
+a:vt0p
+} list_vt_quicksort$cmp (x1: &RD(a), x2: &RD(a)):<> int(*sgn*)
 //
 fun{
 a:vt0p
@@ -438,6 +464,28 @@ a:vt0p
   {n:int} (
   xs: list_vt (INV(a), n), cmp: cmpref (a)
 ) :<!wrt> list_vt (a, n) // end of [list_vt_quicksort_fun]
+//
+#atscode_separator()
+//
+// overloading for certain symbols
+//
+#atscode_separator()
+//
+overload [] with list_vt_get_at
+overload [] with list_vt_set_at
+//
+overload iseqz with list_vt_is_nil
+overload isneqz with list_vt_is_cons
+//
+overload length with list_vt_length
+//
+overload copy with list_vt_free
+overload free with list_vt_free
+//
+overload print with print_list_vt
+overload prerr with prerr_list_vt
+overload fprint with fprint_list_vt
+overload fprint with fprint_list_vt_sep
 //
 #atscode_separator()
 

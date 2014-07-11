@@ -34,7 +34,6 @@
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libats.stringbuf"
-#define ATS_STALOADFLAG 0 // no static loading at run-time
 #define ATS_EXTERN_PREFIX "atslib_" // prefix for external names
 
 (* ****** ****** *)
@@ -83,6 +82,8 @@ stringbuf_get_capacity (sbf: !stringbuf):<> size_t
 
 fun{}
 stringbuf_get_bufptr (sbf: !stringbuf):<> Ptr1
+fun{}
+stringbuf_get_strptr (sbf: !stringbuf):<!wrt> vStrptr1
 
 (* ****** ****** *)
 

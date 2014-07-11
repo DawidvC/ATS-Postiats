@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2010-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 **
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -28,7 +28,7 @@
 (* ****** ****** *)
 
 (* Author: Hongwei Xi *)
-(* Authoremail: hwxi AT cs DOT bu DOT edu *)
+(* Authoremail: gmhwxiATgmailDOTcom *)
 (* Start time: August, 2013 *)
 
 (* ****** ****** *)
@@ -61,7 +61,7 @@ staload "libats/ML/SATS/hashtblref.sats"
 //
 implement
 hash_key<string> (str) =
-  string_hash_multiplier (31UL, 61803398875UL, str)
+  string_hash_multiplier (31UL, 31415926536UL, str)
 //
 (* ****** ****** *)
 
@@ -221,6 +221,33 @@ prval () = $UN.cast2void (tbl)
 val kxs = list0_of_list_vt{(key,itm)}(kxs)
 //
 } (* end of [hashtbl_takeout_all] *)
+
+(* ****** ****** *)
+
+implement
+{key,itm}
+fprint_hashtbl
+  (out, tbl) = let
+//
+implement
+$HT.fprint_hashtbl$sep<> = fprint_hashtbl$sep<>
+implement
+$HT.fprint_hashtbl$mapto<> = fprint_hashtbl$mapto<>
+//
+val tbl = htdecode (tbl)
+val () = $HT.fprint_hashtbl (out, tbl)
+prval () = $UN.cast2void (tbl)
+//
+in
+  // nothing
+end // end of [fprint_hashtbl]
+
+(* ****** ****** *)
+
+implement{}
+fprint_hashtbl$sep (out) = fprint (out, "; ")
+implement{}
+fprint_hashtbl$mapto (out) = fprint (out, "->")
 
 (* ****** ****** *)
 

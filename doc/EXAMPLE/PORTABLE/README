@@ -24,7 +24,7 @@ should be able to use the same Makefile to compile the generated C code.
 
 If you use the following command-line to generate C code:
 
-make MYPORTDIR=MYPORTDIR
+make MYPORTDIR MYPORTDIR=MYPORTDIR
 
 then please use the the following command-line to compile the generated
 C code:
@@ -35,10 +35,10 @@ It is okay to replace gcc with clang.
 
 Note that various needed CATS-files (corresponding to header files in C)
 are contained in the package ATS2-Postiats-include-xxx, where xxx is the
-version number of the package. For instance ATS2-Postiats-include-0.0.4
+version number of the package. For instance, ATS2-Postiats-include-0.0.7
 is available at:
 
-http://sourceforge.net/projects/ats2-lang/files/ats2-lang/ats2-postiats-0.0.4/
+http://sourceforge.net/projects/ats2-lang/files/ats2-lang/ats2-postiats-0.0.7/
 
 ######
 
@@ -52,14 +52,16 @@ C code:
 make PATSCC=gcc MYCCRULE=PORTABLE INCLUDE= -f /path/to/Makefile
 
 There is no need for CATS-files in this case as the generated C code is
-already pre-processed.
+already pre-processed. However, this approach is quite limited and is not
+preferred except for compiling C-files (generated from ATS source) in a
+setting where ATS-includes is not available.
 
 ######
 
 Please see:
 
-${PATSHOME}/doc/PROJECT/SMALL/GameOf24
-${PATSHOME}/doc/PROJECT/SMALL/calculator
+https://github.com/githwxi/ATS-Postiats-contrib/tree/master/projects/SMALL/GameOf24
+https://github.com/githwxi/ATS-Postiats-contrib/tree/master/projects/SMALL/calculator
 
 for slightly more advanced examples.
 

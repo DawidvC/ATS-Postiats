@@ -22,11 +22,15 @@ cleanall::
 
 ######
 
-pdf: main.db
-	jw -b pdf --output PDF/ main.db
+JADE=/usr/bin/openjade
 
-html: main.db
-	jw -b html --output HTML/ main.db
+######
+
+pdf: main.db ; jw -b pdf --dsl default --parser $(JADE) --output PDF/ main.db
+
+######
+
+html: main.db ; jw -b html --dsl default --parser $(JADE) --output HTML/ main.db
 
 ######
 
@@ -74,89 +78,97 @@ allchap:: CHAP_PRGTHMPRV
 # PART IV
 #
 allchap:: CHAP_VVTINTRO
+allchap:: CHAP_DATAVIEW
+allchap:: CHAP_DATAVTYPE
+allchap:: CHAP_ABSVTYPE
 #
 ######
 
 CHAP_START:: ; \
-  make -C CHAP_START -f ../Makefile.chap main.db
-CHAP_START:: ; \
-  make -C CHAP_START -f ../Makefile.chap clean
+  make -C CHAP_START -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_START -f ../Makefile_chap clean
 
 CHAP_PROGELEM:: ; \
-  make -C CHAP_PROGELEM -f ../Makefile.chap main.db
-CHAP_PROGELEM:: ; \
-  make -C CHAP_PROGELEM -f ../Makefile.chap clean
+  make -C CHAP_PROGELEM -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_PROGELEM -f ../Makefile_chap clean
 
 CHAP_FUNCTION:: ; \
-  make -C CHAP_FUNCTION -f ../Makefile.chap main.db
-CHAP_FUNCTION:: ; \
-  make -C CHAP_FUNCTION -f ../Makefile.chap clean
+  make -C CHAP_FUNCTION -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_FUNCTION -f ../Makefile_chap clean
 
 CHAP_DATATYPE:: ; \
-  make -C CHAP_DATATYPE -f ../Makefile.chap main.db
-CHAP_DATATYPE:: ; \
-  make -C CHAP_DATATYPE -f ../Makefile.chap clean
+  make -C CHAP_DATATYPE -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DATATYPE -f ../Makefile_chap clean
 
 CHAP_POLYMORPH:: ; \
-  make -C CHAP_POLYMORPH -f ../Makefile.chap main.db
-CHAP_POLYMORPH:: ; \
-  make -C CHAP_POLYMORPH -f ../Makefile.chap clean
+  make -C CHAP_POLYMORPH -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_POLYMORPH -f ../Makefile_chap clean
 
 ######
 
 CHAP_EFFECTFUL:: ; \
-  make -C CHAP_EFFECTFUL -f ../Makefile.chap main.db
-CHAP_EFFECTFUL:: ; \
-  make -C CHAP_EFFECTFUL -f ../Makefile.chap clean
+  make -C CHAP_EFFECTFUL -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_EFFECTFUL -f ../Makefile_chap clean
 
 ######
 
 CHAP_MODULARITY:: ; \
-  make -C CHAP_MODULARITY -f ../Makefile.chap main.db
-CHAP_MODULARITY:: ; \
-  make -C CHAP_MODULARITY -f ../Makefile.chap clean
+  make -C CHAP_MODULARITY -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_MODULARITY -f ../Makefile_chap clean
 
 ######
 
 CHAP_CINTERACT:: ; \
-  make -C CHAP_CINTERACT -f ../Makefile.chap main.db
-CHAP_CINTERACT:: ; \
-  make -C CHAP_CINTERACT -f ../Makefile.chap clean
+  make -C CHAP_CINTERACT -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_CINTERACT -f ../Makefile_chap clean
 
 ######
 
 CHAP_DEPTYPES:: ; \
-  make -C CHAP_DEPTYPES -f ../Makefile.chap main.db
-CHAP_DEPTYPES:: ; \
-  make -C CHAP_DEPTYPES -f ../Makefile.chap clean
+  make -C CHAP_DEPTYPES -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DEPTYPES -f ../Makefile_chap clean
 
 ######
 
 CHAP_DEPDTREF:: ; \
-  make -C CHAP_DEPDTREF -f ../Makefile.chap main.db
-CHAP_DEPDTREF:: ; \
-  make -C CHAP_DEPDTREF -f ../Makefile.chap clean
+  make -C CHAP_DEPDTREF -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DEPDTREF -f ../Makefile_chap clean
 
 ######
 
 CHAP_THMPRVING:: ; \
-  make -C CHAP_THMPRVING -f ../Makefile.chap main.db
-CHAP_THMPRVING:: ; \
-  make -C CHAP_THMPRVING -f ../Makefile.chap clean
+  make -C CHAP_THMPRVING -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_THMPRVING -f ../Makefile_chap clean
 
 ######
 
 CHAP_PRGTHMPRV:: ; \
-  make -C CHAP_PRGTHMPRV -f ../Makefile.chap main.db
-CHAP_PRGTHMPRV:: ; \
-  make -C CHAP_PRGTHMPRV -f ../Makefile.chap clean
+  make -C CHAP_PRGTHMPRV -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_PRGTHMPRV -f ../Makefile_chap clean
 
 ######
 
 CHAP_VVTINTRO:: ; \
-  make -C CHAP_VVTINTRO -f ../Makefile.chap main.db
-CHAP_VVTINTRO:: ; \
-  make -C CHAP_VVTINTRO -f ../Makefile.chap clean
+  make -C CHAP_VVTINTRO -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_VVTINTRO -f ../Makefile_chap clean
+
+######
+
+CHAP_DATAVIEW:: ; \
+  make -C CHAP_DATAVIEW -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DATAVIEW -f ../Makefile_chap clean
+
+######
+
+CHAP_DATAVTYPE:: ; \
+  make -C CHAP_DATAVTYPE -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DATAVTYPE -f ../Makefile_chap clean
+
+######
+
+CHAP_ABSVTYPE:: ; \
+  make -C CHAP_ABSVTYPE -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_ABSVTYPE -f ../Makefile_chap clean
 
 ######
 
@@ -166,9 +178,17 @@ CHMOD=chmod
 
 ######
 
-uploadloc:: ; \
-  $(SCPR) PDF hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/INT2PROGINATS
-  $(SCPR) HTML hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/INT2PROGINATS
+SUBDIRS_CODE := $(wildcard CODE/*/)
+
+regress:: ; \
+  set -e; \
+  for i in $(SUBDIRS_CODE); do \
+    $(MAKE) -C $$i $@; \
+  done
+
+######
+
+upload:: upload_html
 
 upload_pdf:: ; \
   scp -r PDF ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/INT2PROGINATS/
@@ -177,9 +197,17 @@ upload_html:: ; \
 
 ######
 
+uploadloc:: ; \
+  $(SCPR) PDF hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/INT2PROGINATS
+  $(SCPR) HTML hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/INT2PROGINATS
+
+######
+#
+upload_code:: ; \
+  make -C CODE cleanall
 upload_code:: ; \
   scp -r CODE ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/INT2PROGINATS
-
+#
 ######
 
 RMF=rm -f

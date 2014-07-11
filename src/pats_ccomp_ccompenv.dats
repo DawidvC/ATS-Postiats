@@ -789,7 +789,7 @@ ccompenv_struct =
 , ccompenv_vbindmapenv= vbindmapenv
 //
 , ccompenv_markenvlst= markenvlst_vt
-, ccompenv_vbindmapall= d2varmap_vt (primval)
+, ccompenv_vbindmapall= d2varmaplst_vt (primval)
 //
 } // end of [ccompenv_struct]
 
@@ -805,6 +805,7 @@ ccompenv_struct_uninitize (x) = let
 //
   val () =
     markenvlst_vt_free (x.ccompenv_markenvlst)
+  (* end of [val] *)
 //
   val () = freeconenv_free (x.ccompenv_freeconenv)
   val () = loopexnenv_free (x.ccompenv_loopexnenv)
@@ -815,7 +816,7 @@ ccompenv_struct_uninitize (x) = let
   val () = dvarsetenv_free (x.ccompenv_dvarsetenv)
   val () = vbindmapenv_free (x.ccompenv_vbindmapenv)
 //
-  val () = d2varmap_vt_free (x.ccompenv_vbindmapall)
+  val () = d2varmaplst_vt_free (x.ccompenv_vbindmapall)
 //
 in
   // end of [ccompenv_struct_uninitize]
@@ -853,7 +854,7 @@ val () = p->ccompenv_vbindmapenv := list_vt_nil ()
 //
 val () = p->ccompenv_markenvlst := MARKENVLSTnil ()
 //
-val () = p->ccompenv_vbindmapall := d2varmap_vt_nil ()
+val () = p->ccompenv_vbindmapall := d2varmaplst_vt_nil ()
 //
 val () = fold@ (env)
 //
@@ -1166,19 +1167,32 @@ fun auxfind2
   d2c0: d2cst, tci: !tlcalitm
 ) : funlabopt_vt = let
 //
-val-TCIfun (fl) = tci
-val opt = funlab_get_d2copt (fl)
-prval () = fold@ (tci)
+(*
+val () =
+println! ("auxfind2: d2c0 = ", d2c0)
+*)
 //
 in
 //
-case+ opt of
-| Some (d2c) => let
-    val iseq = eq_d2cst_d2cst (d2c0, d2c)
+case+ tci of
+| TCIfnx _ =>
+  (
+    fold@(tci); None_vt ()
+  ) (* TCIfnx *)
+| TCIfun (fl) => let
+    val opt =
+      funlab_get_d2copt (fl)
+    // end of [val]
+    prval ((*void*)) = fold@ (tci)
   in
-    if iseq then Some_vt(fl) else None_vt()
-  end // end of [Some]
-| None ((*void*)) => None_vt((*void*))
+    case+ opt of
+    | Some (d2c) => let
+        val iseq = eq_d2cst_d2cst (d2c0, d2c)
+      in
+        if iseq then Some_vt(fl) else None_vt()
+      end // end of [Some]
+    | None ((*void*)) => None_vt((*void*))
+  end // end of [TCIfun]
 //
 end // end of [auxfind2]
 
@@ -1487,7 +1501,7 @@ case+ fls of
     val flvl = funlab_get_level (fl)
   in
     if flvl > flvl0 then let
-      val-Some (fent) = funlab_get_funent (fl)
+      val-Some(fent) = funlab_get_funent (fl)
       val () = auxenv (env, vbmap, funent_get_d2envlst (fent))
     in
       addlst_if (env, flvl0, vbmap, fls)
@@ -1583,7 +1597,7 @@ assume ccompenv_push_v = unit_v
 
 fun auxpop
 (
-  map: &d2varmap_vt (primval), xs: markenvlst_vt
+  map: &d2varmaplst_vt (primval), xs: markenvlst_vt
 ) : markenvlst_vt = let
 in
 //
@@ -1593,7 +1607,7 @@ case+ xs of
   end // end of [MENVLSTnil]
 | ~MARKENVLSTmark (xs) => xs
 | ~MARKENVLSTcons_var (d2v, xs) => let
-    val _(*removed*) = d2varmap_vt_remove (map, d2v)
+    val _(*removed*) = d2varmaplst_vt_remove (map, d2v)
   in
     auxpop (map, xs)
   end // end of [MENVLSTcons]
@@ -1609,7 +1623,7 @@ end // end of [auxpop]
 
 fun auxjoin
 (
-  map: &d2varmap_vt (primval), xs: &markenvlst_vt
+  map: &d2varmaplst_vt (primval), xs: &markenvlst_vt
 ) : void = let
 in
 //
@@ -1724,7 +1738,7 @@ val CCOMPENV (!p) = env
 //
 val xs = p->ccompenv_markenvlst
 val () = p->ccompenv_markenvlst := MARKENVLSTcons_var (d2v, xs)
-val _(*replaced*) = d2varmap_vt_insert (p->ccompenv_vbindmapall, d2v, pmv)
+val _(*replaced*) = d2varmaplst_vt_insert (p->ccompenv_vbindmapall, d2v, pmv)
 //
 prval () = fold@ (env)
 //
@@ -1738,7 +1752,7 @@ ccompenv_find_vbindmapall
 {
 //
   val CCOMPENV (!p) = env
-  val opt = d2varmap_vt_search (p->ccompenv_vbindmapall, d2v)
+  val opt = d2varmaplst_vt_search (p->ccompenv_vbindmapall, d2v)
   prval () = fold@ (env)
 //
 } // end of [ccompenv_add_vbindmapall]

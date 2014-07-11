@@ -63,9 +63,19 @@ staload SYN = "./pats_syntax.sats"
 (* ****** ****** *)
 
 staload "./pats_staexp2.sats"
-staload "./pats_staexp2_error.sats"
 staload "./pats_staexp2_util.sats"
+staload "./pats_staexp2_error.sats"
+
+(* ****** ****** *)
+
 staload "./pats_stacst2.sats"
+
+(* ****** ****** *)
+
+staload "./pats_patcst2.sats"
+
+(* ****** ****** *)
+
 staload "./pats_dynexp2.sats"
 staload "./pats_dynexp3.sats"
 
@@ -168,8 +178,10 @@ val () = println! ("d2exp_trdn: d2e0 = ", d2e0)
 val () = println! ("d2exp_trdn: loc0 = ", loc0)
 val () = println! ("d2exp_trdn: s2e0(bef) = ", s2e0)
 *)
+//
 val s2f0 = s2exp2hnf (s2e0)
 val s2e0 = s2hnf2exp (s2f0)
+//
 (*
 val () = println! ("d2exp_trdn: s2e0(aft) = ", s2e0)
 *)
@@ -283,7 +295,7 @@ val s2e0 = (
   if iswth then let
     val () = d3exp_open_and_add (d3e0)
   in
-    s2exp_wth_instantiate (loc0, s2e0)
+    s2exp_wthtype_instantiate (loc0, s2e0)
   end else begin
     s2e0 // HX: [s2e0] does not carry a state type
   end // end of [if]
@@ -405,6 +417,8 @@ case+ s2e0.s2exp_node of
 //
     val (pfeff | ()) = the_effenv_push_lam (s2fe)
 //
+    val () = funarg_patck_exhaust (loc0, p2ts_arg, s2es_arg)
+//
     var serr: int = 0
     val p3ts_arg =
       p2atlst_trdn_arg (loc0, npf, p2ts_arg, s2es_arg, serr)
@@ -440,7 +454,9 @@ case+ s2e0.s2exp_node of
   in
     d3exp_lam_dyn (loc0, s2e0, lin, npf, p3ts_arg, d3e_body)
   end // end of [S2Efun]
-| S2Euni (s2vs, s2ps, s2e) => let
+//
+| S2Euni
+    (s2vs, s2ps, s2e) => let
     val (pfpush | ()) = trans3_env_push ()
     val () = trans3_env_add_svarlst (s2vs)
     val () = trans3_env_hypadd_proplst (loc0, s2ps)
@@ -449,6 +465,11 @@ case+ s2e0.s2exp_node of
   in
     d3exp_lam_sta (loc0, s2e0, s2vs, s2ps, d3e0)
   end // end of [S2Euni]
+//
+| S2Erefarg (knd, s2e) => let
+    val s2f = s2exp2hnf (s2e) in d2exp_trdn_lam_dyn (d2e0, s2f)
+  end // end of [s2Erefarg]
+//
 | _ => let
     val d3e0 = d2exp_trup (d2e0) in d3exp_trdn (d3e0, s2e0)
   end // end of [let]
@@ -899,13 +920,14 @@ d2exp_trdn_exist
   var err: int = 0
   val s2e_ins = (
     case+ s2e0.s2exp_node of
-    | S2Ewth (s2e1, wths2e2) => let
+    | S2Ewthtype
+        (s2e1, wths2e2) => let
         val (s2e1, s2ps1) =
           s2exp_exi_instantiate_sexparg (s2e1, s2a, err)
         val () = s2ps := s2ps1
       in
-        s2exp_wth (s2e1, wths2e2)
-      end // end of [S2Ewth]
+        s2exp_wthtype (s2e1, wths2e2)
+      end // end of [S2Ewthtype]
     | _ => s2e1 where {
         val (s2e1, s2ps1) =
           s2exp_exi_instantiate_sexparg (s2e0, s2a, err)

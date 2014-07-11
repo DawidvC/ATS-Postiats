@@ -45,6 +45,11 @@ implement prerr_FILENAME<> () = prerr "pats_trans1_staexp"
 (* ****** ****** *)
 
 staload
+LOC = "./pats_location.sats"
+
+(* ****** ****** *)
+
+staload
 FIL = "./pats_filename.sats"
 staload FIX = "./pats_fixity.sats"
 staload SYM = "./pats_symbol.sats"
@@ -56,9 +61,17 @@ staload "./pats_symenv.sats"
 
 (* ****** ****** *)
 
+staload SYN = "./pats_syntax.sats"
+
+(* ****** ****** *)
+
 staload "./pats_staexp1.sats"
 staload "./pats_dynexp1.sats"
 staload "./pats_trans1_env.sats"
+
+(* ****** ****** *)
+
+overload print with $LOC.print_location
 
 (* ****** ****** *)
 
@@ -461,16 +474,20 @@ end // end of [staload_file_search]
 
 (* ****** ****** *)
 
+(*
+** HX-2014-06-06:
+** [ldflag] is no longer in use
+*)
 implement
 staload_file_insert
-  (fil, flag, d1cs) = {
+  (fil, ldflag, d1cs) = {
 //
 val fname =
   $FIL.filename_get_fullname (fil)
 //
 val k0 = $SYM.symbol_get_stamp (fname)
 //
-var x0: itm = (flag, d1cs) // HX: local var
+var x0: itm = (ldflag, d1cs) // HX: local var
 //
 val (vbox(pf) | p) = ref_get_view_ptr{map}(theStaloadMap)
 //
@@ -479,6 +496,156 @@ val _(*isexi*) = $LM.linmap_insert<key,itm> (!p, k0, x0, cmp0, res)
 prval () = opt_clear {itm} (res)
 //
 } // end of [staload_file_insert]
+
+end // end of [local]
+
+(* ****** ****** *)
+
+implement
+fprint_pkgrelocitm
+  (out, itm) = let
+//
+macdef
+prstr (s) = fprint_string (out, ,(s))
+//
+fun auxpr
+(
+  out: FILEref, d0c: $SYN.d0ecl
+) : void =
+(
+case+ d0c.d0ecl_node of
+| $SYN.D0Cinclude _ => fprint (out, "include")
+| $SYN.D0Cstaload _ => fprint (out, "staload")
+| $SYN.D0Crequire _ => fprint (out, "require")
+| $SYN.D0Cdynload _ => fprint (out, "dynload")
+| _ (*rest/deadcode*) => fprint (out, "*ERROR*")
+)
+//
+in
+//
+case+ itm of
+| PKGRELOCITM
+    (d0c, given) =>
+  {
+    val () = prstr "{\n"
+    val () = prstr "\"pkgreloc_kind\": "
+    val () = prstr "\""
+    val () = auxpr (out, d0c)
+    val () = prstr "\""
+    val () = prstr "\n,\n"
+    val () = prstr "\"pkgreloc_given\": "
+    val () = prstr "\""
+    val () = fprint_string (out, given)
+    val () = prstr "\""
+    val () = prstr "\n}\n"
+  }
+| PKGRELOCITM2
+    (d0c, source, target) =>
+  {
+    val () = prstr "{\n"
+    val () = prstr "\"pkgreloc_kind\": "
+    val () = prstr "\""
+    val () = auxpr (out, d0c)
+    val () = prstr "\""
+    val () = prstr "\n,\n"
+    val () = prstr "\"pkgreloc_target\": "
+    val () = prstr "\""
+    val () = fprint_string (out, target)
+    val () = prstr "\""
+    val () = prstr "\n,\n"
+    val () = prstr "\"pkgreloc_source\": "
+    val () = prstr "\""
+    val () = fprint_string (out, source)
+    val () = prstr "\""
+    val () = prstr "\n}\n"  
+  }
+//
+end // end of [fprint_pkgrelocitm]
+
+implement
+fprint_pkgrelocitmlst
+  (out, xs) = let
+in
+//
+case+ xs of
+| list_nil () => ()
+| list_cons (x, xs) => (
+    fprint_pkgrelocitm (out, x); fprint_pkgrelocitmlst (out, xs)
+  ) (* end of [list_cons] *)
+//
+end // end of [fprint_pkgrelocitmlst]
+
+(* ****** ****** *)
+
+local
+//
+val the_itmlst =
+  ref<pkgrelocitmlst> (list_nil)
+//
+in (* in-of-local *)
+
+implement
+the_pkgrelocitmlst_get () = let
+  val xs = !the_itmlst
+  val () = !the_itmlst := list_nil
+in
+  list_of_list_vt (list_reverse (xs))
+end // end of [the_itmlst_get]
+
+(* ****** ******* *)
+
+implement
+the_pkgreloc_insert
+  (d0c0, given) = let
+//
+val
+loc0 = d0c0.d0ecl_loc
+//
+(*
+val () =
+println! ("the_pkgreloc_insert: ", loc0)
+val () =
+println! ("the_pkgreloc_insert: given= ", given)
+*)
+//
+val itm =
+PKGRELOCITM (d0c0, given)
+val () = !the_itmlst := list_cons (itm, !the_itmlst)
+//
+in
+  // nothing
+end // end of [the_pkgreloc_insert]
+
+implement
+the_pkgreloc_insert2
+  (d0c0, given_s, given_t) = let
+//
+val
+loc0 = d0c0.d0ecl_loc
+//
+(*
+val (
+) = print
+  ("the_pkgreloc_insert: d0c0 = ")
+val () = $SYN.fprint_d0ecl (stdout_ref, d0c0)
+val () = fprint_newline (stdout_ref)
+*)
+(*
+val () =
+println! ("the_pkgreloc_insert2: ", loc0)
+val () =
+println! ("the_pkgreloc_insert2: sourceloc= ", given_s)
+val () =
+println! ("the_pkgreloc_insert2: targetloc= ", given_t)
+*)
+//
+val itm =
+PKGRELOCITM2 (d0c0, given_s, given_t)
+val () = !the_itmlst := list_cons (itm, !the_itmlst)
+//
+in
+  // nothing
+end // end of [the_pkgreloc_insert2]
 
 end // end of [local]
 

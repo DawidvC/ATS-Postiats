@@ -23,6 +23,11 @@ patscc_env.sh
 patsopt_env.sh
 
 #
+# An external link
+#
+contrib
+
+#
 # The compiler for POSTIATS 
 #
 src/.depend
@@ -35,6 +40,9 @@ src/TAGATS
 
 bin/patscc
 bin/patsopt
+bin/pats2xhtml
+bin/atspkgreloc_curl
+bin/atspkgreloc_wget
 
 #
 # boostrapping
@@ -184,41 +192,6 @@ libatsynmark/libatsynmark.a
 libatsyn2json/libatsyn2json.a
 
 #
-# ATSLIB/contrib
-#
-
-contrib/cairo/cairo-1.12.*
-contrib/cairo/TUTORIAL/IMAGE
-contrib/zeromq/DOC/zguide
-
-contrib/*/atsctrb_*.o
-contrib/*/SATS/DOCUGEN/*_atxt.txt
-contrib/*/SATS/DOCUGEN/*_atxt.dats
-contrib/*/SATS/DOCUGEN/Makefile
-contrib/*/SATS/DOCUGEN/*_atxt.txt
-contrib/*/SATS/DOCUGEN/*_atxt.dats
-contrib/*/SATS/DOCUGEN/HTML
-contrib/*/SATS/DOCUGEN/TRYIT
-contrib/*/CATS/CODEGEN/*.cats
-contrib/*/CATS/CODEGEN/*_atxt.txt
-contrib/*/CATS/CODEGEN/*_atxt.dats
-contrib/*/TEST/test??
-
-contrib/*/*/SATS/DOCUGEN/*_atxt.txt
-contrib/*/*/SATS/DOCUGEN/*_atxt.dats
-contrib/*/*/SATS/DOCUGEN/Makefile
-contrib/*/*/SATS/DOCUGEN/*_atxt.txt
-contrib/*/*/SATS/DOCUGEN/*_atxt.dats
-contrib/*/*/SATS/DOCUGEN/HTML
-contrib/*/*/SATS/DOCUGEN/TRYIT
-contrib/*/*/CATS/CODEGEN/*.cats
-contrib/*/*/CATS/CODEGEN/*_atxt.txt
-contrib/*/*/CATS/CODEGEN/*_atxt.dats
-contrib/*/*/TEST/test??
-
-contrib/zlog/zlog-latest-stable/
-
-#
 # ATSHOME/doc/DISTRIB
 #
 doc/DISTRIB/*_atxt.txt
@@ -260,6 +233,7 @@ doc/DISTRIB/ATS-Postiats/libats/?ATS/*.?ats
 doc/DISTRIB/ATS-Postiats/libats/?ATS/SHARE/*.?ats
 doc/DISTRIB/ATS-Postiats/libats/ML/?ATS/*.?ats
 doc/DISTRIB/ATS-Postiats/libats/ML/?ATS/SHARE/*.?ats
+doc/DISTRIB/ATS-Postiats/libats/ATS1/?ATS/*.?ats
 doc/DISTRIB/ATS-Postiats/contrib/*
 doc/DISTRIB/ATS-Postiats/doc/EXAMPLE/INTRO/*.?ats
 doc/DISTRIB/ATS-Postiats/doc/EXAMPLE/INTRO/Makefile
@@ -273,6 +247,9 @@ doc/DISTRIB/ATS2-Postiats-0.0.1
 doc/DISTRIB/ATS2-Postiats-0.0.2
 doc/DISTRIB/ATS2-Postiats-0.0.3
 doc/DISTRIB/ATS2-Postiats-0.0.4
+doc/DISTRIB/ATS2-Postiats-0.0.5
+doc/DISTRIB/ATS2-Postiats-0.0.6
+doc/DISTRIB/ATS2-Postiats-0.0.7
 #
 # ATSHOME/doc/DISTRIB/ATS-Postiats-contrib
 #
@@ -282,12 +259,24 @@ doc/DISTRIB/ATS-Postiats-contrib/project/*
 doc/DISTRIB/ATS2-Postiats-contrib-0.0.1
 doc/DISTRIB/ATS2-Postiats-contrib-0.0.2
 doc/DISTRIB/ATS2-Postiats-contrib-0.0.3
+doc/DISTRIB/ATS2-Postiats-contrib-0.0.4
+doc/DISTRIB/ATS2-Postiats-contrib-0.0.5
+doc/DISTRIB/ATS2-Postiats-contrib-0.0.6
+doc/DISTRIB/ATS2-Postiats-contrib-0.0.7
 #
 # ATSHOME/doc/DISTRIB/ATS-Postiats-include
 #
-doc/DISTRIB/ATS-Postiats-include
+doc/DISTRIB/ATS-Postiats-include/share
+doc/DISTRIB/ATS-Postiats-include/prelude
+doc/DISTRIB/ATS-Postiats-include/libc
+doc/DISTRIB/ATS-Postiats-include/libats
+doc/DISTRIB/ATS-Postiats-include/ccomp
+doc/DISTRIB/ATS-Postiats-include/contrib
+#
 doc/DISTRIB/ATS2-Postiats-include-0.0.4
-
+doc/DISTRIB/ATS2-Postiats-include-0.0.5
+doc/DISTRIB/ATS2-Postiats-include-0.0.6
+doc/DISTRIB/ATS2-Postiats-include-0.0.7
 #
 # ATSHOME/doc/EXAMPLE
 #
@@ -310,7 +299,7 @@ doc/BOOK/INT2PROGINATS/preface
 doc/BOOK/INT2PROGINATS/preface.db
 doc/BOOK/INT2PROGINATS/*_atxt.txt
 doc/BOOK/INT2PROGINATS/*_atxt.dats
-doc/BOOK/INT2PROGINATS/*/main.db
+doc/BOOK/INT2PROGINATS/CHAP_*/main.db
 
 #
 # ATS2TUTORIAL
@@ -318,11 +307,16 @@ doc/BOOK/INT2PROGINATS/*/main.db
 
 doc/BOOK/ATS2TUTORIAL/preface
 doc/BOOK/ATS2TUTORIAL/preface.db
-doc/BOOK/ATS2TUTORIAL/*_atxt.txt
-doc/BOOK/ATS2TUTORIAL/*_atxt.dats
-doc/BOOK/ATS2TUTORIAL/*/main.db
+doc/BOOK/ATS2TUTORIAL/CHAP_*/*_atxt.txt
+doc/BOOK/ATS2TUTORIAL/CHAP_*/*_atxt.dats
+doc/BOOK/ATS2TUTORIAL/CHAP_*/main.db
 doc/BOOK/ATS2TUTORIAL/HTML
-doc/BOOK/ATS2TUTORIAL/CODE/*.html
-doc/BOOK/ATS2TUTORIAL/CODE/chap_*.dats
+
+#
+# ATS-for-APUE3
+#
+
+doc/BOOK/ATS-for-APUE3/apue.3e
+doc/BOOK/ATS-for-APUE3/CHAP_*/main.db
 
 ###### end of [.gitignore] ######

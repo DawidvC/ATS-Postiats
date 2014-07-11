@@ -126,6 +126,8 @@ case+ funclo of
 //
 end // end of [primval_make_funlab]
 
+(* ****** ****** *)
+
 implement
 primval_make2_funlab
   (loc, hse0, fl) = let
@@ -334,6 +336,8 @@ case+ x.instr_node of
 | INSupdate_ptrinc (tmp(*ptr*), _(*type*)) => ()
 | INSupdate_ptrdec (tmp(*ptr*), _(*type*)) => ()
 //
+| INSclosure_initize _ => ()
+//
 | INStmpdec (tmp) => tmpadd (tmp)
 //
 | INSdcstdef (d2c, pmv) => ()
@@ -416,9 +420,12 @@ case+ pmd.primdec_node of
     val inss = $UN.cast{instrlst} (inss) in auxlst (res, inss)
   end // end of [PMDvardecs]
 //
-| PMDinclude (pmds) => auxpmdlst (res, pmds)
+| PMDinclude (knd, pmds) => auxpmdlst (res, pmds)
 //
 | PMDstaload _ => ()
+//
+| PMDstaloadloc (pfil, nspace, pmds) => auxpmdlst (res, pmds)
+//
 | PMDdynload _ => ()
 //
 | PMDlocal (

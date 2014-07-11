@@ -6,12 +6,12 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2010-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
 **
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
@@ -27,7 +27,8 @@
 
 (* ****** ****** *)
 //
-// Author: Hongwei Xi (hwxi AT cs DOT bu DOT edu)
+// Author: Hongwei Xi
+// Authoremail: gmhwxiATgmailDOTcom
 // Start Time: July, 2012
 //
 (* ****** ****** *)
@@ -36,41 +37,183 @@
 
 (* ****** ****** *)
 
+(*
 #if VERBOSE_PRELUDE #then
 #print "Loading [stream_vt.dats] starts!\n"
 #endif // end of [VERBOSE_PRELUDE]
+*)
 
 (* ****** ****** *)
 
 staload UN = "prelude/SATS/unsafe.sats"
 
 (* ****** ****** *)
+//
+// HX-2014-04-07:
+// This is a wild implementation!
+//
+implement
+{a}(*tmp*)
+stream_vt2t (xs) = let
+//
+fun aux (
+  xs: stream_vt a
+) : stream (a) = let
+  val xs = $UN.castvwtp0{ptr}(xs)
+in
+//
+$delay
+(
+let
+  val xs =
+    $UN.castvwtp0{stream_vt(a)}(xs)
+  val xs_con = !xs
+in
+  case+ xs_con of
+  | @stream_vt_cons
+      (x, xs1) => let
+      val xs1_val = xs1
+      val () = xs1 := aux (xs1_val)
+    in
+      $UN.castvwtp0{stream_con(a)}((view@x, view@xs1 | xs_con))
+    end // end of [stream_cons]
+  | ~stream_vt_nil () => stream_nil ()
+end
+)
+end // end of [aux]
+//
+in
+  aux (xs)
+end // end of [stream_vt2t]
 
-implement{a}
+(* ****** ****** *)
+
+local
+//
+// HX-2012: casting stream_vt_cons to list_cons
+//
+extern
+castfn
+stream2list_vt_cons
+  {l0,l1,l2:addr}
+(
+  stream_vt_cons_unfold (l0, l1, l2)
+) :<> list_vt_cons_unfold (l0, l1, l2)
+
+in (* in-of-local *)
+
+implement
+{a}(*tmp*)
+stream2list_vt (xs) = let
+//
+fun loop (
+  xs: stream_vt a
+) :<!laz> List0_vt (a) = let
+  val xs_con = !xs
+in
+  case+ xs_con of
+  | @stream_vt_cons
+      (x, xs1) => let
+      val xs1_val = xs1
+      val () = xs1 := loop (xs1_val)
+      val xs_con = stream2list_vt_cons (xs_con)
+    in
+      fold@ (xs_con); xs_con
+    end // end of [stream_cons]
+  | ~stream_vt_nil () => list_vt_nil ()
+end // end of [loop]
+//
+in
+  loop (xs)
+end // end of [stream2list_vt]
+
+end // end of [local]
+
+(* ****** ****** *)
+
+implement
+{a}(*tmp*)
 stream_vt_free (xs) = ~(xs)
 
 (* ****** ****** *)
-
-implement{a}
-stream_vt_drop
+//
+implement
+{a}(*tmp*)
+stream_vt_drop_exn
   (xs, n) = let
 in
 //
-if n > 0 then
+if n > 0
+  then (
+  case+ !xs of
+  | ~stream_vt_nil () => $raise StreamSubscriptExn()
+  | ~stream_vt_cons (_, xs) => stream_vt_drop_exn (xs, n-1)
+  ) (* end of [then] *)
+  else (xs) // end of [else]
+// end of [if]
+//
+end // end of [stream_vt_drop_exn]
+//
+implement
+{a}(*tmp*)
+stream_vt_drop_opt
+  (xs, n) = let
+in
+//
+if n > 0
+  then (
+  case+ !xs of
+  | ~stream_vt_nil () => None_vt ((*void*))
+  | ~stream_vt_cons (_, xs) => stream_vt_drop_opt (xs, n-1)
+  ) (* end of [then] *)
+  else Some_vt{stream_vt(a)}(xs) // end of [else]
+// end of [if]
+//
+end // end of [stream_vt_drop_opt]
+//
+(* ****** ****** *)
+//
+implement
+{a}(*tmp*)
+stream_vt_head (xs) =
 (
 case+ !xs of
-| ~stream_vt_cons
-    (_, xs) => stream_vt_drop (xs, n-1)
-| ~stream_vt_nil ((*void*)) => None_vt ()
-) else (
-  Some_vt{stream_vt(a)}(xs)
-) (* end of [if] *)
+| ~stream_vt_cons (x, xs) =>
+    let val () = stream_vt_free (xs) in x end
+| ~stream_vt_nil ((*void*)) => $raise StreamSubscriptExn()
+) (* end of [stream_vt_head] *)
 //
-end // end of [stream_vt_drop]
+implement
+{a}(*tmp*)
+stream_vt_tail (xs) =
+(
+case+ !xs of
+| ~stream_vt_cons (x, xs) => (xs)
+| ~stream_vt_nil ((*void*)) => $raise StreamSubscriptExn()
+) (* end of [stream_vt_tail] *)
+//
+(* ****** ****** *)
+
+implement
+{a}(*tmp*)
+stream_vt_uncons (xs0) =
+(
+case+ !xs0 of
+| ~stream_vt_cons
+    (x, xs) => (xs0 := xs; x)
+| ~stream_vt_nil () => let
+    val () =
+      xs0 := $ldelay (stream_vt_nil)
+    // end of [val]
+  in
+    $raise StreamSubscriptExn((*void*))
+  end // end of [stream_vt_nil]
+) (* end of [stream_vt_uncons] *)
 
 (* ****** ****** *)
 
-implement{a}
+implement
+{a}(*tmp*)
 stream_vt_foreach
   (xs) = let
   var env: void = ()
@@ -78,7 +221,8 @@ in
   stream_vt_foreach_env<a><void> (xs, env)
 end // end of [stream_vt_foreach]
 
-implement{a}{env}
+implement
+{a}(*tmp*){env}
 stream_vt_foreach_env
   (xs, env) = let
   val xs_con = !xs
@@ -96,39 +240,6 @@ case+ xs_con of
 | ~stream_vt_nil () => ()
 //
 end // end of [stream_vt_foreach_env]
-
-(* ****** ****** *)
-//
-// HX-2012: casting stream_cons to list_cons
-//
-extern
-castfn stream2list_vt_cons
-  {l0,l1,l2:addr}
-  (x: stream_vt_cons_unfold (l0, l1, l2)):<> list_vt_cons_unfold (l0, l1, l2)
-// end of [stream2list_vt_cons]
-
-implement{a}
-stream2list_vt (xs) = let
-//
-fun loop (
-  xs: stream_vt a
-) :<!laz> List0_vt (a) = let
-  val xs_con = !xs
-in
-  case+ xs_con of
-  | @stream_vt_cons (x, xs1) => let
-      val xs1_val = xs1
-      val () = xs1 := loop (xs1_val)
-      val xs_con = stream2list_vt_cons (xs_con)
-    in
-      fold@ (xs_con); xs_con
-    end // end of [stream_cons]
-  | ~stream_vt_nil () => list_vt_nil ()
-end // end of [loop]
-//
-in
-  loop (xs)
-end // end of [stream2list_vt]
 
 (* ****** ****** *)
 
@@ -167,12 +278,14 @@ end (* end of [stream_vt_filter_con] *)
 
 in (* in of [local] *)
 
-implement{a}
+implement
+{a}(*tmp*)
 stream_vt_filter (xs) =
   $ldelay (stream_vt_filter_con<a> (xs), ~xs)
 // end of [stream_vt_filter]
 
-implement{a}
+implement
+{a}(*tmp*)
 stream_vt_filter_fun
   (xs, pred) = let
 //
@@ -235,7 +348,8 @@ end (* end of [stream_vt_filter_cloptr_con] *)
 
 in (* in of [local] *)
 
-implement{a}
+implement
+{a}(*tmp*)
 stream_vt_filter_cloptr
   (xs, pred) = $ldelay
 (
@@ -384,9 +498,79 @@ end // end of [local]
 
 (* ****** ****** *)
 
+implement
+{a}(*tmp*)
+stream_vt_tabulate
+(
+// argumentless
+) = aux (0) where
+{
+//
+fun aux (i: intGte(0)): stream_vt (a) =
+  $ldelay (stream_vt_cons{a}(stream_vt_tabulate$fopr<a> (i), aux (i+1)))
+//
+} (* end of [stream_vt_tabulate] *)
+
+(* ****** ****** *)
+
+local
+//
+datavtype streamer
+  (a:vt@ype+) = STREAMER of (stream_vt(a))
+//
+assume streamer_vtype (a:vt0p) = streamer (a)
+//
+in (* in-of-local *)
+
+implement
+{}(*tmp*)
+streamer_vt_make (xs) = STREAMER (xs)
+
+implement
+{}(*tmp*)
+streamer_vt_free
+  (xser) = let val+~STREAMER(xs) = xser in ~xs end
+// end of [streamer_free]
+
+implement
+{a}(*tmp*)
+streamer_vt_eval_exn
+  (xser) = let
+//
+val+@STREAMER(xs) = xser
+//
+in
+//
+case+ !xs of
+| ~stream_vt_cons
+    (x, xs2) =>
+  (
+    xs := xs2; fold@(xser); x
+  ) (* end of [stream_vt_cons] *)
+| ~stream_vt_nil
+    ((*void*)) => let
+    prval () =
+     __assert (view@xs) where
+    {
+      extern
+      praxi __assert{l:addr}(!ptr@l >> stream_vt(a)@l): void
+    } (* end of [prval] *)
+    prval () = fold@(xser)
+  in
+    $raise StreamSubscriptExn()
+  end (* end of [stream_vt_nil] *)
+//
+end // end of [stream_eval_exn]
+
+end // end of [local]
+
+(* ****** ****** *)
+
+(*
 #if VERBOSE_PRELUDE #then
 #print "Loading [stream_vt.dats] finishes!\n"
 #endif // end of [VERBOSE_PRELUDE]
+*)
 
 (* ****** ****** *)
 

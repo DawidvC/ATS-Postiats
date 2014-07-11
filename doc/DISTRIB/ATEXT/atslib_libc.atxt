@@ -43,8 +43,8 @@ val () = fprint_string (out, "\
 # This script is automatically generated.\n\
 #\n\
 \n\
-SOURCE=../../libc/\n\
-TARGET=ATS-Postiats/libc/\n\
+SOURCE=../../libc\n\
+TARGET=ATS-Postiats/libc\n\
 \n\
 srcget ()\n\
 {\n\
@@ -101,6 +101,7 @@ The ATSLIB/libc library\
 
 (* ****** ****** *)
 
+#packfilename("CATS/alloca.cats")
 #packfilename("CATS/dirent.cats")
 #packfilename("CATS/dlfcn.cats")
 #packfilename("CATS/errno.cats")
@@ -108,6 +109,7 @@ The ATSLIB/libc library\
 #packfilename("CATS/fnmatch.cats")
 #packfilename("CATS/malloc.cats")
 #packfilename("CATS/math.cats")
+#packfilename("CATS/signal.cats")
 #packfilename("CATS/stdio.cats")
 #packfilename("CATS/stdlib.cats")
 #packfilename("CATS/string.cats")
@@ -117,6 +119,7 @@ The ATSLIB/libc library\
 
 #packfilename("sys/CATS/mman.cats")
 #packfilename("sys/CATS/stat.cats")
+#packfilename("sys/CATS/time.cats")
 #packfilename("sys/CATS/types.cats")
 #packfilename("sys/CATS/wait.cats")
 
@@ -125,6 +128,7 @@ The ATSLIB/libc library\
 
 (* ****** ****** *)
 
+#packfilename("SATS/alloca.sats")
 #packfilename("SATS/dirent.sats")
 #packfilename("SATS/dlfcn.sats")
 #packfilename("SATS/errno.sats")
@@ -132,6 +136,7 @@ The ATSLIB/libc library\
 #packfilename("SATS/fnmatch.sats")
 #packfilename("SATS/malloc.sats")
 #packfilename("SATS/math.sats")
+#packfilename("SATS/signal.sats")
 #packfilename("SATS/stddef.sats")
 #packfilename("SATS/stdio.sats")
 #packfilename("SATS/stdlib.sats")
@@ -144,6 +149,7 @@ The ATSLIB/libc library\
 
 #packfilename("sys/SATS/mman.sats")
 #packfilename("sys/SATS/stat.sats")
+#packfilename("sys/SATS/time.sats")
 #packfilename("sys/SATS/types.sats")
 #packfilename("sys/SATS/wait.sats")
 
@@ -153,6 +159,7 @@ The ATSLIB/libc library\
 (* ****** ****** *)
 
 #packfilename("DATS/dirent.dats")
+#packfilename("DATS/errno.dats")
 #packfilename("DATS/fcntl.dats")
 #packfilename("DATS/math.dats")
 #packfilename("DATS/stdio.dats")
@@ -162,12 +169,8 @@ The ATSLIB/libc library\
 #packfilename("DATS/time.dats")
 #packfilename("DATS/unistd.dats")
 
-%{
-(*
 #packfilename("sys/DATS/stat.dats")
 #packfilename("sys/DATS/types.dats")
-*)
-%}
 
 %{
 (*

@@ -47,4 +47,71 @@ qa-list-67: an example involving destroying arrayptr
 
 ######
 
+qa-list-73: an example of large flat type
+
+######
+
+qa-list-91: an example involving $effmask_ref
+
+######
+
+qa-list-97: an example involving string generation
+
+######
+
+qa-list-190: an example involving arrpsz/arrayptrsize
+
+######
+
+qa-list-191: an example involving $vcopyenv_vt
+
+######
+
+qa-list-195: a fancy example involving alloca
+
+######
+
+qa-list-197: a simple example involving list_map
+
+######
+
+qa-list-200: a simple example involving stack-allocation
+
+######
+
+qa-list-205: a simple example involving showtype and showlvaltype
+
+######
+
+qa-list-209: extfcall for printf
+
+######
+
+qa-list-223: a simple example of vcopyenv_vt
+
+######
+
+qa-list-229: a simple example of viewptr_match
+
+######
+
+qa-list-244: fact: (Nat, Nat) -> Nat
+
+######
+
+alloca: a simple example involving alloca
+//
+list_copy: copying a given list tail-recursively
+list_last: finding the last element of a given list
+//
+strlen: a safe implementation of the string-length function
+stkclo: a simple example of stack-allocating closure-functions
+//
+calc_refcount:
+a simple example of abstract syntax trees with ref-counted nodes
+//
+for-0install: MISC
+
+######
+
 ###### [end of [README] ######

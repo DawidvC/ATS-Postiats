@@ -43,8 +43,8 @@ val () = fprint_string (out, "\
 # This script is automatically generated.\n\
 #\n\
 \n\
-SOURCE=../../doc/EXAMPLE/ATSLIB/\n\
-TARGET=ATS-Postiats/doc/EXAMPLE/ATSLIB/\n\
+SOURCE=../../doc/EXAMPLE/ATSLIB\n\
+TARGET=ATS-Postiats/doc/EXAMPLE/ATSLIB\n\
 \n\
 srcget ()\n\
 {\n\
@@ -148,6 +148,11 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 
 (* ****** ****** *)
 
+#packfilename("prelude_stream.dats")
+#packfilename("prelude_stream_vt.dats")
+
+(* ****** ****** *)
+
 #packfilename("prelude_gprint.dats")
 
 (* ****** ****** *)
@@ -158,12 +163,17 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 #packfilename("libc_fnmatch.dats")
 #packfilename("libc_malloc.dats")
 #packfilename("libc_math.dats")
+#packfilename("libc_signal.dats")
 #packfilename("libc_stdio.dats")
 #packfilename("libc_stdlib.dats")
 #packfilename("libc_string.dats")
 #packfilename("libc_strings.dats")
 #packfilename("libc_time.dats")
 #packfilename("libc_unistd.dats")
+
+(* ****** ****** *)
+
+#packfilename("libc_sys_stat.dats")
 
 (* ****** ****** *)
 
@@ -178,6 +188,10 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 (* ****** ****** *)
 
 #packfilename("libats_stkarray.dats")
+#packfilename("libats_deqarray.dats")
+
+(* ****** ****** *)
+
 #packfilename("libats_dynarray.dats")
 
 (* ****** ****** *)
@@ -186,7 +200,12 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 
 (* ****** ****** *)
 
+#packfilename("libats_stringbuf.dats")
+
+(* ****** ****** *)
+
 #packfilename("libats_hashtbl_chain.dats")
+#packfilename("libats_hashtbl_linprb.dats")
 
 (* ****** ****** *)
 
@@ -222,6 +241,7 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 
 #packfilename("libats_ML_list0.dats")
 #packfilename("libats_ML_array0.dats")
+#packfilename("libats_ML_matrix0.dats")
 #packfilename("libats_ML_string.dats")
 #packfilename("libats_ML_strarr.dats")
 
@@ -232,11 +252,26 @@ The ATSHOME/doc/EXAMPLE/ATSLIB\
 (* ****** ****** *)
 
 #packfilename("libats_ML_funset.dats")
+#packfilename("libats_ML_funmap.dats")
 
 (* ****** ****** *)
 
 #packfilename("libats_ML_monad_list.dats")
 #packfilename("libats_ML_monad_maybe.dats")
+
+(* ****** ****** *)
+
+#packfilename("libats_ATS1_funheap_braun.dats")
+#packfilename("libats_ATS1_funheap_binomial.dats")
+
+(* ****** ****** *)
+
+#packfilename("libats_ATS1_funset_listord.dats")
+#packfilename("libats_ATS1_funmset_listord.dats")
+
+(* ****** ****** *)
+
+#packfilename("libats_ATS1_linset_listord.dats")
 
 (* ****** ****** *)
 

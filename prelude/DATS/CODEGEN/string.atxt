@@ -53,13 +53,31 @@ fun memcpy
 
 #atscode_separator()
 
+implement
+{}(*tmp*)
+string_sing (c) = let
+  val (pfat, pfgc | p) = malloc_gc (i2sz(2))
+  val ((*void*)) = $UN.ptr0_set<char> (p, c)
+  val ((*void*)) = $UN.ptr0_set_at<char> (p, 1, '\000')
+in
+  $UN.castvwtp0{strnptr(1)}((pfat, pfgc | p))
+end // end of [string_sing]
+
+#atscode_separator()
+
 implement{}
-string_is_empty (str) = let
-  val p = string2ptr(str) in $UN.ptr1_get<char>(p) = CNUL
+string_is_empty
+  {n} (str) = let
+  val p = string2ptr(str)
+in
+  $UN.cast{bool(n==0)}($UN.ptr1_get<char>(p) = CNUL)
 end // end of [string_is_empty]
 implement{}
-string_isnot_empty (str) = let
-  val p = string2ptr(str) in $UN.ptr1_get<char>(p) != CNUL
+string_isnot_empty
+  {n} (str) = let
+  val p = string2ptr(str)
+in
+  $UN.cast{bool(n > 0)}($UN.ptr1_get<char>(p) != CNUL)
 end // end of [string_isnot_empty]
 
 #atscode_separator()
@@ -144,6 +162,8 @@ end // end of [loop]
 in
   $UN.cast{int(sgn(n1-n2))}(loop (string2ptr(x1), n2))
 end // end of [strintcmp]
+
+#atscode_separator()
 
 implement{
 } strlencmp
@@ -276,6 +296,15 @@ in
   castvwtp_trans{strnptr(ln)}((pf, pfgc | p_dst))
 end // end of [string_make_substring]
 
+#atscode_separator()
+//
+implement{}
+string_head
+  (str) = $UN.ptr0_get<charNZ> (string2ptr(str))
+implement{}
+string_tail{n}
+  (str) = $UN.cast{string(n-1)}(ptr_succ<char> (string2ptr(str)))
+//
 #atscode_separator()
 
 implement{}
@@ -427,6 +456,21 @@ val p2 = memcpy (p + n1, string2ptr(x2), succ(n2))
 in
   castvwtp_trans{strnptr(n1+n2)}((pf, fpf | p))
 end // end of [string1_append]
+
+#atscode_separator()
+
+implement{}
+string0_append3
+  (x1, x2, x3) = let
+//
+var xs = @[string](x1, x2, x3)
+//
+in
+//
+stringarr_concat<>
+  ($UN.cast{arrayref(string,3)}(addr@xs), i2sz(3))
+//
+end // end of [string0_append3]
 
 #atscode_separator()
 
@@ -624,27 +668,44 @@ string_rforeach (str) = let
   var env: void = () in string_rforeach_env (str, env)
 end // end of [string_rforeach]
 
-implement{env}
+implement
+{env}(*tmp*)
 string_rforeach_env
   {n} (str, env) = let
 //
-val n = string1_length (str)
-typedef chararr = array (char, n)
-val p = string2ptr (str)
-val (pf, fpf | p) = $UN.ptr_vtake {chararr} (p)
+fun loop
+(
+  p0: ptr, p1: ptr, env: &env >> _
+) : ptr = let
+in
 //
-implement
-array_rforeach$cont<char><env>
-  (c, env) = string_rforeach$cont<env> (c, env)
-implement
-array_rforeach$fwork<char><env>
-  (c, env) = string_rforeach$fwork<env> (c, env)
-val res = array_rforeach_env<char><env> (!p, n, env)
+if
+(p1 > p0)
+then let
+  val p2 = ptr_pred<char> (p1)
+  val c2 = $UN.ptr0_get<charNZ> (p2)
+  val cont =
+    string_rforeach$cont<env> (c2, env)
+  // end of [val]
+in
+  if cont
+    then let
+      val () =
+      string_rforeach$fwork<env> (c2, env)
+    in
+      loop (p0, p2, env)
+    end // end of [then]
+    else (p1) // end of [else]    
+end // end of [then]
+else (p1) // end of [else]
 //
-prval () = fpf (pf)
+end // end of [loop]
+//
+val p0 = ptrcast(str)
+val p1 = ptr_add<char> (p0, length(str))
 //
 in
-  res
+  $UN.cast{sizeLte(n)}(p1 - loop (p0, p1, env))
 end // end of [string_rforeach_env]
 
 #atscode_separator()

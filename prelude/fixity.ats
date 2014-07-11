@@ -57,8 +57,8 @@ prefix  79  &    // dynamic
 *)
 
 (*
-infixl  70 app
 postfix 69 ?
+infixl 70 app
 *)
 
 prefix  61 ~
@@ -69,6 +69,10 @@ infixl 60 nmul ndiv nmod
 *)
 
 infixl 50 + -
+
+(*
+infixr (+) ++ (*concat*)
+*)
 
 infixl 41 asl asr lsl lsr
 
@@ -85,7 +89,7 @@ infixl ( >= ) igte fgte pgte ugte
 
 infixr 40 :: @
 
-infix 30 = == <> !=
+infix 30 = == != <>
 (*
 //
 // HX-2012-07: removed
@@ -105,8 +109,8 @@ infix 0 := :=: // HX: assgn and xchng
 
 (* ****** ****** *)
 
-infixl 0 <<
-infixr 0 >>
+infixl 0 << (* g0int_asl, g0uint_lsl *)
+infixr 0 >> (* g0int_asr, g0uint_lsr *)
 
 (* ****** ****** *)
 

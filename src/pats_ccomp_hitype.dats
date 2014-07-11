@@ -98,6 +98,8 @@ datatype hitype =
 //
   | HITtyvar of (s2var) (* for substitution *)
 //
+  | HITtyclo of (funlab)
+//
   | HITrefarg of (int(*knd*), hitype)
 //
   | HITundef of (stamp, hisexp)
@@ -179,6 +181,12 @@ case+ hit of
     val () = prstr ")"
   }
 //
+| HITtyclo (flab) => {
+    val () = prstr "HITtyclo("
+    val () = fprint_funlab (out, flab)
+    val () = prstr ")"
+  }
+//
 | HITrefarg (knd, hit) => {
     val () = prstr "HITrefarg("
     val () = fprint_int (out, knd)
@@ -256,6 +264,8 @@ fun eq_hitype_hitype (x1: hitype, x2: hitype): bool
 
 extern
 fun s2exp_typize (flag: int, s2e: s2exp): hitype
+extern
+fun s2zexp_typize (flag: int, s2ze: s2zexp): hitype
 
 (* ****** ****** *)
 //
@@ -322,7 +332,14 @@ case+ x1 of
 | HITtyvar (s2v1) => (
   case+ x2 of
   | HITtyvar (s2v2) => if s2v1 != s2v2 then abort ()
-  | _ => abort ()
+  | _ => abort ((*void*))
+  )
+//
+| HITtyclo (flab1) => (
+  case+ x2 of
+  | HITtyclo (flab2) =>
+      if $UN.cast{ptr}(flab1) != $UN.cast{ptr}(flab2) then abort ()
+  | _ => abort ((*void*))
   )
 //
 | HITrefarg
@@ -483,14 +500,24 @@ case+ hit0 of
     (lhits) => let
     val () = auxlablst (hval, lhits)
   in
-    auxstr (hval, "postiats_tyrexn")
+    auxstr (hval, "postiats_tyexn")
   end // end of [HITtyexn]
 //
 | HITtyvar (s2v) => let
+    val () =
+      auxstr (hval, "postiats_tyvar")
     val stamp = s2var_get_stamp (s2v)
   in
     auxint (hval, $STMP.stamp_get_int (stamp))
   end // end of [HITtyvar]
+//
+| HITtyclo (flab) => let
+    val () =
+      auxstr (hval, "postiats_tyclo")
+    val stamp = funlab_get_stamp (flab)
+  in
+    auxint (hval, $STMP.stamp_get_int (stamp))
+  end // end of [HITtyclo]
 //
 | HITrefarg
     (knd, hit) => let
@@ -812,6 +839,14 @@ case+ hit0 of
 | HITtysum _ => emit_text (out, "atstysum_type(*ERROR*)")
 | HITtyexn _ => emit_text (out, "atstyexn_type(*ERROR*)")
 //
+| HITtyclo (flab) =>
+  {
+    val () =
+      emit_text (out, "atstyclo_type(")
+    val ((*void*)) = emit_funlab (out, flab)
+    val ((*void*)) = emit_text (out, ")")
+  }
+//
 | HITtyvar (s2v) => {
     val () = emit_text (out, "atstyvar_type")
     val (
@@ -879,10 +914,13 @@ implement
 emit_hisexp
   (out, hse) = let
 //
+(*
+val () = println! ("emit_hisexp: hse = ", hse)
+*)
+//
 val hit = hisexp_typize (1, hse)
 //
 (*
-val () = println! ("emit_hisexp: hse = ", hse)
 val () = println! ("emit_hisexp: hit = ", hit)
 *)
 //
@@ -892,7 +930,7 @@ case+ hit of
 | HITundef _ =>
   (
     emit_text (out, "HITundef("); fprint_hisexp (out, hse); emit_text (out, ")")
-  ) // end of [HITundef]
+  ) (* end of [HITundef] *)
 | _ => emit_hitype (out, hit)
 //
 end // end of [emit_hisexp]
@@ -998,15 +1036,38 @@ case+
 | S2Eextkind (name, _) => HITnmd (name)
 //
 | S2Eat _ => hitype_none ()
-| S2EVar _ => hitype_none ()
 //
-| _ => let
+| S2EVar (s2V) =>
+  (
+    s2zexp_typize (flag, s2Var_get_szexp (s2V))
+  ) (* end of [S2EVar] *)
+//
+| _ (*rest*) => let
     val hse0 = $TYER.s2exp_tyer_shallow ($LOC.location_dummy, s2e0)
   in
     hisexp_typize (flag, hse0)
   end // end of [_]
 //
 end // end of [s2exp_typize]
+
+(* ****** ****** *)
+
+implement
+s2zexp_typize
+  (flag, s2ze0) = let
+in
+//
+case+ s2ze0 of
+//
+| S2ZEextype (name, _) => HITnmd (name)
+| S2ZEextkind (name, _) => HITnmd (name)
+| _ (*rest*) => let
+    val hse0 = $TYER.s2zexp_tyer ($LOC.location_dummy, s2ze0)
+  in
+    hisexp_typize (flag, hse0)
+  end // end of [_]
+//
+end // end of [s2zexp_typize]
 
 (* ****** ****** *)
 
@@ -1054,6 +1115,8 @@ case+ hse0.hisexp_node of
     // end of [if]
   ) // end of [HSEtysum]
 //
+| HSEtyclo (flab) => HITtyclo ($UN.cast{funlab}(flab))
+//
 | HSErefarg (knd, hse) => let
     val hit = aux (flag, hse) in HITrefarg (knd, hit)
   end // end of [HSErefarg]
@@ -1063,9 +1126,14 @@ case+ hse0.hisexp_node of
     case+ hit of HITnone () => hitype_undef (hse0) | _ => (hit)
   end // end of [HSEs2exp]
 //
+| HSEs2zexp (s2ze) => let
+    val hit = s2zexp_typize (flag, s2ze) in
+    case+ hit of HITnone () => hitype_undef (hse0) | _ => (hit)
+  end // end of [HSEs2zexp]
+//
 | HSEtyvar (s2v) => HITtyvar (s2v)
 //
-| _ => hitype_undef (hse0)
+| _(*undefined-type*) => hitype_undef (hse0)
 //
 end // end of [aux]
 

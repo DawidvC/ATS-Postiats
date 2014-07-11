@@ -308,8 +308,15 @@ emit_ATSPMVf0loat
 (* ****** ****** *)
 
 implement
+emit_stamp
+  (out, x) = $STMP.fprint_stamp (out, x)
+// end of [emit_stamp]
+
+(* ****** ****** *)
+
+implement
 emit_symbol
-  (out, sym) = $SYM.fprint_symbol (out, sym)
+  (out, x) = $SYM.fprint_symbol (out, x)
 // end of [emit_symbol]
 
 (* ****** ****** *)
@@ -492,7 +499,7 @@ emit_sizeof
   (out, hselt) = let
 //
 val () =
-  emit_text (out, "ATSPMVsizeof(")
+emit_text (out, "ATSPMVsizeof(")
 val () = emit_hisexp (out, hselt)
 val () = emit_rparen (out)
 //
@@ -611,19 +618,33 @@ val extdef = $D2E.d2cst_get_extdef (d2c)
 in
 //
 case+ extdef of
-| $SYN.DCSTEXTDEFnone () => let
+//
+| $SYN.DCSTEXTDEFnone (knd) => let
+//
     val fil = $D2E.d2cst_get_fil (d2c)
     val packopt = $D2E.d2cst_get_pack (d2c)
     val () = aux_prfx (out, fil, packopt)
+//
     val () = emit_text (out, "__")
     val name = $D2E.d2cst_get_name (d2c)
     val () = emit_ident (out, name)
+//
+    val () =
+    if (knd = 0) then
+    {
+      val () = emit_text (out, "__")
+      val stamp = $D2E.d2cst_get_stamp (d2c)
+      val () = emit_stamp (out, stamp)
+    } (* end of [if] *)
+//
   in
     // nothing
   end // end of [DCSTEXTDEFnone]
 //
 | $SYN.DCSTEXTDEFsome_ext (name) => emit_ident (out, name)
+//
 | $SYN.DCSTEXTDEFsome_mac (name) => emit_ident (out, name)
+//
 | $SYN.DCSTEXTDEFsome_sta (name) => emit_ident (out, name)
 //
 end // end of [emit_d2cst]
@@ -781,11 +802,12 @@ val () = (
 val tmpknd =
   funlab_get_tmpknd (flab)
 val () =
-  if tmpknd > 0 then {
+if tmpknd > 0 then
+{
   val () = emit_text (out, "__")
   val stamp = funlab_get_stamp (flab)
   val () = $STMP.fprint_stamp (out, stamp)
-} // end of [val]
+} (* end of [if] *) // end of [val]
 //
 in
   // nothing
@@ -819,12 +841,11 @@ emit2_funlab
 val qopt = funlab_get_d2copt (flab)
 val name = (
   case+ qopt of
-  | Some (
-      d2c
-    ) => $D2E.d2cst_get_name (d2c)
-  | None () => funlab_get_name (flab)
+  | Some (d2c) => $D2E.d2cst_get_name (d2c)
+  | None ((*void*)) => funlab_get_name (flab)
 ) : string // end of [val]
-val () = emit_ident (out, name)
+//
+val ((*void*)) = emit_ident (out, name)
 //
 in
   // nothing
@@ -900,25 +921,18 @@ val () = emit_text (out, "(")
 //
 val () = emit_tmpvar (out, tmp)
 //
-val () =
-(
+val () = (
 case+ hse.hisexp_node of
-| HSEtyarr
-  (
-    _(*elt*), s2es
-  ) => emit_arrdim (out, s2es)
-| _ (*nonarr*) => ((*nothing*))
+| HSEtyarr (_(*elt*), s2es) => emit_arrdim (out, s2es)
+| _ (*non-tyarr*) => ((*nothing*))
 ) (* end of [val] *)
 //
 val () = emit_text (out, ", ")
 //
 val () = (
 case+ hse.hisexp_node of
-| HSEtyarr
-  (
-    hse_elt, _(*dim*)
-  ) => emit_hisexp (out, hse_elt)
-| _ (*nonarr*) => emit_hisexp (out, hse)
+| HSEtyarr (hse_elt, _(*dim*)) => emit_hisexp (out, hse_elt)
+| _ (*non-tyarr*) => emit_hisexp (out, hse)
 ) (* end of [val] *)
 //
 val () = emit_text (out, ") ;\n")
@@ -1181,11 +1195,12 @@ end // end of [emit_d2var_env]
 
 implement
 emit_d2envlst
-  (out, d2es) = let
+  (out, d2es, i) = let
 //
 fun auxlst
 (
-  out: FILEref, d2es: d2envlst, i: int
+  out: FILEref
+, d2es: d2envlst, i: int
 ) : int = let
 in
 //
@@ -1204,7 +1219,7 @@ case+ d2es of
 end (* end of [auxlst] *)
 //
 in
-  auxlst (out, d2es, 0)
+  auxlst (out, d2es, i)
 end // end of [emit_d2envlst]
 
 (* ****** ****** *)
@@ -1241,8 +1256,11 @@ val hse0 = pmv0.primval_type
 val-PMVcastfn
   (d2c, arg) = pmv0.primval_node
 //
-val () = emit_text (out, "ATSPMVcastfn(")
+val () =
+emit_text (out, "ATSPMVcastfn(")
+//
 val () = emit2_d2cst (out, d2c) // local name
+//
 val () = emit_text (out, ", ")
 val () = emit_hisexp (out, hse0)
 val () = emit_text (out, ", ")
@@ -1388,12 +1406,14 @@ case+ opt of
 | None () => list_nil ()
 ) : d2envlst
 //
-val () = emit_text (out, "ATSPMVcfunlab(")
+val () =
+emit_text (out, "ATSPMVcfunlab(")
+//
 val () = emit_int (out, knd)
 val () = emit_text (out, ", ")
 val () = emit_funlab (out, flab)
 val () = emit_text (out, ", (")
-val nenv = emit_d2envlst (out, d2es)
+val nenv = emit_d2envlst (out, d2es, 0)
 val () = emit_text (out, "))")
 //
 in
@@ -1429,7 +1449,7 @@ in
 //
 case+ pmv.primval_node of
 | PMVptrof (pmv) => emit_primval (out, pmv)
-| _ => auxmain (out, pmv, hse)
+| _(* non-ptrof *) => auxmain (out, pmv, hse)
 //
 end // end of [emit_primval_deref]
 
@@ -1900,6 +1920,30 @@ case+ ins.instr_node of
     val () = emit_hisexp (out, hse)
     val () = emit_text (out, ") ;")
   } // end of [INSupdate_ptrdec]
+//
+| INSclosure_initize
+    (tmp, flab) => {
+    val-Some(fent) =
+      funlab_get_funent (flab)
+    val d2es =
+      funent_eval_d2envlst (fent)
+    val () =
+      emit_text (out, "ATSINSclosure_initize(")
+    // end of [val]
+    val () = emit_funlab (out, flab)
+    val () = emit_text (out, ", ")
+    val () = emit_text (out, "(")
+    val () = emit_text (out, "(")
+    val () = emit_funlab (out, flab)
+    val () = emit_text (out, "__closure_t0ype*)")
+    val () = emit_text (out, "(")
+    val () = emit_text (out, "&")
+    val () = emit_tmpvar (out, tmp)
+    val () = emit_text (out, ")")
+    val _(*nenv+1*) = emit_d2envlst (out, d2es, 1)
+    val () = emit_text (out, ")")
+    val () = emit_text (out, ") ;")
+  } (* end of [INSclosure_initize] *)
 //
 | INStmpdec (tmp) => let
     val () = emit_text (out, "/*\n")

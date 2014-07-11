@@ -100,7 +100,8 @@ assume filenv_type = ref (filenv_struct)
 in (* in of [local] *)
 
 implement
-filenv_make (
+filenv_make
+(
   fil, s2tm, s2im, d2im, d2cs
 ) = let
 //
@@ -336,10 +337,10 @@ end // end of [local]
 implement
 the_s2rtenv_find_qua (q, id) = let
 (*
-  val () = print "the_s2rtenv_find_qua: qid = "
-  val () = $SYN.print_s0rtq (q)
-  val () = $SYM.print_symbol (id)
-  val () = print_newline ()
+val () =
+print "the_s2rtenv_find_qua: qid = "
+val () = ($SYN.print_s0rtq (q); $SYM.print_symbol (id))
+val () = print_newline ((*void*))
 *)
 in
 //
@@ -534,15 +535,20 @@ end // end of [local]
 implement
 the_s2expenv_find_qua (q, id) = let
 (*
-  val () = print "the_s2expenv_find_qua: qid = "
-  val () = ($SYN.print_s0taq (q); $SYM.print_symbol (id))
-  val () = print_newline ()
+//
+val () =
+print "the_s2expenv_find_qua: qid = "
+val () = ($SYN.print_s0taq (q); $SYM.print_symbol (id))
+val () = print_newline ((*void*))
+//
 *)
 in
 //
 case+ q.s0taq_node of
+//
 | $SYN.S0TAQnone _ =>
     the_s2expenv_find (id)
+//
 | $SYN.S0TAQsymdot (sym) => let
     val ans = the_s2expenv_find (sym)
   in
@@ -564,7 +570,7 @@ case+ q.s0taq_node of
           val () = prerr ": the qualifier ["
           val () = $SYM.prerr_symbol (sym)
           val () = prerr "] should refer to a filename but it does not."
-          val () = prerr_newline ()
+          val () = prerr_newline ((*void*))
         in
           None_vt ()
         end
@@ -575,11 +581,12 @@ case+ q.s0taq_node of
         val () = prerr ": the qualifier ["
         val () = $SYM.prerr_symbol (sym)
         val () = prerr "] is unrecognized."
-        val () = prerr_newline ()
+        val () = prerr_newline ((*void*))
       in
         None_vt ()
       end
   end // end of [S2RTsymdot]
+//
 | $SYN.S0TAQsymcolon _ => None_vt ()
 //
 end // end of [the_s2expenv_find_qua]

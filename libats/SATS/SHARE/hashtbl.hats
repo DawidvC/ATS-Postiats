@@ -105,7 +105,7 @@ key:t0p;itm:vt0p
 fun{
 key:t0p;itm:vt0p
 } hashtbl_insert_opt
-  (tbl: !hashtbl (key, INV(itm)), k0: key, x0: itm): Option_vt (itm)
+  (tbl: !hashtbl (key, INV(itm)), key, itm): Option_vt (itm)
 // end of [hashtbl_insert_opt]
 
 (* ****** ****** *)
@@ -163,25 +163,19 @@ key:t0p;itm:vt0p
 (* ****** ****** *)
 //
 fun{
-} fprint_hashtbl$sep (out: FILEref): void // "; "
-fun{
-} fprint_hashtbl$mapto (out: FILEref): void // "->"
-//
-fun{
 key,itm:t@ype
 } fprint_hashtbl
   (out: FILEref, tbl: !hashtbl (key, INV(itm))): void
 //
 overload fprint with fprint_hashtbl
 //
+fun{}
+fprint_hashtbl$sep (out: FILEref): void // default: fprint("; ")
+fun{}
+fprint_hashtbl$mapto (out: FILEref): void // default: fprint("->")
+//
 (* ****** ****** *)
 //
-fun
-{key:t0p
-;itm:vt0p}
-{env:vt0p}
-hashtbl_foreach$fwork
-  (k: key, x: &itm >> _, &env >> _): void
 fun
 {key:t0p
 ;itm:vt0p}
@@ -193,6 +187,19 @@ fun
 hashtbl_foreach_env
   (tbl: !hashtbl (key, INV(itm)), env: &env >> _): void
 //
+fun
+{key:t0p
+;itm:vt0p}
+{env:vt0p}
+hashtbl_foreach$fwork (k: key, x: &itm >> _, &env >> _): void
+//
+(* ****** ****** *)
+
+fun
+{key:t0p
+;itm:t0p}
+hashtbl_free (tbl: hashtbl (key, INV(itm))): void
+
 (* ****** ****** *)
 //
 fun

@@ -6,19 +6,19 @@
 
 (*
 ** ATS/Postiats - Unleashing the Potential of Types!
-** Copyright (C) 2011-2012 Hongwei Xi, ATS Trustful Software, Inc.
+** Copyright (C) 2011-2013 Hongwei Xi, ATS Trustful Software, Inc.
 ** All rights reserved
 **
 ** ATS is free software;  you can  redistribute it and/or modify it under
-** the terms of the GNU LESSER GENERAL PUBLIC LICENSE as published by the
-** Free Software Foundation; either version 2.1, or (at your option)  any
+** the terms of  the GNU GENERAL PUBLIC LICENSE (GPL) as published by the
+** Free Software Foundation; either version 3, or (at  your  option)  any
 ** later version.
-**
+** 
 ** ATS is distributed in the hope that it will be useful, but WITHOUT ANY
 ** WARRANTY; without  even  the  implied  warranty  of MERCHANTABILITY or
 ** FITNESS FOR A PARTICULAR PURPOSE.  See the  GNU General Public License
 ** for more details.
-**
+** 
 ** You  should  have  received  a  copy of the GNU General Public License
 ** along  with  ATS;  see the  file COPYING.  If not, please write to the
 ** Free Software Foundation,  51 Franklin Street, Fifth Floor, Boston, MA
@@ -28,13 +28,12 @@
 (* ****** ****** *)
 
 (* Author: Hongwei Xi *)
-(* Authoremail: hwxi AT cs DOT bu DOT edu *)
+(* Authoremail: gmmhwxiATgmailDOTcom *)
 (* Start time: February, 2013 *)
 
 (* ****** ****** *)
 
 #define ATS_PACKNAME "ATSLIB.libats.ML"
-#define ATS_STALOADFLAG 0 // no need for staloading at run-time
 #define ATS_EXTERN_PREFIX "atslib_ML_" // prefix for external names
 
 (* ****** ****** *)
@@ -117,14 +116,14 @@ overload isneqz with strarr_isnot_empty
 
 (* ****** ****** *)
 //
-symintr strarr_get_at
-//
 fun{tk:tk}
 strarr_get_at_gint
   (str: strarr, i: g0int(tk)):<!exn> char
 fun{tk:tk}
 strarr_get_at_guint
   (str: strarr, i: g0uint(tk)):<!exn> char
+//
+symintr strarr_get_at
 //
 overload [] with strarr_get_at_gint of 0
 overload strarr_get_at with strarr_get_at_gint of 0
@@ -163,24 +162,29 @@ overload <> with neq_strarr_strarr
 
 (* ****** ****** *)
 
-fun strarr_compare
+fun
+strarr_compare
   (str1: strarr, str2: strarr):<> int
 overload compare with strarr_compare
 
 (* ****** ****** *)
-
-fun{}
-strarr_length (str: strarr):<> size_t
+//
+fun
+strarr_length (strarr):<> size_t
+//
 overload length with strarr_length
-
+//
 (* ****** ****** *)
 //
 fun print_strarr (str: strarr): void
 fun prerr_strarr (str: strarr): void
-fun fprint_strarr (out: FILEref, str: strarr): void
 //
 overload print with print_strarr
 overload prerr with prerr_strarr
+//
+fun
+fprint_strarr (out: FILEref, str: strarr): void
+//
 overload fprint with fprint_strarr
 //
 (* ****** ****** *)
