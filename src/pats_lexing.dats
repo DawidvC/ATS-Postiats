@@ -317,17 +317,17 @@ end // end of [local]
 (* ****** ****** *)
 
 local
-
+//
 staload
 STRING = "libc/SATS/string.sats" // for [string.cats]
+//
 extern
 fun substrncmp
   (x1: string, i1: int, x2: string, i2: int): int = "mac#atslib_substrcmp"
-// end of [substrncmp]
-
+//
 macdef
 slash2_test (x, i) = (substrncmp (,(x), ,(i), "//", 0) = 0)
-
+//
 in (*in-of-local*)
 
 fun
@@ -610,12 +610,10 @@ testing_char
 ) = res where {
   val i = lexbufpos_get_char (buf, pos)
   val res = (
-    if i >= 0 then
-      if (i2c)i = lit then 1 else ~1
-    else ~1
+    if i >= 0 then (if (i2c)i = lit then 1 else ~1) else ~1
   ) : int // end of [val]
   val () = if res >= 0 then posincbyc (pos, i)
-} // end of [testing_char]
+} (* end of [testing_char] *)
 
 (* ****** ****** *)
 //
@@ -654,20 +652,25 @@ end // end of [loop]
 //
 val nchr0 = lexbufpos_diff (buf, pos)
 val res = loop (buf, nchr0, lit, 0)
-val () = if res >= 0
+val () =
+(
+if res >= 0
   then $LOC.position_incby_count (pos, (i2u)res) else ()
-// end of [if] // end of [val]
+// end of [if]
+) (* end of [val] *)
 //
 } // end of [testing_literal]
 
 (* ****** ****** *)
 
-fun testing_identrstseq0
+fun
+testing_identrstseq0
   (buf: &lexbuf, pos: &position): uint
   = ftesting_seq0 (buf, pos, IDENTRST_test)
 // end of [testing_identrstseq0]
 
-fun testing_symbolicseq0
+fun
+testing_symbolicseq0
   (buf: &lexbuf, pos: &position): uint
   = ftesting_seq0 (buf, pos, SYMBOLIC_test)
 // end of [testing_symbolicseq0]
@@ -708,7 +711,9 @@ testing_fexponent
   val i = lexbufpos_get_char (buf, pos)
 in
 //
-if i >= 0 then let
+if
+i >= 0
+then let
   val c = (i2c)i
 in
   if eE_test (c) then let
@@ -716,7 +721,8 @@ in
     val k1 = ftesting_opt (buf, pos, SIGN_test)
     val k2 = testing_digitseq0 (buf, pos) // err: k2 = 0
 //
-    val () = if k2 = 0u then {
+    val () =
+    if k2 = 0u then {
       val loc = lexbufpos_get_location (buf, pos)
       val err = lexerr_make (loc, LE_FEXPONENT_empty)
       val () = the_lexerrlst_add (err)
@@ -725,7 +731,8 @@ in
   in
     u2i (k1+k2+1u)
   end else ~1 // end [if]
-end else ~1 // end of [if]
+end // end of [then]
+else (~1) // end of [else]
 //
 end // end of [testing_fexponent]
 
@@ -750,7 +757,8 @@ if i >= 0 then let
     ) : int // end of [val]
 //
 (*
-    val () = if (k12 = 0) then {
+    val () =
+    if (k12 = 0) then {
       val loc = lexbufpos_get_location (buf, pos)
       val err = lexerr_make (loc, LE_FEXPONENT_empty)
       val () = the_lexerrlst_add (err)
@@ -782,7 +790,8 @@ in
     val k1 = ftesting_opt (buf, pos, SIGN_test)
     val k2 = testing_digitseq0 (buf, pos) // err: k2 = 0
 //
-    val () = if k2 = 0u then {
+    val () =
+    if k2 = 0u then {
       val loc = lexbufpos_get_location (buf, pos)
       val err = lexerr_make (loc, LE_FEXPONENT_empty)
       val () = the_lexerrlst_add (err)
@@ -835,10 +844,12 @@ lexbufpos_token_reset
 , pos: &position
 , node: token_node
 ) : token = let
-  val loc =
-    lexbufpos_get_location (buf, pos)
-  // end of [val]
-  val () = lexbuf_reset_position (buf, pos)
+//
+val loc =
+  lexbufpos_get_location (buf, pos)
+//
+val () = lexbuf_set_position (buf, pos)
+//
 in
   token_make (loc, node)
 end // end of [lexbufpos_token_reset]
@@ -852,9 +863,11 @@ lexbufpos_lexerr_reset
 , pos: &position
 , node: lexerr_node
 ) : token = let
-  val loc = lexbufpos_get_location (buf, pos)
-  val () = the_lexerrlst_add (lexerr_make (loc, node))
-  val () = lexbuf_reset_position (buf, pos)
+//
+val loc = lexbufpos_get_location (buf, pos)
+val ((*void*)) = the_lexerrlst_add (lexerr_make (loc, node))
+val ((*void*)) = lexbuf_set_position (buf, pos)
+//
 in
   token_make (loc, T_ERR)
 end // end of [lexbufpos_lexerr_reset]
@@ -927,20 +940,24 @@ fun lexing_EXTCODE_knd
 implement
 lexing_COMMENT_line
   (buf, pos) = let
-  val i = lexbufpos_get_char (buf, pos)  
+//
+val i = lexbufpos_get_char (buf, pos)
+//
 in
 //
-if i >= 0 then (
-  case+ (i2c)i of
-  | '\n' => (
-      lexbufpos_token_reset (buf, pos, T_COMMENT_line)
-    ) // end of ['\n']
-  | _ => let
-      val () = posincby1 (pos) in lexing_COMMENT_line (buf, pos)
-    end // end of [_]
-) else (
-  lexbufpos_token_reset (buf, pos, T_COMMENT_line)
-) // end of [if]
+if (
+i >= 0
+) then (
+//
+case+ (i2c)i of
+| '\n' => (
+    lexbufpos_token_reset (buf, pos, T_COMMENT_line)
+  ) (* end of [EOL] *)
+| _ (*non-EOL*) => let
+    val () = posincby1 (pos) in lexing_COMMENT_line (buf, pos)
+  end (* end of [_] *)
+//
+) else lexbufpos_token_reset (buf, pos, T_COMMENT_line)
 //
 end // end of [lexing_COMMENT_line]
 
@@ -990,7 +1007,7 @@ lexing_COMMENT_block_ml
     val () = list_vt_free (xs)
     val err = lexerr_make (loc, LE_COMMENT_block_unclose)
     val () = the_lexerrlst_add (err)
-    val () = lexbuf_reset_position (buf, pos)
+    val () = lexbuf_set_position (buf, pos)
   in
     token_make (loc, T_ERR)
   end // end of [feof]
@@ -1149,7 +1166,7 @@ if i >= 0 then let
         val str = lexbuf_get_substrptr1 (buf, nchr, len)
         val str = string_of_strptr (str)
 //
-        val () = lexbuf_reset_position (buf, pos)
+        val () = lexbuf_set_position (buf, pos)
       in
         token_make (loc, T_EXTCODE (knd, str))
       end else let
@@ -1335,7 +1352,8 @@ end // end of [lexing_DOT]
 (* ****** ****** *)
 
 extern
-fun lexing_PERCENT
+fun
+lexing_PERCENT
   (buf: &lexbuf, pos: &position): token
 implement
 lexing_PERCENT
@@ -1552,11 +1570,16 @@ in
 end // end of [lexing_char_closing]
 
 implement
-lexing_QUOTE (buf, pos) = let
-  val i = lexbufpos_get_char (buf, pos)
+lexing_QUOTE
+  (buf, pos) = let
+//
+val i = lexbufpos_get_char (buf, pos)
+//
 in
 //
-if i >= 0 then let
+if
+i >= 0
+then let
   val c = (i2c)i
   val () = posincby1 (pos) in
   case+ c of
@@ -1565,12 +1588,15 @@ if i >= 0 then let
   | '\[' => lexbufpos_token_reset (buf, pos, T_QUOTELBRACKET)
   | '\{' => lexbufpos_token_reset (buf, pos, T_QUOTELBRACE)
 //
-  | _ when c = '\\' =>
-      lexing_char_special (buf, pos)
-  | _ => lexing_char_closing (buf, pos, c)
-end else
+  | _ when c = '\\' => lexing_char_special (buf, pos)
+//
+  | _ (*rest-of-char*) => lexing_char_closing (buf, pos, c)
+//
+end // end of [then]
+else (
   lexbufpos_lexerr_reset (buf, pos, LE_QUOTE_dangling)
-// end of [if]
+) (* end of [else] *)
+//
 end // end of [lexing_QUOTE]
 
 end // end of [local]
@@ -1986,7 +2012,7 @@ case+ (i2c)i of
     lexbufpos_token_reset (buf, pos, T_IDENT_ext (str))
   end
 //
-| _ => let
+| _ (*rest*) => let
     val mystr =
       lexbuf_get_strptr1 (buf, k)
     // end of [val]
@@ -2006,6 +2032,7 @@ viewtypedef mystr = strptr(l)
 val sym = IDENT_alp_get_lexsym ($UN.castvwtp1{string}{mystr}(mystr))
 //
 in
+//
 case+ sym of
 | LS_ABST () when
     testing_literal (buf, pos, "@ype") >= 0 => let
@@ -2102,7 +2129,7 @@ case+ sym of
     val () = strptr_free (mystr) in lexing_REF (buf, pos)
   end // end of [LS_REF]
 //
-| _ => let
+| _ (*rest*) => let
     val tnode =
       tnode_search ($UN.castvwtp1{string}{mystr}(mystr))
     // end of [val]
@@ -2113,7 +2140,7 @@ case+ sym of
       in
         lexbufpos_token_reset (buf, pos, T_IDENT_alp (mystr))
       end
-    | _ => let
+    | _ (*not-NONE*) => let
         val () = strptr_free (mystr) in lexbufpos_token_reset (buf, pos, tnode)
       end // end of [_]
   end // end of [_]
@@ -2363,7 +2390,7 @@ var pos: position
 val () = lexbuf_get_position (buf, pos)
 val k0 = testing_blankseq0 (buf, pos)
 val () = lexbuf_set_nspace (buf, (u2i)k0)
-val () = lexbuf_reset_position (buf, pos)
+val () = lexbuf_set_position (buf, pos)
 //
 val i0 = lexbuf_get_char (buf, 0u)
 //
@@ -2439,9 +2466,9 @@ case+ 0 of
     val loc =
       lexbufpos_get_location (buf, pos)
     val err =
-      lexerr_make (loc, LE_UNSUPPORTED (c0))
+      lexerr_make (loc, LE_UNSUPPORTED_char(c0))
     val () = the_lexerrlst_add (err)
-    val () = lexbuf_reset_position (buf, pos)
+    val () = lexbuf_set_position (buf, pos)
   in
     lexing_next_token (buf)
   end // end of [rest-of-char]
