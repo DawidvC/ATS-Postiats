@@ -68,7 +68,7 @@ typedef c2lau = $DYNEXP2.c2lau
 
 (* ****** ****** *)
 
-fun intinf_of_i0nt (x: $SYN.i0nt): intinf
+fun i0nt2intinf (x: $SYN.i0nt): intinf
 
 (* ****** ****** *)
 
@@ -93,6 +93,12 @@ p2atcstlst
   (n:int) = list (p2atcst, n)
 and p2atcstlst = List (p2atcst)
 and labp2atcstlst = List (labp2atcst)
+
+(* ****** ****** *)
+
+fun p2atcst_lst (lin: int, xs: p2atcstlst): p2atcst
+
+(* ****** ****** *)
 
 viewtypedef
 p2atcstlst_vt = List_vt (p2atcst)

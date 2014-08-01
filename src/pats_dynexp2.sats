@@ -498,13 +498,19 @@ fun fprint_d2pitm : fprint_type (d2pitm)
 fun fprint_d2pitmlst : fprint_type (d2pitmlst)
 
 (* ****** ****** *)
-
-fun d2sym_make (
-  loc: location, dq: $SYN.d0ynq, id: symbol, d2pis: d2pitmlst
+//
+fun
+d2sym_make
+(
+  loc: location
+, dq: $SYN.d0ynq, id: symbol, d2pis: d2pitmlst
 ) : d2sym // end of [d2sym_make]
-
-fun fprint_d2sym : fprint_type (d2sym)
-
+//
+fun
+fprint_d2sym : fprint_type(d2sym)
+//
+overload fprint with fprint_d2sym
+//
 (* ****** ****** *)
 
 datatype pckind =
@@ -557,8 +563,8 @@ p2at_node =
 //
   | P2Tempty of ()
 //
-  | P2Trec of (int(*knd*), int(*npf*), labp2atlst)
   | P2Tlst of (int(*lin*), p2atlst) // pattern list
+  | P2Trec of (int(*knd*), int(*npf*), labp2atlst)
 //
   | P2Trefas of (d2var, p2at)
 //
