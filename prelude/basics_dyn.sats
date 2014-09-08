@@ -96,9 +96,11 @@ eqint_make_guint
 dataprop
 EQADDR (addr, addr) = {x:addr} EQADDR (x, x)
 //
-prfun eqaddr_make {x,y:addr | x == y} (): EQADDR (x, y)
+prfun
+eqaddr_make {x,y:addr | x == y} (): EQADDR (x, y)
 //
-prfun eqaddr_make_ptr {x:addr} (x: ptr (x)): [y:addr] EQADDR (x, y)
+prfun
+eqaddr_make_ptr {x:addr} (x: ptr (x)): [y:addr] EQADDR (x, y)
 //
 (* ****** ****** *)
 
@@ -116,7 +118,8 @@ prfun prop_verify_and_add{b:bool | b} ():<prf> [b] void
 
 (* ****** ****** *)
 
-prfun pridentity{v:view} (pf: !INV(v)): void
+prfun pridentity_v{v:view} (x: !INV(v)): void
+prfun pridentity_vt{vt:viewt@ype} (x: !INV(vt)): void
 
 (* ****** ****** *)
 
@@ -559,13 +562,14 @@ overload assertexn with assertexn_bool0 of 0
 overload assertexn with assertexn_bool1 of 10
 //
 (* ****** ****** *)
-
+//
+symintr assert_errmsg
+//
 fun assert_errmsg_bool0
   (x: bool, msg: string):<!exn> void = "mac#%"
 fun assert_errmsg_bool1
   {b:bool} (x: bool b, msg: string):<!exn> [b] void = "mac#%"
 //
-symintr assert_errmsg
 overload assert_errmsg with assert_errmsg_bool0 of 0
 overload assert_errmsg with assert_errmsg_bool1 of 10
 //

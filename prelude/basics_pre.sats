@@ -335,9 +335,11 @@ stadef - = add_eff_eff // difference of effsets
 // HX: some overloaded symbols
 //
 symintr ~ not
-symintr && || << >>
+(*
+symintr && || // macros
+*)
 symintr lnot lor lxor land
-symintr + - * / mod ndiv nmod
+symintr + - * / % mod ndiv nmod
 symintr < <= > >= = == != <> compare
 symintr isltz isltez isgtz isgtez iseqz isneqz
 symintr neg abs max min
@@ -345,6 +347,7 @@ symintr succ pred half double
 symintr square sqrt cube cbrt pow
 //
 symintr [] // for subscripting
+symintr << >> // for L/R-shifting
 //
 symintr inc dec
 symintr ++ -- // inc and dec
@@ -378,9 +381,12 @@ symintr tostring tostrptr
 // for dot-notation overloading
 //
 symintr .size
+symintr .length
+symintr .get .set .exch
 symintr .nrow .ncol
 symintr .head .tail
 symintr .next .prev
+symintr .init .last
 symintr .eval
 //
 (* ****** ****** *)
