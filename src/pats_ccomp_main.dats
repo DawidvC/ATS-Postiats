@@ -161,6 +161,15 @@ val () = emit_text (out, "#include _ATS_CCOMP_PRELUDE_USER\n")
 val () = emit_text (out, "//\n")
 val () = emit_text (out, "#endif /* _ATS_CCOMP_PRELUDE_USER */\n")
 //
+val () = emit_text (out, "/*\n")
+val () = emit_text (out, "** for user2-supplied prelude\n")
+val () = emit_text (out, "*/\n")
+val () = emit_text (out, "#ifdef _ATS_CCOMP_PRELUDE_USER2\n")
+val () = emit_text (out, "//\n")
+val () = emit_text (out, "#include _ATS_CCOMP_PRELUDE_USER2\n")
+val () = emit_text (out, "//\n")
+val () = emit_text (out, "#endif /* _ATS_CCOMP_PRELUDE_USER2 */\n")
+//
 in
   emit_newline (out)
 end // end of [emit_ats_ccomp_prelude]
@@ -932,8 +941,6 @@ val () =
   emit_text (out, "** for initialization(dynloading)")
 val () = emit_text (out, "\n*/\n")
 //
-val () = aux_dynload_ias (out, infil)
-//
 val () =
 if flag <= 0 then (
   emit_text (out, "ATSdynloadflag_init(");
@@ -987,6 +994,8 @@ val () = emit_text (out, "ATSfunbody_end()\n")
 //
 val () = emit_text (out, "ATSreturn_void(tmpret_void) ;\n")
 val () = emit_text (out, "} /* end of [*_dynload] */\n")
+//
+val () = aux_dynload_ias (out, infil) // HX: creating an alias
 //
 val () =
 if flag = 0 then emit_text (out, "#endif // end of [#if(0)]\n")

@@ -455,12 +455,15 @@ HX: VERSION-0.0.8 released on Sunday, May 4, 2014
 //
 HX: VERSION-0.1.0 released on Monday, June 9, 2014
 HX: VERSION-0.1.1 released on Wednesday, July 30, 2014
-HX: VERSION-0.1.2 released on Friday, Auguest 29, 2014
+HX: VERSION-0.1.2 released on Friday, August 29, 2014
+HX: VERSION-0.1.3 released on Monday, September 29, 2014
+HX: VERSION-0.1.4 released on Thursday, October 23, 2014
+HX: VERSION-0.1.5 released on Thursday, November 20, 2014
 //
 *)
 #define PATS_MAJOR_VERSION 0
 #define PATS_MINOR_VERSION 1
-#define PATS_MICRO_VERSION 3
+#define PATS_MICRO_VERSION 6
 (*
 //
 // HX-2011-04-27: this is supported in Postiats:
@@ -999,7 +1002,8 @@ do_trans1234
 ) : hideclist // end-of-function
 //
 extern
-fun do_transfinal
+fun
+do_transfinal
   (state: &cmdstate, given: string, d0cs: d0eclist): void
 //
 (* ****** ****** *)
@@ -1191,6 +1195,10 @@ case+ arglst of
 //
         val () = state.infil := $FIL.filename_stdin
 //
+        val () =
+        if stadyn >= 1
+          then $GLOB.the_DYNLOADFLAG_set (1)
+        // end of [if]
         val d0cs = parse_from_stdin_toplevel (stadyn)
 //
         var istrans: bool = true
@@ -1231,7 +1239,8 @@ case+ arg of
 //
 // HX: the [inpwait] state stays unchanged
 //
-    val stadyn = waitkind_get_stadyn (state.waitkind)
+    val stadyn =
+      waitkind_get_stadyn (state.waitkind)
     val nif = state.ninpfile
   in
     case+ arg of
@@ -1246,7 +1255,13 @@ case+ arg of
         val () = state.ninpfile := state.ninpfile + 1
         val () = prelude_load_if (PATSHOME, state.preludeflag)
 //
-        val d0cs = parse_from_givename_toplevel (stadyn, given, state.infil)
+        val () =
+        if stadyn >= 1
+          then $GLOB.the_DYNLOADFLAG_set (1)
+        // end of [if]
+        val d0cs =
+          parse_from_givename_toplevel (stadyn, given, state.infil)
+        // end of [val]
 //
         var istrans: bool = true
         val isdepgen = state.depgen > 0

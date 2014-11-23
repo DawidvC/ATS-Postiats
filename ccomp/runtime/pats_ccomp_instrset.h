@@ -62,10 +62,6 @@ ATStylazy(tyval) \
 //
 /* ****** ****** */
 
-#define ATSempty()
-
-/* ****** ****** */
-
 #define ATSif(x) if(x)
 #define ATSthen()
 #define ATSelse() else
@@ -144,14 +140,12 @@ ATSloop_close(init, fini, cont) \
 #define ATSCSTSPmyloc(info) info
 
 /* ****** ****** */
-
+//
 #define ATSPMVtop() atserror_top
-#define ATSPMVempty() atserror_empty
-
-/* ****** ****** */
-
-#define ATSPMVextval(id) (id)
-
+//
+#define ATSPMVempty() /*empty*/
+#define ATSPMVextval(name) (name)
+//
 /* ****** ****** */
 
 #define ATSPMVfunlab(flab) (flab)
@@ -182,8 +176,13 @@ ATSloop_close(init, fini, cont) \
 //
 /* ****** ****** */
 
-#define ATSfuncall(fun_id, fun_arg) (fun_id)fun_arg
+#define ATSfuncall(fun, funarg) (fun)funarg
 
+/* ****** ****** */
+//
+#define ATSextfcall(fun, funarg) (fun)funarg
+#define ATSextmcall(obj, mtd, funarg) (obj->mtd)funarg
+//
 /* ****** ****** */
 //
 #define \
@@ -344,6 +343,11 @@ ATSINSmove_con0(tmp, tag) (tmp = ((void*)tag))
 //
 /* ****** ****** */
 
+#define ATSINSextvar_assign(var, pmv) var = (pmv)
+#define ATSINSdyncst_valbind(d2c, pmv) d2c = (pmv)
+
+/* ****** ****** */
+
 #define ATSINSclosure_initize(flab, tmpenv) (flab##__closureinit)tmpenv
 
 /* ****** ****** */
@@ -384,7 +388,10 @@ do { \
 /* ****** ****** */
 
 #define \
-ATSINSmove_ldelay(tmpret, tyval, pmv_thk) ATSINSmove(tmpret, pmv_thk)
+ATSINSmove_ldelay(tmpret, tyval, __thunk) \
+do { \
+  ATSINSmove(tmpret, __thunk) ; \
+} while(0) /* end of [do ... while ...] */
 
 #define \
 ATSINSmove_llazyeval(tmpret, tyval, __thunk) \
@@ -394,6 +401,8 @@ do { \
   ATS_MFREE(__thunk) ; \
 } while(0) /* end of [do ... while ...] */
 
+/* ****** ****** */
+
 #define \
 atspre_lazy_vt_free(__thunk) \
 do { \
@@ -401,6 +410,12 @@ do { \
   ATS_MFREE(__thunk) ; \
 } while(0) /* atspre_lazy_vt_free */
 
+/* ****** ****** */
+//
+// HX-2014-10:
+//
+#define atspre_lazy2cloref(pmv_lazy) ((*(ATStylazy(atstype_ptr)*)pmv_lazy).lazy.thunk)
+//
 /* ****** ****** */
 
 #endif /* PATS_CCOMP_INSTRSET_H */

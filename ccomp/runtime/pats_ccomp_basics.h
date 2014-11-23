@@ -47,8 +47,6 @@
 //
 #define atsptr_null ((void*)0)
 //
-#define ATSextval(name) name
-//
 /* ****** ****** */
 //
 #define ATSstruct struct
@@ -58,12 +56,12 @@
 //
 /* ****** ****** */
 
-#define ATSinline() static inline
+#define ATSextern() extern
+#define ATSstatic() static
 
 /* ****** ****** */
 
-#define ATSextern() extern
-#define ATSstatic() static
+#define ATSinline() static inline
 
 /* ****** ****** */
 //
@@ -109,7 +107,6 @@ ATSdynexn_initize(d2c, exnmsg) the_atsexncon_initize(&(d2c), exnmsg)
 
 #define ATSdyncst_valimp(d2c, type) type d2c
 #define ATSdyncst_valdec(d2c, type) ATSextern() type d2c
-#define ATSdyncst_valbind(d2c, pmv) d2c = (pmv)
 
 /* ****** ****** */
 //

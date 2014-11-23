@@ -181,23 +181,23 @@ fun tmpvar_make_ret
 fun tmpvar_copy_err (tmp: tmpvar): tmpvar
 
 (* ****** ****** *)
-
+//
 fun tmpvar_get_loc (tmp: tmpvar): location
-
+//
 fun tmpvar_get_type (tmp: tmpvar): hisexp
-
+//
 fun tmpvar_isref (tmp: tmpvar): bool // tmpref?
 fun tmpvar_isret (tmp: tmpvar): bool // tmpret?
 fun tmpvar_iserr (tmp: tmpvar): bool // tmperr?
-
+//
 fun tmpvar_get_topknd
   (tmp: tmpvar): int // knd=0/1: local/(static)top
-
+//
 fun tmpvar_get_origin (tmp: tmpvar): tmpvaropt
 fun tmpvar_get_suffix (tmp: tmpvar): int
-
+//
 fun tmpvar_get_stamp (tmp: tmpvar): stamp // unicity
-
+//
 (* ****** ****** *)
 
 fun tmpvar_get_tailcal (tmp: tmpvar): int // if >= 2
@@ -335,14 +335,22 @@ fun funlab_make_dcst_type
 fun funlab_make_dvar_type
   (d2v: d2var, hse: hisexp, opt: fcopt_vt): funlab
 //
-fun funlab_make_tmpcst_type
+fun
+funlab_make_tmpcst_type
 (
   d2c: d2cst, t2ms: t2mpmarglst, hse: hisexp, opt: fcopt_vt
 ) : funlab // endfun
-fun funlab_make_tmpvar_type
+(*
+//
+// HX-2014-11-01:
+// Where is this needed?
+//
+fun
+funlab_make_tmpvar_type
 (
    d2v: d2var, t2ms: t2mpmarglst, hse: hisexp, opt: fcopt_vt
 ) : funlab // endfun
+*)
 //
 (* ****** ****** *)
 //
@@ -544,6 +552,10 @@ primdec_node =
 //
   | PMDsaspdec of (s2aspdec)
 //
+  | PMDextvar of
+      (string(*name*), instrlst)
+    // end of [PMDextvar]
+//
   | PMDdatdecs of (s2cstlst)
   | PMDexndecs of (d2conlst)
 //
@@ -688,14 +700,23 @@ fun fprint_primdeclst : fprint_type (primdeclst)
 fun primdec_none (loc: location): primdec
 
 (* ****** ****** *)
+//
+fun primdec_list
+  (loc: location, pmds: primdeclst): primdec
+//
+(* ****** ****** *)
 
-fun primdec_list (loc: location, pmds: primdeclst): primdec
+fun
+primdec_saspdec
+  (loc: location, d2c: s2aspdec): primdec
+// end of [primdec_saspdec]
 
 (* ****** ****** *)
 
-fun primdec_saspdec
-  (loc: location, d2c: s2aspdec): primdec
-// end of [primdec_saspdec]
+fun
+primdec_extvar
+  (loc: location, name: string, inss: instrlst): primdec
+// end of [primdec_extvar]
 
 (* ****** ****** *)
 
@@ -709,16 +730,23 @@ fun primdec_exndecs
 
 (* ****** ****** *)
 
-fun primdec_fundecs (
-  loc: location, knd: funkind, decarg: s2qualst, hfds: hifundeclst
+fun
+primdec_fundecs
+(
+  loc: location
+, knd: funkind, decarg: s2qualst, hfds: hifundeclst
 ) : primdec // end of [primdec_fundecs]
 
 (* ****** ****** *)
 
-fun primdec_valdecs (
+fun
+primdec_valdecs
+(
   loc: location, knd: valkind, hvds: hivaldeclst, inss: instrlst
 ) : primdec // end of [primdec_valdecs]
-fun primdec_valdecs_rec (
+fun
+primdec_valdecs_rec
+(
   loc: location, knd: valkind, hvds: hivaldeclst, inss: instrlst
 ) : primdec // end of [primdec_valdecs_rec]
 
@@ -1108,7 +1136,9 @@ instr_node =
       (tmpvar, primval(*fun*), hisexp, primvalist(*arg*))
   | INSfcall2 of // tail-recursive funcall // ntl: 0/1+ : fun/fnx
       (tmpvar, funlab, int(*ntl*), hisexp, primvalist(*arg*))
+//
   | INSextfcall of (tmpvar, string(*fun*), primvalist(*arg*))
+  | INSextmcall of (tmpvar, primval(*obj*), string(*mtd*), primvalist(*arg*))
 //    
   | INScond of ( // conditinal instruction
       primval(*test*), instrlst(*then*), instrlst(*else*)
@@ -1195,6 +1225,7 @@ instr_node =
 //
   | INStmpdec of (tmpvar) // HX-2013-01: this is a no-op
 //
+  | INSextvar of (string, primval) // HX-2013-05: extvar def
   | INSdcstdef of (d2cst, primval) // HX-2013-05: global const def
 //
 // end of [instr_node]
@@ -1270,12 +1301,22 @@ fun instr_fcall2
 , pmvs_arg: primvalist
 ) : instr // end of [instr_fcall2]
 
-fun instr_extfcall
+(* ****** ****** *)
+//
+fun
+instr_extfcall
 (
   loc: location
 , tmpret: tmpvar, _fun: string, _arg: primvalist
 ) : instr // end of [instr_extfcall]
-
+//
+fun
+instr_extmcall
+(
+  loc: location
+, tmpret: tmpvar, _obj: primval, _mtd: string, _arg: primvalist
+) : instr // end of [instr_extmcall]
+//
 (* ****** ****** *)
 
 fun instr_cond
@@ -1476,6 +1517,7 @@ fun instr_tmpdec (loc: location, tmp: tmpvar): instr
 
 (* ****** ****** *)
 
+fun instr_extvar (loc: location, xnm: string, pmv: primval): instr
 fun instr_dcstdef (loc: location, d2c: d2cst, pmv: primval): instr
 
 (* ****** ****** *)
@@ -1514,6 +1556,15 @@ fun instrseq_add_comment (res: !instrseq, comment: string): void
 //
 fun instrseq_add_tmpdec
   (res: !instrseq, loc: location, tmp: tmpvar): void
+//
+(* ****** ****** *)
+//
+fun
+instrseq_add_extvar
+(
+  res: !instrseq, loc: location, xnm: string, pmv: primval
+) : void // end-of-fun
+//
 fun instrseq_add_dcstdef
   (res: !instrseq, loc: location, d2c: d2cst, pmv: primval): void
 //
@@ -1593,6 +1644,12 @@ fun funent_get_vbindmap (fent: funent): vbindmap
 fun funent_get_instrlst (fent: funent): instrlst
 
 (* ****** ****** *)
+//
+datatype
+hifundec2 =
+HIFUNDEC2 of (hifundec, tmpsub)
+//
+fun fprint_hifundec2 (out: FILEref, hfd2: hifundec2): void
 //
 datatype
 hiimpdec2 =
@@ -1727,7 +1784,12 @@ fun ccompenv_add_vbindmapenvall
 
 (* ****** ****** *)
 //
+fun ccompenv_add_tmpsub (env: !ccompenv, tsub: tmpsub): void
+//
+(* ****** ****** *)
+//
 fun ccompenv_add_fundec (env: !ccompenv, hfd: hifundec): void
+fun ccompenv_add_fundec2 (env: !ccompenv, hfd2: hifundec2): void
 //
 fun ccompenv_add_impdec (env: !ccompenv, imp: hiimpdec): void
 fun ccompenv_add_impdec2 (env: !ccompenv, imp2: hiimpdec2): void
@@ -1736,13 +1798,15 @@ fun ccompenv_add_staload (env: !ccompenv, fenv: filenv): void
 //
 (* ****** ****** *)
 //
-fun ccompenv_add_tmpsub (env: !ccompenv, tsub: tmpsub): void
-//
-fun ccompenv_add_impdecloc (env: !ccompenv, imp: hiimpdec): void
+fun
+ccompenv_add_impdecloc
+(
+  env: !ccompenv, sub: !stasub, imp: hiimpdec
+) : void // end of [ccompenv_add_impdecloc]
 //
 fun ccompenv_add_fundecsloc
 (
-  env: !ccompenv, knd: funkind, decarg: s2qualst, hfds: hifundeclst
+  env: !ccompenv, sub: !stasub, knd: funkind, decarg: s2qualst, hfds: hifundeclst
 ) : void // end of [ccompenv_add_fundecsloc]
 //
 fun ccompenv_add_tmpcstmat (env: !ccompenv, tmpmat: tmpcstmat): void
@@ -1815,11 +1879,15 @@ fun hidexp_ccomp_ret_lazyeval : hidexp_ccomp_ret_funtype
 fun hidexp_ccomp_ret_trywith : hidexp_ccomp_ret_funtype
 //
 (* ****** ****** *)
-
+//
 fun hidexplst_ccomp
   (env: !ccompenv, res: !instrseq, hdes: hidexplst): primvalist
 // end of [hidexplst_ccomp]
-
+//
+fun hidexplst_ccompv
+  (env: !ccompenv, res: !instrseq, hdes: hidexplst): primvalist
+// end of [hidexplst_ccompv]
+//
 (* ****** ****** *)
 
 fun hidexp_ccomp_funlab_arg_body
@@ -1888,6 +1956,7 @@ fun hideclist_ccomp0 (hdcs: hideclist): primdeclst
 // HX-2013-04: for handling environvals
 //
 fun funent_varbindmap_initize (fent: funent): void
+fun funent_varbindmap_initize2 (fent: funent): void
 fun funent_varbindmap_uninitize (fent: funent): void
 fun the_funent_varbindmap_find (d2v: d2var): Option_vt (primval)
 //
@@ -2091,7 +2160,9 @@ fun emit_instr : emit_instr_type
 //
 fun emit_instr_fcall : emit_instr_type
 fun emit_instr_fcall2 : emit_instr_type
+//
 fun emit_instr_extfcall : emit_instr_type
+fun emit_instr_extmcall : emit_instr_type
 //
 fun emit_instr_patck : emit_instr_type
 //
@@ -2144,28 +2215,31 @@ fun funlab_tmpcst_match
 // end of [funlab_tmpcst_match]
 
 (* ****** ****** *)
-
+//
 fun hiimpdec_tmpcst_match
   (imp: hiimpdec, d2c: d2cst, t2mas: t2mpmarglst): tmpcstmat
 // end of [hiimpdec_tmpcst_match]
-
-fun hiimpdeclst_tmpcst_match
-  (imps: hiimpdeclst, d2c: d2cst, t2mas: t2mpmarglst): tmpcstmat
-// end of [hiimpdeclst_tmpcst_match]
-
 fun hiimpdec2_tmpcst_match
   (imp2: hiimpdec2, d2c: d2cst, t2mas: t2mpmarglst): tmpcstmat
 // end of [hiimpdec2_tmpcst_match]
-
+//
+fun hiimpdeclst_tmpcst_match
+  (imps: hiimpdeclst, d2c: d2cst, t2mas: t2mpmarglst): tmpcstmat
+// end of [hiimpdeclst_tmpcst_match]
+//
 (* ****** ****** *)
-
+//
 fun hifundec2tmpvarmat
   (hfd: hifundec, t2mas: t2mpmarglst): tmpvarmat
 fun hifundecopt2tmpvarmat
   (opt: Option_vt (hifundec), t2mas: t2mpmarglst): tmpvarmat
+//
 fun hifundec_tmpvar_match
   (hfd: hifundec, d2v: d2var, t2mas: t2mpmarglst): tmpvarmat
-// end of [hiimpdec_tmpvar_match]
+// end of [hifundec_tmpvar_match]
+fun hifundec2_tmpvar_match
+  (hfd2: hifundec2, d2v: d2var, t2mas: t2mpmarglst): tmpvarmat
+// end of [hifundec2_tmpvar_match]
 
 (* ****** ****** *)
 

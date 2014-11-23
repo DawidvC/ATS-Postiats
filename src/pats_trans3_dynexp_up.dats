@@ -107,6 +107,7 @@ staload "./pats_trans3_env.sats"
 
 extern fun d2exp_trup_extval (d2e0: d2exp): d3exp
 extern fun d2exp_trup_extfcall (d2e0: d2exp): d3exp
+extern fun d2exp_trup_extmcall (d2e0: d2exp): d3exp
 
 (* ****** ****** *)
 
@@ -255,6 +256,7 @@ case+ d2e0.d2exp_node of
 //
 | D2Eextval _ => d2exp_trup_extval (d2e0)
 | D2Eextfcall _ => d2exp_trup_extfcall (d2e0)
+| D2Eextmcall _ => d2exp_trup_extmcall (d2e0)
 //
 | D2Econ _ => d2exp_trup_con (d2e0)
 //
@@ -393,11 +395,22 @@ case+ d2e0.d2exp_node of
   (
     s2e_elt, opt, d2es
   ) => let
+//
     var s2i_asz : s2exp
+    val nxs = list_length (d2es)
     val d3e_asz : d3exp =
     (
       case+ opt of
-      | Some (d2e_asz) => let
+      | None () =>
+          d3e_asz where
+        {
+          val () = s2i_asz := s2exp_int (nxs)
+          val s2e_asz = s2exp_int_index_t0ype (s2i_asz)
+          val d3e_asz = d3exp_int (loc0, s2e_asz, nxs)
+        } (* end of [None] *)
+      | Some (d2e_asz) =>
+          d3e_asz where
+        {
           val d3e_asz = d2exp_trup (d2e_asz)
           val s2e_asz = d3exp_get_type (d3e_asz)
           val s2f_asz = s2exp2hnf (s2e_asz)
@@ -406,20 +419,9 @@ case+ d2e0.d2exp_node of
           in
             case+ opt of
             | ~Some_vt (s2i) => s2i_asz := s2i
-            | ~None_vt () => let
-                val s2i = s2exp_err (s2rt_int) in s2i_asz := s2i
-              end // end of [None_vt]
+            | ~None_vt ((*void*)) => s2i_asz := s2exp_err (s2rt_int)
           end // end of [let] // end of [val]
-        in
-          d2exp_trup (d2e_asz)
-        end // end of [Some]
-      | None ((*void*)) => let
-          val n = list_length (d2es)
-          val () = s2i_asz := s2exp_int (n)
-          val s2e_asz = s2exp_int_index_t0ype (s2i_asz)
-        in
-          d3exp_int (loc0, s2e_asz, n)
-        end // end of [None]
+        } (* end of [Some] *)
     ) (* end of [val d3e_asz] *)
 //
     val s2e_elt = (
@@ -494,12 +496,12 @@ case+ d2e0.d2exp_node of
 //
 | D2Eerrexp () => d3exp_errexp (loc0) // : [s2exp_t0ype_err]
 //
-| _ => let
-    val () = println! ("d2exp_trup: loc0 = ", loc0)
-    val () = println! ("d2exp_trup: d2e0 = ", d2e0)
+| _(*unspported*) => let
+    val () = prerr_interror_loc(loc0)
+    val () = prerrln! (": d2exp_trup: d2e0 = ", d2e0)
   in
     exitloc (1)
-  end // end of [_]
+  end // end of [_(*unsupported*)]
 //
 ) : d3exp // end of [val]
 (*
@@ -875,7 +877,7 @@ case+ d3es of
   in
     auxcheck (loc0, d3es)
   end // end of [list_cons]
-| list_nil () => ()
+| list_nil ((*void*)) => ()
 //
 end // end of [auxcheck]
 
@@ -890,7 +892,59 @@ d2exp_trup_extfcall
   val ((*void*)) = auxcheck (loc0, d3es_arg)
 in
   d3exp_extfcall (loc0, s2e, _fun, d3es_arg)
-end // end of [d2exp_trup_extval]
+end // end of [d2exp_trup_extfcall]
+
+end // end of [local]
+
+(* ****** ****** *)
+
+local
+
+fun auxerr
+(
+  loc0: loc_t, d3e: d3exp
+) : void = let
+  val loc = d3e.d3exp_loc
+  val () = prerr_error3_loc (loc)
+  val () = filprerr_ifdebug "d2exp_trup_extmcall"
+  val () = prerr ": no linear argument is allowed for the extmcall."
+  val () = prerr_newline ()
+in
+  the_trans3errlst_add (T3E_d3exp_extmcall_arg (loc0, d3e))
+end // end of [auxerr]
+
+fun auxcheck
+(
+  loc0: loc_t, d3es: d3explst
+) : void = let
+in
+//
+case+ d3es of
+| list_cons
+    (d3e, d3es) => let
+    val s2e = d3exp_get_type (d3e)
+    val islin = s2exp_is_lin (s2e)
+    val () = if islin then auxerr (loc0, d3e)
+  in
+    auxcheck (loc0, d3es)
+  end // end of [list_cons]
+| list_nil ((*void*)) => ()
+//
+end // end of [auxcheck]
+
+in (* in of [local] *)
+
+implement
+d2exp_trup_extmcall
+  (d2e0) = let
+  val loc0 = d2e0.d2exp_loc
+  val-D2Eextmcall (s2e, _obj, _mtd, _arg) = d2e0.d2exp_node
+  val d3e_obj = d2exp_trup (_obj)
+  val d3es_arg = d2explst_trup (_arg)
+  val ((*void*)) = auxcheck (loc0, d3es_arg)
+in
+  d3exp_extmcall (loc0, s2e, d3e_obj, _mtd, d3es_arg)
+end // end of [d2exp_trup_extmcall]
 
 end // end of [local]
 

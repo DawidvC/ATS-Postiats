@@ -190,6 +190,15 @@ lazy_vt_free
 overload ~ with lazy_vt_free
 //
 (* ****** ****** *)
+//
+// HX-2014:
+// macro implemented in [pats_ccomp_instrset]
+//
+fun
+lazy2cloref
+  {a:t0p}(lazy(a)): ((*void*)) -<cloref1> (a) = "mac#%"
+//
+(* ****** ****** *)
 
 (*
 // HX-2012-05-23: this seems TOO complicated!

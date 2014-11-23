@@ -47,11 +47,17 @@ preface.db:: preface.exe ; ./$< > $@
 preface.db:: ; $(RMF) preface.exe preface_atxt_dats.c preface_atxt.dats preface_atxt.txt
 
 ######
+#
+# Basic Topics
+#
+######
 
 allchap:: CHAP_SYNCLR
 CHAP_SYNCLR:: ; \
   make -C CHAP_SYNCLR -f ../Makefile_chap main.db
 clean:: ; make -C CHAP_SYNCLR -f ../Makefile_chap clean
+
+######
 
 allchap:: CHAP_FILENAME
 CHAP_FILENAME:: ; \
@@ -63,10 +69,26 @@ CHAP_FILEINCL:: ; \
   make -C CHAP_FILEINCL -f ../Makefile_chap main.db
 clean:: ; make -C CHAP_FILEINCL -f ../Makefile_chap clean
 
+######
+
 allchap:: CHAP_FIXITY
 CHAP_FIXITY:: ; \
   make -C CHAP_FIXITY -f ../Makefile_chap main.db
 clean:: ; make -C CHAP_FIXITY -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_STALOAD
+CHAP_STALOAD:: ; \
+  make -C CHAP_STALOAD -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_STALOAD -f ../Makefile_chap clean
+
+######
+
+allchap:: CHAP_DYNLOAD
+CHAP_DYNLOAD:: ; \
+  make -C CHAP_DYNLOAD -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_DYNLOAD -f ../Makefile_chap clean
 
 ######
 
@@ -140,6 +162,17 @@ clean:: ; make -C CHAP_HORDFUN -f ../Makefile_chap clean
 
 ######
 
+allchap:: CHAP_STREAM
+CHAP_STREAM:: ; \
+  make -C CHAP_STREAM -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_STREAM -f ../Makefile_chap clean
+
+######
+#
+# Advanced Topics
+#
+######
+
 allchap:: CHAP_CLOPTR
 CHAP_CLOPTR:: ; \
   make -C CHAP_CLOPTR -f ../Makefile_chap main.db
@@ -147,10 +180,10 @@ clean:: ; make -C CHAP_CLOPTR -f ../Makefile_chap clean
 
 ######
 
-allchap:: CHAP_STREAM
-CHAP_STREAM:: ; \
-  make -C CHAP_STREAM -f ../Makefile_chap main.db
-clean:: ; make -C CHAP_STREAM -f ../Makefile_chap clean
+allchap:: CHAP_EXTVAR
+CHAP_EXTVAR:: ; \
+  make -C CHAP_EXTVAR -f ../Makefile_chap main.db
+clean:: ; make -C CHAP_EXTVAR -f ../Makefile_chap clean
 
 ######
 
@@ -177,7 +210,7 @@ upload:: upload_html
 upload_pdf:: ; \
   scp -r PDF ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL/
 upload_html:: ; \
-  scp -r HTML ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL/
+  rsync -av --delete HTML ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL
 
 ######
 
@@ -188,7 +221,7 @@ uploadloc:: ; $(SCPR) HTML hwxi@csa2.bu.edu:public_html/ATS/DOCUMENT/ATS2TUTORIA
 upload_code:: ; \
   make -C CODE cleanall
 upload_code:: ; \
-  scp -r CODE ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL
+  rsync -av --delete CODE ats-hwxi,ats-lang@web.sourceforge.net:htdocs/DOCUMENT/ATS2TUTORIAL
 #
 ######
 
@@ -203,7 +236,6 @@ clean:: ; $(RMF) *_atxt_dats.c
 
 cleanall:: clean
 cleanall:: ; $(RMF) preface.db
-cleanall:: ; $(RMF) HTML/*.html
 cleanall:: ; $(RMF) PDF/main.pdf
 cleanall:: ; $(RMF) TEMP/chap_*.dats
 
